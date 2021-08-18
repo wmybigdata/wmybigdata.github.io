@@ -4,6 +4,169 @@
   
     
     <entry>
+      <title>平台节点的免密登录</title>
+      <link href="/2021/08/18/%E5%B9%B3%E5%8F%B0%E8%8A%82%E7%82%B9%E7%9A%84%E5%85%8D%E5%AF%86%E7%99%BB%E5%BD%95/"/>
+      <url>/2021/08/18/%E5%B9%B3%E5%8F%B0%E8%8A%82%E7%82%B9%E7%9A%84%E5%85%8D%E5%AF%86%E7%99%BB%E5%BD%95/</url>
+      
+        <content type="html"><![CDATA[<h1 id="大数据环境搭建-免密节点设置"><a href="#大数据环境搭建-免密节点设置" class="headerlink" title="大数据环境搭建-免密节点设置"></a>大数据环境搭建-免密节点设置</h1><h2 id="目的"><a href="#目的" class="headerlink" title="目的"></a>目的</h2><p>免密设置的初心就是大数据节点在平台之间的传输的过程当中不会进行一个密码的输入，简化开发，其中设置和配置是非常简单的，但是需要使用一个技巧就是必须的发送所有命令到所有的会话，这样copy的次数的就会比较少</p><h2 id="命令"><a href="#命令" class="headerlink" title="命令"></a>命令</h2><pre class=" language-properties"><code class="language-properties"><span class="token attr-name">192.168.21.151</span> <span class="token attr-value">flink01</span><span class="token attr-name">192.168.21.152</span> <span class="token attr-value">flink02</span><span class="token attr-name">192.168.21.153</span> <span class="token attr-value">flink03</span><span class="token attr-name">ssh-keygen</span> <span class="token attr-value">-t rsa </span><span class="token attr-name">ssh-copy-id</span> <span class="token attr-value">flink01</span><span class="token attr-name">ssh-copy-id</span> <span class="token attr-value">flink02</span><span class="token attr-name">ssh-copy-id</span> <span class="token attr-value">flink03</span></code></pre><p>这样就可以搭建成功了</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 大数据环境搭建 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 大数据环境搭建 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>JDK1.8分布式环境搭建</title>
+      <link href="/2021/08/18/JDK1-8%E5%88%86%E5%B8%83%E5%BC%8F%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/"/>
+      <url>/2021/08/18/JDK1-8%E5%88%86%E5%B8%83%E5%BC%8F%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/</url>
+      
+        <content type="html"><![CDATA[<h1 id="大数据环境搭建-JDK环境搭建"><a href="#大数据环境搭建-JDK环境搭建" class="headerlink" title="大数据环境搭建-JDK环境搭建"></a>大数据环境搭建-JDK环境搭建</h1><h2 id="前提准备"><a href="#前提准备" class="headerlink" title="前提准备"></a>前提准备</h2><p>大数据平台环境搭建基本的原理都是一个类似的操作</p><h2 id="软件版本"><a href="#软件版本" class="headerlink" title="软件版本"></a>软件版本</h2><p>jdk-8u144-linux-x64.tar.gz</p><h2 id="安装所需要的命令和步骤"><a href="#安装所需要的命令和步骤" class="headerlink" title="安装所需要的命令和步骤"></a>安装所需要的命令和步骤</h2><p>这个的话只需要进行一个解压操作就好了</p><h2 id="测试安装是否成功"><a href="#测试安装是否成功" class="headerlink" title="测试安装是否成功"></a>测试安装是否成功</h2><p>java</p><p>javac</p><p>java -version</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 大数据环境搭建 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 大数据环境搭建 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>大数据组件Shell脚本</title>
+      <link href="/2021/08/18/%E5%A4%A7%E6%95%B0%E6%8D%AE%E7%BB%84%E4%BB%B6Shell%E8%84%9A%E6%9C%AC/"/>
+      <url>/2021/08/18/%E5%A4%A7%E6%95%B0%E6%8D%AE%E7%BB%84%E4%BB%B6Shell%E8%84%9A%E6%9C%AC/</url>
+      
+        <content type="html"><![CDATA[<h2 id="大数据平台组件的命令"><a href="#大数据平台组件的命令" class="headerlink" title="大数据平台组件的命令"></a>大数据平台组件的命令</h2><h2 id="查看进程脚本"><a href="#查看进程脚本" class="headerlink" title="查看进程脚本"></a>查看进程脚本</h2><pre class=" language-shell"><code class="language-shell">#!/bin/bashfor i in flink01 flink02 flink02do   echo "====================== $i JPS ======================="   ssh $i /opt/module/jdk1.8.0_144/bin/jpsdone</code></pre><h2 id="传输文件"><a href="#传输文件" class="headerlink" title="传输文件"></a>传输文件</h2><p>yum -y install rsync，记住这个话必须得先安装这个，要不然得就会报错。。。</p><pre class=" language-shell"><code class="language-shell">#!/bin/bash#1. 判断参数个数if [ $# -lt 1 ]then  echo Not Enough Arguement!  exit;fi#2. 遍历集群所有机器for host in flink01 flink02 flink03do  echo ====================  $host  ====================  #3. 遍历所有目录，挨个发送  for file in $@  do    #4 判断文件是否存在    if [ -e $file ]    then      #5. 获取父目录      pdir=$(cd -P $(dirname $file); pwd)      #6. 获取当前文件的名称      fname=$(basename $file)      ssh $host "mkdir -p $pdir"      rsync -av $pdir/$fname $host:$pdir    else      echo $file does not exists!    fi  donedone</code></pre><h2 id="查看kafka-topic个数"><a href="#查看kafka-topic个数" class="headerlink" title="查看kafka topic个数"></a>查看kafka topic个数</h2><pre class=" language-shell"><code class="language-shell">/opt/module/kafka_2.11-2.4.1/bin/kafka-topics.sh --zookeeper flink01:2181/kafka --list</code></pre><h2 id="启动kafka"><a href="#启动kafka" class="headerlink" title="启动kafka"></a>启动kafka</h2><pre class=" language-properties"><code class="language-properties"><span class="token comment" spellcheck="true">#! /bin/bash</span><span class="token attr-name">case</span> <span class="token attr-value">$1 in</span>"start"){<span class="token attr-name">    for</span> <span class="token attr-value">i in flink01 flink02 flink03</span>    do<span class="token attr-name">        echo</span> <span class="token attr-value">"------------------- kafka $i -------------------"</span><span class="token attr-name">        ssh</span> <span class="token attr-value">$i "/opt/module/kafka_2.11-2.4.1/bin/kafka-server-start.sh -daemon /opt/module/kafka_2.11-2.4.1/config/server.properties"</span>    done};;"stop"){<span class="token attr-name">        for</span> <span class="token attr-value">i in flink01 flink02 flink03</span>        do<span class="token attr-name">                echo</span> <span class="token attr-value">"------------------- kafka $i -------------------"</span><span class="token attr-name">                ssh</span> <span class="token attr-value">$i "/opt/module/kafka_2.11-2.4.1/bin/kafka-server-stop.sh"</span>        done};;esac</code></pre><p>注意，这里有一个问题就是我们启动Kafka的时候使用这个是启动不起来的，但是可以使用单台进行一个启动操作</p><h2 id="创建topic"><a href="#创建topic" class="headerlink" title="创建topic"></a>创建topic</h2><pre class=" language-properties"><code class="language-properties"><span class="token attr-name">/opt/module/kafka_2.11-2.4.1/bin/kafka-topics.sh</span> <span class="token attr-value">--zookeeper flink01:2181,flink02:2181,flink03:2181/kafka  --create --replication-factor 1 --partitions 1 --topic $1</span></code></pre><h2 id="启动Flink"><a href="#启动Flink" class="headerlink" title="启动Flink"></a>启动Flink</h2><pre class=" language-shell"><code class="language-shell">#! /bin/bashcase $1 in"start"){    echo "------------------- 启动flink -------------------"    ssh $i "/opt/module/flink-1.13.2/bin/start-cluster.sh"};;"stop"){    echo "------------------- 关闭flink -------------------"    ssh $i "/opt/module/flink-1.13.2/bin/stop-cluster.sh"};;esac</code></pre>]]></content>
+      
+      
+      <categories>
+          
+          <category> 大数据环境搭建 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 大数据环境搭建 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Flink1.13.2环境分布式部署</title>
+      <link href="/2021/08/18/Flink1-13-2%E7%8E%AF%E5%A2%83%E5%88%86%E5%B8%83%E5%BC%8F%E9%83%A8%E7%BD%B2/"/>
+      <url>/2021/08/18/Flink1-13-2%E7%8E%AF%E5%A2%83%E5%88%86%E5%B8%83%E5%BC%8F%E9%83%A8%E7%BD%B2/</url>
+      
+        <content type="html"><![CDATA[<h2 id="前提准备"><a href="#前提准备" class="headerlink" title="前提准备"></a>前提准备</h2><p>Flink是不依赖于任何组件的，但是它可以去集成周边的组件化，来看一下如何去搭建一个Flink-1.13.2的环境勒，这里的话，我是搭建的Flink Standalone的方式来进行一个测试操作</p><h2 id="软件版本"><a href="#软件版本" class="headerlink" title="软件版本"></a>软件版本</h2><h2 id="安装所需要的命令和步骤"><a href="#安装所需要的命令和步骤" class="headerlink" title="安装所需要的命令和步骤"></a>安装所需要的命令和步骤</h2><h2 id="测试安装是否成功"><a href="#测试安装是否成功" class="headerlink" title="测试安装是否成功"></a>测试安装是否成功</h2>]]></content>
+      
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Kafka-2-11-2.4.1环境分布式部署</title>
+      <link href="/2021/08/18/Kafka-2-11-2-4-1%E7%8E%AF%E5%A2%83%E5%88%86%E5%B8%83%E5%BC%8F%E9%83%A8%E7%BD%B2/"/>
+      <url>/2021/08/18/Kafka-2-11-2-4-1%E7%8E%AF%E5%A2%83%E5%88%86%E5%B8%83%E5%BC%8F%E9%83%A8%E7%BD%B2/</url>
+      
+        <content type="html"><![CDATA[<h1 id="大数据环境搭建-kafka-2-11-2-4-1"><a href="#大数据环境搭建-kafka-2-11-2-4-1" class="headerlink" title="大数据环境搭建-kafka-2.11-2.4.1"></a>大数据环境搭建-kafka-2.11-2.4.1</h1><h2 id="前提准备"><a href="#前提准备" class="headerlink" title="前提准备"></a>前提准备</h2><p>这个和以前有点区别，它是一依赖于zookeeper的，所以必须在zookeeper安装之后才能进行一个安装的处理</p><h2 id="软件版本"><a href="#软件版本" class="headerlink" title="软件版本"></a>软件版本</h2><p>kafka_2.11-2.4.1.tgz</p><h2 id="安装所需要的命令和步骤"><a href="#安装所需要的命令和步骤" class="headerlink" title="安装所需要的命令和步骤"></a>安装所需要的命令和步骤</h2><p>这个安装步骤很简单，但是要注意的就是必须和myid的id号一致，否则的话就会启动失败的操作</p><h2 id="测试安装是否成功"><a href="#测试安装是否成功" class="headerlink" title="测试安装是否成功"></a>测试安装是否成功</h2><p><img src="Kafka-2-11-2-4-1%E7%8E%AF%E5%A2%83%E5%88%86%E5%B8%83%E5%BC%8F%E9%83%A8%E7%BD%B2.assets/image-20210818191222464.png" alt="kafka tools"></p><p>这个测试的方便一些，搭建的过程当中一定要注意细节性的问题，如果不注意的话就会花大量的时间查找错误的，这些错误是不值得去犯错的</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 大数据环境搭建 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 大数据环境搭建 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Zookeeper3.5.7环境分布式部署</title>
+      <link href="/2021/08/18/Zookeeper3-5-7%E7%8E%AF%E5%A2%83%E5%88%86%E5%B8%83%E5%BC%8F%E9%83%A8%E7%BD%B2/"/>
+      <url>/2021/08/18/Zookeeper3-5-7%E7%8E%AF%E5%A2%83%E5%88%86%E5%B8%83%E5%BC%8F%E9%83%A8%E7%BD%B2/</url>
+      
+        <content type="html"><![CDATA[<h1 id="大数据环境搭建-Zookeeper"><a href="#大数据环境搭建-Zookeeper" class="headerlink" title="大数据环境搭建-Zookeeper"></a>大数据环境搭建-Zookeeper</h1><h2 id="前提准备"><a href="#前提准备" class="headerlink" title="前提准备"></a>前提准备</h2><p>这个和之前都是一样的，首先得准备需要安装的节点的机器</p><h2 id="软件版本"><a href="#软件版本" class="headerlink" title="软件版本"></a>软件版本</h2><p>zookeeper-3.5.7</p><h2 id="安装所需要的命令和步骤"><a href="#安装所需要的命令和步骤" class="headerlink" title="安装所需要的命令和步骤"></a>安装所需要的命令和步骤</h2><pre class=" language-properties"><code class="language-properties">注意：必须在bin/zkEnv.sh<span class="token comment" spellcheck="true"># 如果不配置这个的话启动的时候就会报错误</span><span class="token attr-name">export</span> <span class="token attr-value">JAVA_HOME=/opt/module/jdk1.8.0_144</span><span class="token attr-name">dataDir</span><span class="token punctuation">=</span><span class="token attr-value">/opt/module/zookeeper-3.5.7/zkData</span><span class="token attr-name">server.1</span><span class="token punctuation">=</span><span class="token attr-value">flink01:2888:3888</span><span class="token attr-name">server.2</span><span class="token punctuation">=</span><span class="token attr-value">flink02:2888:3888</span><span class="token attr-name">server.3</span><span class="token punctuation">=</span><span class="token attr-value">flink03:2888:3888</span></code></pre><h2 id="测试安装是否成功"><a href="#测试安装是否成功" class="headerlink" title="测试安装是否成功"></a>测试安装是否成功</h2><p>记住，这里的话就会有一个小坑，每一次都是myid不一致导致错误的，这里和kafka哪里也要注意，否则会花大量的时间进行一个排查错误的情况</p><pre class=" language-properties"><code class="language-properties"><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span> flink01 JPS <span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token attr-name">2795</span> <span class="token attr-value">Jps</span><span class="token attr-name">2525</span> <span class="token attr-value">QuorumPeerMain</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span> flink02 JPS <span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token attr-name">2038</span> <span class="token attr-value">QuorumPeerMain</span><span class="token attr-name">2086</span> <span class="token attr-value">Jps</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span> flink02 JPS <span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token attr-name">2038</span> <span class="token attr-value">QuorumPeerMain</span><span class="token attr-name">2104</span> <span class="token attr-value">Jps</span></code></pre>]]></content>
+      
+      
+      <categories>
+          
+          <category> 大数据环境搭建 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 大数据环境搭建 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>MySQL5.7-Linux环境下部署</title>
+      <link href="/2021/08/18/MySQL5-7-Linux%E7%8E%AF%E5%A2%83%E4%B8%8B%E9%83%A8%E7%BD%B2/"/>
+      <url>/2021/08/18/MySQL5-7-Linux%E7%8E%AF%E5%A2%83%E4%B8%8B%E9%83%A8%E7%BD%B2/</url>
+      
+        <content type="html"><![CDATA[<h1 id="大数据环境搭建-MySQL环境部署"><a href="#大数据环境搭建-MySQL环境部署" class="headerlink" title="大数据环境搭建-MySQL环境部署"></a>大数据环境搭建-MySQL环境部署</h1><h2 id="前提准备"><a href="#前提准备" class="headerlink" title="前提准备"></a>前提准备</h2><p>需要一台虚拟机，能够连网，防火墙关闭，各方面正常的虚拟机就可以开始MySQL的环境搭建了</p><h2 id="软件版本"><a href="#软件版本" class="headerlink" title="软件版本"></a>软件版本</h2><p><img src="MySQL5-7-Linux%E7%8E%AF%E5%A2%83%E4%B8%8B%E9%83%A8%E7%BD%B2.assets/image-20210818181630541.png" alt="MySQL安装包"></p><h2 id="安装所需要的命令和步骤如何"><a href="#安装所需要的命令和步骤如何" class="headerlink" title="安装所需要的命令和步骤如何"></a>安装所需要的命令和步骤如何</h2><pre class=" language-properties"><code class="language-properties">1、查看是都有安装过MySQL或者是默认的mariadb<span class="token attr-name">rpm</span> <span class="token attr-value">-qa | grep mysq</span><span class="token attr-name">rpm</span> <span class="token attr-value">-qa | grep mariadb</span>2、删除自带的mariadba<span class="token attr-name">rpm</span> <span class="token attr-value">-e --nodeps mariadb-libs-5.5.56-2.el7.x86_64</span>3、解压MySQL的配置<span class="token attr-name">tar</span> <span class="token attr-value">-xvf mysql-5.7.19-1.el7.x86_64.rpm-bundle.tar</span>4、安装MySQL的rpm<span class="token attr-name">rpm</span> <span class="token attr-value">-ivh --nodeps mysql-community-server-5.7.19-1.el7.x86_64.rpm</span><span class="token attr-name">rpm</span> <span class="token attr-value">-ivh --nodeps mysql-community-client-5.7.19-1.el7.x86_64.rpm</span><span class="token attr-name">rpm</span> <span class="token attr-value">-ivh mysql-community-common-5.7.19-1.el7.x86_64.rpm</span><span class="token attr-name">rpm</span> <span class="token attr-value">-ivh mysql-community-libs-5.7.19-1.el7.x86_64.rpm</span><span class="token attr-name">rpm</span> <span class="token attr-value">-ivh mysql-community-libs-compat-5.7.19-1.el7.x86_64.rpm</span>5、查看是否启动以及启动MySQL<span class="token attr-name">systemctl</span> <span class="token attr-value">status mysqld</span><span class="token attr-name">systemctl</span> <span class="token attr-value">start mysqld</span>6、查看生成的密码<span class="token attr-name">cat</span> <span class="token attr-value">/var/log/mysqld.log | grep password</span>7、第一次登录MySQL<span class="token attr-name">mysql</span> <span class="token attr-value">-uroot -p</span>注意，如果出现了密码里面有一些特殊符号的，可以回车之后在进行输入密码就可以了8、对MySQL进行配置和设置密码以及对远程连接进行一个设置的操作<span class="token attr-name">set</span> <span class="token attr-value">global validate_password_policy=0;</span><span class="token attr-name">set</span> <span class="token attr-value">global validate_password_mixed_case_count=0; </span><span class="token attr-name">set</span> <span class="token attr-value">global validate_password_number_count=3;</span><span class="token attr-name">set</span> <span class="token attr-value">global validate_password_special_char_count=0;</span><span class="token attr-name">set</span> <span class="token attr-value">global validate_password_length=3;</span><span class="token attr-name">SET</span> <span class="token attr-value">PASSWORD FOR 'root'@'localhost' = PASSWORD('000000');</span><span class="token attr-name">update</span> <span class="token attr-value">mysql.user set host = '%' where user = 'root';</span><span class="token attr-name">flush</span> <span class="token attr-value">privileges;</span>quit<span class="token attr-name">mysql</span> <span class="token attr-value">-uroot -p000000;</span></code></pre><h2 id="使用Navicat来进行链接MySQL"><a href="#使用Navicat来进行链接MySQL" class="headerlink" title="使用Navicat来进行链接MySQL"></a>使用Navicat来进行链接MySQL</h2><p><img src="MySQL5-7-Linux%E7%8E%AF%E5%A2%83%E4%B8%8B%E9%83%A8%E7%BD%B2.assets/image-20210818181900933.png" alt="Navicat连接成功之后的截图"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 大数据环境搭建 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 大数据环境搭建 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>搭建博客心得</title>
       <link href="/2021/08/17/%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2%E5%BF%83%E5%BE%97/"/>
       <url>/2021/08/17/%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2%E5%BF%83%E5%BE%97/</url>

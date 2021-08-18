@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="搭建博客心得, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
+    <meta name="keywords" content="MySQL5.7-Linux环境下部署, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
     <meta name="description" content="本网站是个人兴趣爱好，总结分享经验，记录生活点滴的平台，希望在以后的学习旅途中，走出自己的风景。">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -16,7 +16,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>搭建博客心得 | 情深骚明大数据之旅</title>
+    <title>MySQL5.7-Linux环境下部署 | 情深骚明大数据之旅</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -314,12 +314,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/9.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/10.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">搭建博客心得</h1>
+                    <h1 class="description center-align post-title">MySQL5.7-Linux环境下部署</h1>
                 </div>
             </div>
         </div>
@@ -433,12 +433,25 @@
             <div class="row tag-cate">
                 <div class="col s7">
                     
-                          <div class="article-tag">
-                            <span class="chip bg-color">无标签</span>
-                          </div>
+                    <div class="article-tag">
+                        
+                            <a href="/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/">
+                                <span class="chip bg-color">大数据环境搭建</span>
+                            </a>
+                        
+                    </div>
                     
                 </div>
                 <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/%E5%A4%A7%E6%95%B0%E6%8D%AE%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/" class="post-category">
+                                大数据环境搭建
+                            </a>
+                        
+                    </div>
                     
                 </div>
             </div>
@@ -447,7 +460,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2021-08-17
+                    2021-08-18
                 </div>
                 
 
@@ -468,7 +481,50 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                
+                <h1 id="大数据环境搭建-MySQL环境部署"><a href="#大数据环境搭建-MySQL环境部署" class="headerlink" title="大数据环境搭建-MySQL环境部署"></a>大数据环境搭建-MySQL环境部署</h1><h2 id="前提准备"><a href="#前提准备" class="headerlink" title="前提准备"></a>前提准备</h2><p>需要一台虚拟机，能够连网，防火墙关闭，各方面正常的虚拟机就可以开始MySQL的环境搭建了</p>
+<h2 id="软件版本"><a href="#软件版本" class="headerlink" title="软件版本"></a>软件版本</h2><p><img src="MySQL5-7-Linux%E7%8E%AF%E5%A2%83%E4%B8%8B%E9%83%A8%E7%BD%B2.assets/image-20210818181630541.png" alt="MySQL安装包"></p>
+<h2 id="安装所需要的命令和步骤如何"><a href="#安装所需要的命令和步骤如何" class="headerlink" title="安装所需要的命令和步骤如何"></a>安装所需要的命令和步骤如何</h2><pre class=" language-properties"><code class="language-properties">1、查看是都有安装过MySQL或者是默认的mariadb
+<span class="token attr-name">rpm</span> <span class="token attr-value">-qa | grep mysq</span>
+<span class="token attr-name">rpm</span> <span class="token attr-value">-qa | grep mariadb</span>
+
+2、删除自带的mariadba
+<span class="token attr-name">rpm</span> <span class="token attr-value">-e --nodeps mariadb-libs-5.5.56-2.el7.x86_64</span>
+
+3、解压MySQL的配置
+<span class="token attr-name">tar</span> <span class="token attr-value">-xvf mysql-5.7.19-1.el7.x86_64.rpm-bundle.tar</span>
+
+4、安装MySQL的rpm
+<span class="token attr-name">rpm</span> <span class="token attr-value">-ivh --nodeps mysql-community-server-5.7.19-1.el7.x86_64.rpm</span>
+<span class="token attr-name">rpm</span> <span class="token attr-value">-ivh --nodeps mysql-community-client-5.7.19-1.el7.x86_64.rpm</span>
+<span class="token attr-name">rpm</span> <span class="token attr-value">-ivh mysql-community-common-5.7.19-1.el7.x86_64.rpm</span>
+<span class="token attr-name">rpm</span> <span class="token attr-value">-ivh mysql-community-libs-5.7.19-1.el7.x86_64.rpm</span>
+<span class="token attr-name">rpm</span> <span class="token attr-value">-ivh mysql-community-libs-compat-5.7.19-1.el7.x86_64.rpm</span>
+
+5、查看是否启动以及启动MySQL
+<span class="token attr-name">systemctl</span> <span class="token attr-value">status mysqld</span>
+<span class="token attr-name">systemctl</span> <span class="token attr-value">start mysqld</span>
+
+6、查看生成的密码
+<span class="token attr-name">cat</span> <span class="token attr-value">/var/log/mysqld.log | grep password</span>
+
+7、第一次登录MySQL
+<span class="token attr-name">mysql</span> <span class="token attr-value">-uroot -p</span>
+注意，如果出现了密码里面有一些特殊符号的，可以回车之后在进行输入密码就可以了
+
+8、对MySQL进行配置和设置密码以及对远程连接进行一个设置的操作
+<span class="token attr-name">set</span> <span class="token attr-value">global validate_password_policy=0;</span>
+<span class="token attr-name">set</span> <span class="token attr-value">global validate_password_mixed_case_count=0; </span>
+<span class="token attr-name">set</span> <span class="token attr-value">global validate_password_number_count=3;</span>
+<span class="token attr-name">set</span> <span class="token attr-value">global validate_password_special_char_count=0;</span>
+<span class="token attr-name">set</span> <span class="token attr-value">global validate_password_length=3;</span>
+<span class="token attr-name">SET</span> <span class="token attr-value">PASSWORD FOR 'root'@'localhost' = PASSWORD('000000');</span>
+<span class="token attr-name">update</span> <span class="token attr-value">mysql.user set host = '%' where user = 'root';</span>
+<span class="token attr-name">flush</span> <span class="token attr-value">privileges;</span>
+quit
+<span class="token attr-name">mysql</span> <span class="token attr-value">-uroot -p000000;</span>
+</code></pre>
+<h2 id="使用Navicat来进行链接MySQL"><a href="#使用Navicat来进行链接MySQL" class="headerlink" title="使用Navicat来进行链接MySQL"></a>使用Navicat来进行链接MySQL</h2><p><img src="MySQL5-7-Linux%E7%8E%AF%E5%A2%83%E4%B8%8B%E9%83%A8%E7%BD%B2.assets/image-20210818181900933.png" alt="Navicat连接成功之后的截图"></p>
+
                 
             </div>
             <hr/>
@@ -494,7 +550,7 @@
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://github.com/wmybigdata/2021/08/17/%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2%E5%BF%83%E5%BE%97/">https://github.com/wmybigdata/2021/08/17/%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2%E5%BF%83%E5%BE%97/</a>
+                    <a href="https://github.com/wmybigdata/2021/08/18/MySQL5-7-Linux%E7%8E%AF%E5%A2%83%E4%B8%8B%E9%83%A8%E7%BD%B2/">https://github.com/wmybigdata/2021/08/18/MySQL5-7-Linux%E7%8E%AF%E5%A2%83%E4%B8%8B%E9%83%A8%E7%BD%B2/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -531,7 +587,11 @@
                 <div class="post-meta__tag-list" style="display: inline-block;">
                     
                         <div class="article-tag">
-                            <span class="chip bg-color">无标签</span>
+                            
+                                <a href="/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/">
+                                    <span class="chip bg-color">大数据环境搭建</span>
+                                </a>
+                            
                         </div>
                     
                 </div>
@@ -703,13 +763,13 @@
             <div class="article-badge left-badge text-color">
                 <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2021/08/18/MySQL5-7-Linux%E7%8E%AF%E5%A2%83%E4%B8%8B%E9%83%A8%E7%BD%B2/">
+                <a href="/2021/08/18/Zookeeper3-5-7%E7%8E%AF%E5%A2%83%E5%88%86%E5%B8%83%E5%BC%8F%E9%83%A8%E7%BD%B2/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/10.jpg" class="responsive-img" alt="MySQL5.7-Linux环境下部署">
+                        <img src="/medias/featureimages/7.jpg" class="responsive-img" alt="Zookeeper3.5.7环境分布式部署">
                         
-                        <span class="card-title">MySQL5.7-Linux环境下部署</span>
+                        <span class="card-title">Zookeeper3.5.7环境分布式部署</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -749,7 +809,7 @@
         
         <div class="article col s12 m6" data-aos="fade-up">
             <div class="article-badge right-badge text-color">
-                本篇&nbsp;<i class="far fa-dot-circle"></i>
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
                 <a href="/2021/08/17/%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2%E5%BF%83%E5%BE%97/">
@@ -779,7 +839,6 @@
                         </span>
                     </div>
                 </div>
-
                 
             </div>
         </div>

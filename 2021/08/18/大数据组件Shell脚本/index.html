@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="搭建博客心得, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
+    <meta name="keywords" content="大数据组件Shell脚本, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
     <meta name="description" content="本网站是个人兴趣爱好，总结分享经验，记录生活点滴的平台，希望在以后的学习旅途中，走出自己的风景。">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -16,7 +16,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>搭建博客心得 | 情深骚明大数据之旅</title>
+    <title>大数据组件Shell脚本 | 情深骚明大数据之旅</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -314,12 +314,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/9.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/11.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">搭建博客心得</h1>
+                    <h1 class="description center-align post-title">大数据组件Shell脚本</h1>
                 </div>
             </div>
         </div>
@@ -433,12 +433,25 @@
             <div class="row tag-cate">
                 <div class="col s7">
                     
-                          <div class="article-tag">
-                            <span class="chip bg-color">无标签</span>
-                          </div>
+                    <div class="article-tag">
+                        
+                            <a href="/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/">
+                                <span class="chip bg-color">大数据环境搭建</span>
+                            </a>
+                        
+                    </div>
                     
                 </div>
                 <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/%E5%A4%A7%E6%95%B0%E6%8D%AE%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/" class="post-category">
+                                大数据环境搭建
+                            </a>
+                        
+                    </div>
                     
                 </div>
             </div>
@@ -447,7 +460,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2021-08-17
+                    2021-08-18
                 </div>
                 
 
@@ -468,7 +481,79 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                
+                <h2 id="大数据平台组件的命令"><a href="#大数据平台组件的命令" class="headerlink" title="大数据平台组件的命令"></a>大数据平台组件的命令</h2><h2 id="查看进程脚本"><a href="#查看进程脚本" class="headerlink" title="查看进程脚本"></a>查看进程脚本</h2><pre class=" language-shell"><code class="language-shell">#!/bin/bash
+for i in flink01 flink02 flink02
+do
+   echo "====================== $i JPS ======================="
+   ssh $i /opt/module/jdk1.8.0_144/bin/jps
+done
+</code></pre>
+<h2 id="传输文件"><a href="#传输文件" class="headerlink" title="传输文件"></a>传输文件</h2><p>yum -y install rsync，记住这个话必须得先安装这个，要不然得就会报错。。。</p>
+<pre class=" language-shell"><code class="language-shell">#!/bin/bash
+#1. 判断参数个数
+if [ $# -lt 1 ]
+then
+  echo Not Enough Arguement!
+  exit;
+fi
+#2. 遍历集群所有机器
+for host in flink01 flink02 flink03
+do
+  echo ====================  $host  ====================
+  #3. 遍历所有目录，挨个发送
+  for file in $@
+  do
+    #4 判断文件是否存在
+    if [ -e $file ]
+    then
+      #5. 获取父目录
+      pdir=$(cd -P $(dirname $file); pwd)
+      #6. 获取当前文件的名称
+      fname=$(basename $file)
+      ssh $host "mkdir -p $pdir"
+      rsync -av $pdir/$fname $host:$pdir
+    else
+      echo $file does not exists!
+    fi
+  done
+done
+</code></pre>
+<h2 id="查看kafka-topic个数"><a href="#查看kafka-topic个数" class="headerlink" title="查看kafka topic个数"></a>查看kafka topic个数</h2><pre class=" language-shell"><code class="language-shell">/opt/module/kafka_2.11-2.4.1/bin/kafka-topics.sh --zookeeper flink01:2181/kafka --list
+</code></pre>
+<h2 id="启动kafka"><a href="#启动kafka" class="headerlink" title="启动kafka"></a>启动kafka</h2><pre class=" language-properties"><code class="language-properties"><span class="token comment" spellcheck="true">#! /bin/bash</span>
+<span class="token attr-name">case</span> <span class="token attr-value">$1 in</span>
+"start"){
+<span class="token attr-name">    for</span> <span class="token attr-value">i in flink01 flink02 flink03</span>
+    do
+<span class="token attr-name">        echo</span> <span class="token attr-value">"------------------- kafka $i -------------------"</span>
+<span class="token attr-name">        ssh</span> <span class="token attr-value">$i "/opt/module/kafka_2.11-2.4.1/bin/kafka-server-start.sh -daemon /opt/module/kafka_2.11-2.4.1/config/server.properties"</span>
+    done
+};;
+"stop"){
+<span class="token attr-name">        for</span> <span class="token attr-value">i in flink01 flink02 flink03</span>
+        do
+<span class="token attr-name">                echo</span> <span class="token attr-value">"------------------- kafka $i -------------------"</span>
+<span class="token attr-name">                ssh</span> <span class="token attr-value">$i "/opt/module/kafka_2.11-2.4.1/bin/kafka-server-stop.sh"</span>
+        done
+};;
+esac
+</code></pre>
+<p>注意，这里有一个问题就是我们启动Kafka的时候使用这个是启动不起来的，但是可以使用单台进行一个启动操作</p>
+<h2 id="创建topic"><a href="#创建topic" class="headerlink" title="创建topic"></a>创建topic</h2><pre class=" language-properties"><code class="language-properties"><span class="token attr-name">/opt/module/kafka_2.11-2.4.1/bin/kafka-topics.sh</span> <span class="token attr-value">--zookeeper flink01:2181,flink02:2181,flink03:2181/kafka  --create --replication-factor 1 --partitions 1 --topic $1</span>
+</code></pre>
+<h2 id="启动Flink"><a href="#启动Flink" class="headerlink" title="启动Flink"></a>启动Flink</h2><pre class=" language-shell"><code class="language-shell">#! /bin/bash
+case $1 in
+"start"){
+    echo "------------------- 启动flink -------------------"
+    ssh $i "/opt/module/flink-1.13.2/bin/start-cluster.sh"
+};;
+"stop"){
+    echo "------------------- 关闭flink -------------------"
+    ssh $i "/opt/module/flink-1.13.2/bin/stop-cluster.sh"
+};;
+esac
+</code></pre>
+
                 
             </div>
             <hr/>
@@ -494,7 +579,7 @@
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://github.com/wmybigdata/2021/08/17/%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2%E5%BF%83%E5%BE%97/">https://github.com/wmybigdata/2021/08/17/%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2%E5%BF%83%E5%BE%97/</a>
+                    <a href="https://github.com/wmybigdata/2021/08/18/%E5%A4%A7%E6%95%B0%E6%8D%AE%E7%BB%84%E4%BB%B6Shell%E8%84%9A%E6%9C%AC/">https://github.com/wmybigdata/2021/08/18/%E5%A4%A7%E6%95%B0%E6%8D%AE%E7%BB%84%E4%BB%B6Shell%E8%84%9A%E6%9C%AC/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -531,7 +616,11 @@
                 <div class="post-meta__tag-list" style="display: inline-block;">
                     
                         <div class="article-tag">
-                            <span class="chip bg-color">无标签</span>
+                            
+                                <a href="/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/">
+                                    <span class="chip bg-color">大数据环境搭建</span>
+                                </a>
+                            
                         </div>
                     
                 </div>
@@ -703,13 +792,13 @@
             <div class="article-badge left-badge text-color">
                 <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2021/08/18/MySQL5-7-Linux%E7%8E%AF%E5%A2%83%E4%B8%8B%E9%83%A8%E7%BD%B2/">
+                <a href="/2021/08/18/JDK1-8%E5%88%86%E5%B8%83%E5%BC%8F%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/10.jpg" class="responsive-img" alt="MySQL5.7-Linux环境下部署">
+                        <img src="/medias/featureimages/7.jpg" class="responsive-img" alt="JDK1.8分布式环境搭建">
                         
-                        <span class="card-title">MySQL5.7-Linux环境下部署</span>
+                        <span class="card-title">JDK1.8分布式环境搭建</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -749,16 +838,16 @@
         
         <div class="article col s12 m6" data-aos="fade-up">
             <div class="article-badge right-badge text-color">
-                本篇&nbsp;<i class="far fa-dot-circle"></i>
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2021/08/17/%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2%E5%BF%83%E5%BE%97/">
+                <a href="/2021/08/18/Flink1-13-2%E7%8E%AF%E5%A2%83%E5%88%86%E5%B8%83%E5%BC%8F%E9%83%A8%E7%BD%B2/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/9.jpg" class="responsive-img" alt="搭建博客心得">
+                        <img src="/medias/featureimages/11.jpg" class="responsive-img" alt="Flink1.13.2环境分布式部署">
                         
-                        <span class="card-title">搭建博客心得</span>
+                        <span class="card-title">Flink1.13.2环境分布式部署</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -769,7 +858,7 @@
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2021-08-17
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-08-18
                             </span>
                         <span class="publish-author">
                             
@@ -779,7 +868,6 @@
                         </span>
                     </div>
                 </div>
-
                 
             </div>
         </div>
