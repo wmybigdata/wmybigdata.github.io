@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="Spark3.0.0-hadoop3.2分布式部署, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
+    <meta name="keywords" content="HBASE2.0.5分布式部署, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
     <meta name="description" content="本网站是个人兴趣爱好，总结分享经验，记录生活点滴的平台，希望在以后的学习旅途中，走出自己的风景。">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -16,7 +16,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>Spark3.0.0-hadoop3.2分布式部署 | 情深骚明大数据之旅</title>
+    <title>HBASE2.0.5分布式部署 | 情深骚明大数据之旅</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -314,12 +314,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/19.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/10.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">Spark3.0.0-hadoop3.2分布式部署</h1>
+                    <h1 class="description center-align post-title">HBASE2.0.5分布式部署</h1>
                 </div>
             </div>
         </div>
@@ -481,22 +481,33 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h1 id="大数据环境搭建-Spark3-0-0-hadoop3-2分布式部署"><a href="#大数据环境搭建-Spark3-0-0-hadoop3-2分布式部署" class="headerlink" title="大数据环境搭建-Spark3.0.0-hadoop3.2分布式部署"></a>大数据环境搭建-Spark3.0.0-hadoop3.2分布式部署</h1><h2 id="spark-env-sh"><a href="#spark-env-sh" class="headerlink" title="spark-env.sh"></a>spark-env.sh</h2><pre class=" language-shell"><code class="language-shell">SPARK_MASTER_HOST=flink01
-SPARK_MASTER_PORT=7077
-export JAVA_HOME=/opt/module/jdk1.8.0_144
+                <h1 id="大数据环境搭建-HBASE2-0-5分布式部署"><a href="#大数据环境搭建-HBASE2-0-5分布式部署" class="headerlink" title="大数据环境搭建-HBASE2.0.5分布式部署"></a>大数据环境搭建-HBASE2.0.5分布式部署</h1><h2 id="hbase-env-sh"><a href="#hbase-env-sh" class="headerlink" title="hbase-env.sh"></a>hbase-env.sh</h2><pre class=" language-xml"><code class="language-xml">export HBASE_MANAGES_ZK=false
 </code></pre>
-<h2 id="spark-defaults-conf"><a href="#spark-defaults-conf" class="headerlink" title="spark-defaults.conf"></a>spark-defaults.conf</h2><pre class=" language-shell"><code class="language-shell">spark.master    yarn
-spark.eventLog.enabled    true
-spark.eventLog.dir    hdfs://flink01:9820/spark-history
-spark.executor.memory    1g
-spark.driver.memory    1g
-spark.yarn.jars hdfs://flink01:9820/spark-jars/*
+<h2 id="hbase-site-xml"><a href="#hbase-site-xml" class="headerlink" title="hbase-site.xml"></a>hbase-site.xml</h2><pre class=" language-xml"><code class="language-xml"><span class="token prolog">&lt;?xml version="1.0"?></span>
+<span class="token prolog">&lt;?xml-stylesheet type="text/xsl" href="configuration.xsl"?></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>configuration</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>name</span><span class="token punctuation">></span></span>hbase.rootdir<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>name</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>value</span><span class="token punctuation">></span></span>hdfs://flink01:9820/hbase<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>value</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>property</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>name</span><span class="token punctuation">></span></span>hbase.cluster.distributed<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>name</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>value</span><span class="token punctuation">></span></span>true<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>value</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>property</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>name</span><span class="token punctuation">></span></span>hbase.zookeeper.quorum<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>name</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>value</span><span class="token punctuation">></span></span>flink01,flink02,flink03<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>value</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>property</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>name</span><span class="token punctuation">></span></span>hbase.master.maxclockskew<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>name</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>value</span><span class="token punctuation">></span></span>180000<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>value</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>description</span><span class="token punctuation">></span></span>Time difference of regionserver from master<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>description</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>property</span><span class="token punctuation">></span></span>
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>configuration</span><span class="token punctuation">></span></span>
 </code></pre>
-<h2 id="slaves"><a href="#slaves" class="headerlink" title="slaves"></a>slaves</h2><pre class=" language-xml"><code class="language-xml">flink01
-flink02
-flink03
-</code></pre>
-<p>在这里，我只是把Spark当作了Hive的计算引擎了</p>
+<h2 id="kylin"><a href="#kylin" class="headerlink" title="kylin"></a>kylin</h2><p>这个安装很简单，只需要解压完成就好了</p>
+<h2 id="phoenix安装"><a href="#phoenix安装" class="headerlink" title="phoenix安装"></a>phoenix安装</h2><p>安装成功了</p>
 
                 
             </div>
@@ -523,7 +534,7 @@ flink03
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://github.com/wmybigdata/2021/08/18/Spark3-0-0-hadoop3-2%E5%88%86%E5%B8%83%E5%BC%8F%E9%83%A8%E7%BD%B2/">https://github.com/wmybigdata/2021/08/18/Spark3-0-0-hadoop3-2%E5%88%86%E5%B8%83%E5%BC%8F%E9%83%A8%E7%BD%B2/</a>
+                    <a href="https://github.com/wmybigdata/2021/08/18/HBASE2-0-5%E5%88%86%E5%B8%83%E5%BC%8F%E9%83%A8%E7%BD%B2/">https://github.com/wmybigdata/2021/08/18/HBASE2-0-5%E5%88%86%E5%B8%83%E5%BC%8F%E9%83%A8%E7%BD%B2/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -732,54 +743,18 @@ flink03
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+                <i class="far fa-dot-circle"></i>&nbsp;本篇
+            </div>
             <div class="card">
-                <a href="/2021/08/18/HBASE2-3-5%E5%88%86%E5%B8%83%E5%BC%8F%E9%83%A8%E7%BD%B2/">
+                <a href="/2021/08/18/HBASE2-0-5%E5%88%86%E5%B8%83%E5%BC%8F%E9%83%A8%E7%BD%B2/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/15.jpg" class="responsive-img" alt="HBASE2.3.5分布式部署">
+                        <img src="/medias/featureimages/10.jpg" class="responsive-img" alt="HBASE2.0.5分布式部署">
                         
-                        <span class="card-title">HBASE2.3.5分布式部署</span>
-                    </div>
-                </a>
-                <div class="card-content article-content">
-                    <div class="summary block-with-text">
-                        
-                            学习心得记录
-                        
-                    </div>
-                    <div class="publish-info">
-                        <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2021-08-18
-                        </span>
-                        <span class="publish-author">
-                            
-                            <i class="fas fa-user fa-fw"></i>
-                            情深骚明
-                            
-                        </span>
-                    </div>
-                </div>
-                
-            </div>
-        </div>
-        
-        
-        <div class="article col s12 m6" data-aos="fade-up">
-            <div class="article-badge right-badge text-color">
-                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
-            </div>
-            <div class="card">
-                <a href="/2021/08/18/hiveOnSpark%E5%88%86%E5%B8%83%E5%BC%8F%E6%90%AD%E5%BB%BA/">
-                    <div class="card-image">
-                        
-                        
-                        <img src="/medias/featureimages/17.jpg" class="responsive-img" alt="hiveOnSpark分布式搭建">
-                        
-                        <span class="card-title">hiveOnSpark分布式搭建</span>
+                        <span class="card-title">HBASE2.0.5分布式部署</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -804,6 +779,7 @@ flink03
                         </span>
                     </div>
                 </div>
+
                 
                 <div class="card-action article-tags">
                     
@@ -811,6 +787,43 @@ flink03
                         <span class="chip bg-color">大数据环境搭建</span>
                     </a>
                     
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2021/08/18/HBASE2-3-5%E5%88%86%E5%B8%83%E5%BC%8F%E9%83%A8%E7%BD%B2/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/15.jpg" class="responsive-img" alt="HBASE2.3.5分布式部署">
+                        
+                        <span class="card-title">HBASE2.3.5分布式部署</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            学习心得记录
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-08-18
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-user fa-fw"></i>
+                            情深骚明
+                            
+                        </span>
+                    </div>
                 </div>
                 
             </div>
