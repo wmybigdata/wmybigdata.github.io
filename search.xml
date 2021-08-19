@@ -4,6 +4,56 @@
   
     
     <entry>
+      <title>Redis单节点部署</title>
+      <link href="/2021/08/19/Redis%E5%8D%95%E8%8A%82%E7%82%B9%E9%83%A8%E7%BD%B2/"/>
+      <url>/2021/08/19/Redis%E5%8D%95%E8%8A%82%E7%82%B9%E9%83%A8%E7%BD%B2/</url>
+      
+        <content type="html"><![CDATA[<h1 id="大数据环境搭建-Redis单节点部署"><a href="#大数据环境搭建-Redis单节点部署" class="headerlink" title="大数据环境搭建-Redis单节点部署"></a>大数据环境搭建-Redis单节点部署</h1><h2 id="安装编译器"><a href="#安装编译器" class="headerlink" title="安装编译器"></a>安装编译器</h2><pre class=" language-properties"><code class="language-properties"><span class="token attr-name">yum</span> <span class="token attr-value">install centos-release-scl scl-utils-build</span><span class="token attr-name">yum</span> <span class="token attr-value">install -y devtoolset-8-toolchain</span><span class="token attr-name">scl</span> <span class="token attr-value">enable devtoolset-8 bash</span></code></pre><p><img src="Redis%E5%8D%95%E8%8A%82%E7%82%B9%E9%83%A8%E7%BD%B2.assets/image-20210819193846635.png" alt="GCC 版本"></p><h2 id="安装Redis"><a href="#安装Redis" class="headerlink" title="安装Redis"></a>安装Redis</h2><pre class=" language-properties"><code class="language-properties"><span class="token attr-name">tar</span> <span class="token attr-value">-zxvf redis-6.2.1.tar.gz -C /opt/module/</span><span class="token attr-name">cd</span> <span class="token attr-value">redis-6.2.1</span>make如果出错了的话，就执行这个，出错的原因可能就是编译器的安装没有准备好<span class="token attr-name">make</span> <span class="token attr-value">distclean  ---> 如果出错了，先执行make，然后在执行make install</span><span class="token attr-name">make</span> <span class="token attr-value">install</span>安装目录：/usr/local/bin查看默认安装目录：<span class="token attr-name">redis-benchmark</span><span class="token punctuation">:</span><span class="token attr-value">性能测试工具，可以在自己本子运行，看看自己本子性能如何</span>redis-check-aof：修复有问题的AOF文件，rdb和aof后面讲redis-check-dump：修复有问题的dump.rdb文件redis-sentinel：Redis集群使用redis-server：Redis服务器启动命令redis-cli：客户端，操作入口<span class="token attr-name">mv</span> <span class="token attr-value">redis.conf redis</span><span class="token attr-name">daemonize</span> <span class="token attr-value">no改成yes</span></code></pre><h2 id="配置文件的更改"><a href="#配置文件的更改" class="headerlink" title="配置文件的更改"></a>配置文件的更改</h2><pre class=" language-properties"><code class="language-properties"><span class="token attr-name">daemonize</span> <span class="token attr-value">yes ---> 后台启动</span><span class="token attr-name">bind</span> <span class="token attr-value">0.0.0.0  ---> 表任何IP地址都能连接上，以前只有127.0.0.1表示主机连接</span><span class="token attr-name">protected-mode</span> <span class="token attr-value">no ---> 将也是改成no，将安全连接关闭，不然也连接不上</span><span class="token attr-name">dir</span> <span class="token attr-value">/opt/module/redis/db</span><span class="token attr-name">dbfilename</span> <span class="token attr-value">wmy.rdb</span><span class="token attr-name">pidfile</span> <span class="token attr-value">/opt/module/redis/redis_6379.pid</span>查看是否关闭防火墙<span class="token attr-name">systemctl</span> <span class="token attr-value">status firewalld</span><span class="token attr-name">systemctl</span> <span class="token attr-value">stop firewalld.service</span><span class="token attr-name">redis-server</span> <span class="token attr-value">/opt/module/redis/redis.conf</span><span class="token attr-name">ps</span> <span class="token attr-value">-ef | grep redis</span><span class="token attr-name">redis-cli</span> <span class="token attr-value">-h flink01</span><span class="token attr-name">redis-cli</span> <span class="token attr-value">shutdown</span></code></pre>]]></content>
+      
+      
+      <categories>
+          
+          <category> 大数据环境搭建 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 大数据环境搭建 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Clickhouse分布式部署</title>
+      <link href="/2021/08/19/Clickhouse%E5%88%86%E5%B8%83%E5%BC%8F%E9%83%A8%E7%BD%B2/"/>
+      <url>/2021/08/19/Clickhouse%E5%88%86%E5%B8%83%E5%BC%8F%E9%83%A8%E7%BD%B2/</url>
+      
+        <content type="html"><![CDATA[<h1 id="大数据环境搭建-Clickhouse分布式部署"><a href="#大数据环境搭建-Clickhouse分布式部署" class="headerlink" title="大数据环境搭建-Clickhouse分布式部署"></a>大数据环境搭建-Clickhouse分布式部署</h1><h2 id="所需要的文件"><a href="#所需要的文件" class="headerlink" title="所需要的文件"></a>所需要的文件</h2><pre class=" language-properties"><code class="language-properties"><span class="token attr-name">-rw-r--r--.</span> <span class="token attr-value">1 root root     78074 8月  19 19:29 clickhouse-client-21.7.3.14-2.noarch.rpm</span><span class="token attr-name">-rw-r--r--.</span> <span class="token attr-value">1 root root 174283244 8月  19 19:29 clickhouse-common-static-21.7.3.14-2.x86_64.rpm</span><span class="token attr-name">-rw-r--r--.</span> <span class="token attr-value">1 root root 786208040 8月  19 19:29 clickhouse-common-static-dbg-21.7.3.14-2.x86_64.rpm</span><span class="token attr-name">-rw-r--r--.</span> <span class="token attr-value">1 root root    101969 8月  19 19:29 clickhouse-server-21.7.3.14-2.noarch.rpm</span></code></pre><h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><pre class=" language-properties"><code class="language-properties"><span class="token attr-name">sudo</span> <span class="token attr-value">rpm -ivh *.rpm</span>修改配置文件&lt;listen_host>0.0.0.0&lt;/listen_host><span class="token attr-name">sudo</span> <span class="token attr-value">systemctl start clickhouse-server</span><span class="token attr-name">ps</span> <span class="token attr-value">-ef | grep clickhouse</span><span class="token attr-name">clickhouse-client</span> <span class="token attr-value">-h flink01</span></code></pre><h2 id="启动集群"><a href="#启动集群" class="headerlink" title="启动集群"></a>启动集群</h2><pre class=" language-properties"><code class="language-properties"><span class="token attr-name">systemctl</span> <span class="token attr-value">start clickhouse-server</span><span class="token attr-name">systemctl</span> <span class="token attr-value">stop clickhouse-server</span><span class="token attr-name">clickhouse-client</span> <span class="token attr-value">-h flink01</span></code></pre>]]></content>
+      
+      
+      <categories>
+          
+          <category> 大数据环境搭建 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 大数据环境搭建 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>HBASE2.0.5分布式部署</title>
       <link href="/2021/08/18/HBASE2-0-5%E5%88%86%E5%B8%83%E5%BC%8F%E9%83%A8%E7%BD%B2/"/>
       <url>/2021/08/18/HBASE2-0-5%E5%88%86%E5%B8%83%E5%BC%8F%E9%83%A8%E7%BD%B2/</url>
