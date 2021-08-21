@@ -29,9 +29,9 @@
 
     <script src="/libs/jquery/jquery.min.js"></script>
 
-<meta name="generator" content="Hexo 4.2.0"><link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
+<meta name="generator" content="Hexo 4.2.0">
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
-
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
 </head>
 
@@ -530,20 +530,20 @@
 <span class="token keyword">SELECT</span> <span class="token function">count</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token keyword">FROM</span> mysql_binlog<span class="token punctuation">;</span>
 </code></pre>
 <p><img src="Flink-CDC.assets/image-20210820143731544.png" alt="Flink SQL"></p>
-<h3 id="02-Flink-CDC-DataStream-API"><a href="#02-Flink-CDC-DataStream-API" class="headerlink" title="02 Flink CDC DataStream API"></a>02 Flink CDC DataStream API</h3><h4 id="依赖准备"><a href="#依赖准备" class="headerlink" title="依赖准备"></a>依赖准备</h4><pre class=" language-properties"><code class="language-properties"><span class="token attr-name">&lt;!--</span> <span class="token attr-value">  Flink connctor mysql 不在官网当中的，这个是进行一个额外进行一个引入的     --&gt;</span>
-&lt;dependency&gt;
-    &lt;groupId&gt;com.alibaba.ververica&lt;/groupId&gt;
-    &lt;artifactId&gt;flink-connector-mysql-cdc&lt;/artifactId&gt;
-    &lt;version&gt;${flink.cdc.mysql.version}&lt;/version&gt;
-&lt;/dependency&gt;
+<h3 id="02-Flink-CDC-DataStream-API"><a href="#02-Flink-CDC-DataStream-API" class="headerlink" title="02 Flink CDC DataStream API"></a>02 Flink CDC DataStream API</h3><h4 id="依赖准备"><a href="#依赖准备" class="headerlink" title="依赖准备"></a>依赖准备</h4><pre class=" language-properties"><code class="language-properties"><span class="token attr-name">&lt;!--</span> <span class="token attr-value">  Flink connctor mysql 不在官网当中的，这个是进行一个额外进行一个引入的     --></span>
+&lt;dependency>
+    &lt;groupId>com.alibaba.ververica&lt;/groupId>
+    &lt;artifactId>flink-connector-mysql-cdc&lt;/artifactId>
+    &lt;version>${flink.cdc.mysql.version}&lt;/version>
+&lt;/dependency>
 </code></pre>
 <h4 id="代码编写，不过我现在使用的是一个自定义的序列化的方式"><a href="#代码编写，不过我现在使用的是一个自定义的序列化的方式" class="headerlink" title="代码编写，不过我现在使用的是一个自定义的序列化的方式"></a>代码编写，不过我现在使用的是一个自定义的序列化的方式</h4><h3 id="03-Data-Type-Mapping"><a href="#03-Data-Type-Mapping" class="headerlink" title="03 Data Type Mapping"></a>03 Data Type Mapping</h3><p><a href="https://ververica.github.io/flink-cdc-connectors/master/content/connectors/mysql-cdc.html" target="_blank" rel="noopener">MySQL CDC Connector — Flink CDC 2.0.0 documentation (ververica.github.io)</a></p>
 <h3 id="04-改变JSON格式化"><a href="#04-改变JSON格式化" class="headerlink" title="04  改变JSON格式化"></a>04  改变JSON格式化</h3><p><a href="https://ververica.github.io/flink-cdc-connectors/master/content/formats/changelog-json.html" target="_blank" rel="noopener">Changelog JSON Format — Flink CDC 2.0.0 documentation (ververica.github.io)</a></p>
-<h4 id="依赖"><a href="#依赖" class="headerlink" title="依赖"></a>依赖</h4><pre class=" language-properties"><code class="language-properties">&lt;dependency&gt;
-  &lt;groupId&gt;com.ververica&lt;/groupId&gt;
-  &lt;artifactId&gt;flink-format-changelog-json&lt;/artifactId&gt;
-  &lt;version&gt;2.0.0&lt;/version&gt;
-&lt;/dependency&gt;
+<h4 id="依赖"><a href="#依赖" class="headerlink" title="依赖"></a>依赖</h4><pre class=" language-properties"><code class="language-properties">&lt;dependency>
+  &lt;groupId>com.ververica&lt;/groupId>
+  &lt;artifactId>flink-format-changelog-json&lt;/artifactId>
+  &lt;version>2.0.0&lt;/version>
+&lt;/dependency>
 </code></pre>
 <pre class=" language-sql"><code class="language-sql"><span class="token comment" spellcheck="true">-- MySQL</span>
 <span class="token keyword">CREATE</span> <span class="token keyword">DATABASE</span> mydb<span class="token punctuation">;</span>
@@ -906,18 +906,17 @@ kafka_gmv 消费
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="far fa-dot-circle"></i>&nbsp;本篇
-            </div>
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2021/08/20/Flink-CDC/">
+                <a href="/2021/08/21/Maxwell%E9%83%A8%E7%BD%B2/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/11.jpg" class="responsive-img" alt="Flink-CDC">
+                        <img src="/medias/featureimages/20.jpg" class="responsive-img" alt="Maxwell部署">
                         
-                        <span class="card-title">Flink-CDC</span>
+                        <span class="card-title">Maxwell部署</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -927,29 +926,16 @@ kafka_gmv 消费
                         
                     </div>
                     <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2021-08-20
-                            </span>
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2021-08-21
+                        </span>
                         <span class="publish-author">
                             
-                            <i class="fas fa-bookmark fa-fw icon-category"></i>
-                            
-                            <a href="/categories/%E5%A4%A7%E6%95%B0%E6%8D%AE%E9%87%87%E9%9B%86%E7%B3%BB%E7%BB%9F/" class="post-category">
-                                    大数据采集系统
-                                </a>
-                            
+                            <i class="fas fa-user fa-fw"></i>
+                            情深骚明
                             
                         </span>
                     </div>
-                </div>
-
-                
-                <div class="card-action article-tags">
-                    
-                    <a href="/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE%E9%87%87%E9%9B%86%E7%B3%BB%E7%BB%9F/">
-                        <span class="chip bg-color">大数据采集系统</span>
-                    </a>
-                    
                 </div>
                 
             </div>
