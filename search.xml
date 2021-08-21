@@ -4,23 +4,23 @@
   
     
     <entry>
-      <title>测试图片上传问题</title>
-      <link href="/2021/08/21/%E6%B5%8B%E8%AF%95%E5%9B%BE%E7%89%87%E4%B8%8A%E4%BC%A0%E9%97%AE%E9%A2%98/"/>
-      <url>/2021/08/21/%E6%B5%8B%E8%AF%95%E5%9B%BE%E7%89%87%E4%B8%8A%E4%BC%A0%E9%97%AE%E9%A2%98/</url>
+      <title>Spring入门</title>
+      <link href="/2021/08/21/Spring%E5%85%A5%E9%97%A8/"/>
+      <url>/2021/08/21/Spring%E5%85%A5%E9%97%A8/</url>
       
-        <content type="html"><![CDATA[<h1 id="博客服务维护-测试图片上传问题"><a href="#博客服务维护-测试图片上传问题" class="headerlink" title="博客服务维护-测试图片上传问题"></a>博客服务维护-测试图片上传问题</h1><p><img src="%E6%B5%8B%E8%AF%95%E5%9B%BE%E7%89%87%E4%B8%8A%E4%BC%A0%E9%97%AE%E9%A2%98.assets/image-20210821092541781.png" alt="image-20210821092541781"></p><p>s</p>]]></content>
+        <content type="html"><![CDATA[<h1 id="SpringBoot"><a href="#SpringBoot" class="headerlink" title="SpringBoot"></a>SpringBoot</h1><h2 id="01-SpringBoot入门"><a href="#01-SpringBoot入门" class="headerlink" title="01 SpringBoot入门"></a>01 SpringBoot入门</h2><h3 id="1、Spring-Boot简介"><a href="#1、Spring-Boot简介" class="headerlink" title="1、Spring Boot简介"></a>1、Spring Boot简介</h3><h3 id="2、微服务"><a href="#2、微服务" class="headerlink" title="2、微服务"></a>2、微服务</h3><p><img src="Spring%E5%85%A5%E9%97%A8/image-20210821222506694.png" alt="image-20210821222506694"></p>]]></content>
       
       
       <categories>
           
-          <category> 博客服务维护 </category>
+          <category> Spring </category>
           
       </categories>
       
       
         <tags>
             
-            <tag> 博客服务维护 </tag>
+            <tag> Spring </tag>
             
         </tags>
       
@@ -384,31 +384,6 @@
         <tags>
             
             <tag> 大数据环境搭建 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>搭建博客心得</title>
-      <link href="/2021/08/17/%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2%E5%BF%83%E5%BE%97/"/>
-      <url>/2021/08/17/%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2%E5%BF%83%E5%BE%97/</url>
-      
-        <content type="html"><![CDATA[<h1 id="博客服务维护"><a href="#博客服务维护" class="headerlink" title="博客服务维护"></a>博客服务维护</h1><h1 id="博客上传问题"><a href="#博客上传问题" class="headerlink" title="博客上传问题"></a>博客上传问题</h1><p>如果出现无法上传的时候，请清理一下，然后在进行一个上传的任务操作</p><h2 id="如何解决上传图片问题"><a href="#如何解决上传图片问题" class="headerlink" title="如何解决上传图片问题"></a>如何解决上传图片问题</h2><p>参考文档：<a href="https://www.cnblogs.com/cekaigongchengshi/p/12869226.html" target="_blank" rel="noopener">https://www.cnblogs.com/cekaigongchengshi/p/12869226.html</a></p><p><a href="https://support.typora.io/Upload-Image/" target="_blank" rel="noopener">Upload Images (typora.io)</a></p><p><img src="C:\Users\wmy\AppData\Roaming\Typora\typora-user-images\image-20210821090744814.png" alt="image-20210821090744814"></p>]]></content>
-      
-      
-      <categories>
-          
-          <category> 博客服务维护 </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> 博客服务维护 </tag>
             
         </tags>
       
