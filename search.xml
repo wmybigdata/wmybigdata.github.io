@@ -8,7 +8,7 @@
       <link href="/2021/08/21/%E6%B5%8B%E8%AF%95%E5%9B%BE%E7%89%87%E4%B8%8A%E4%BC%A0%E9%97%AE%E9%A2%98/"/>
       <url>/2021/08/21/%E6%B5%8B%E8%AF%95%E5%9B%BE%E7%89%87%E4%B8%8A%E4%BC%A0%E9%97%AE%E9%A2%98/</url>
       
-        <content type="html"><![CDATA[<h1 id="博客服务维护-测试图片上传问题"><a href="#博客服务维护-测试图片上传问题" class="headerlink" title="博客服务维护-测试图片上传问题"></a>博客服务维护-测试图片上传问题</h1><p><img src="image-20210821085250707.png" alt="image-20210821085250707"></p><p><img src="D:\github-service\wmybigdata-github-service\source_posts\测试图片上传问题.assets\image-20210821085603270.png" alt="image-20210821085603270"></p>]]></content>
+        <content type="html"><![CDATA[<h1 id="博客服务维护-测试图片上传问题"><a href="#博客服务维护-测试图片上传问题" class="headerlink" title="博客服务维护-测试图片上传问题"></a>博客服务维护-测试图片上传问题</h1><p><img src="%E6%B5%8B%E8%AF%95%E5%9B%BE%E7%89%87%E4%B8%8A%E4%BC%A0%E9%97%AE%E9%A2%98.assets/image-20210821092541781.png" alt="image-20210821092541781"></p><p>s</p>]]></content>
       
       
       <categories>
@@ -23,19 +23,6 @@
             <tag> 博客服务维护 </tag>
             
         </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>Canal部署</title>
-      <link href="/2021/08/21/Canal%E9%83%A8%E7%BD%B2/"/>
-      <url>/2021/08/21/Canal%E9%83%A8%E7%BD%B2/</url>
-      
-        <content type="html"><![CDATA[]]></content>
-      
-      
       
     </entry>
     
@@ -409,7 +396,7 @@
       <link href="/2021/08/17/%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2%E5%BF%83%E5%BE%97/"/>
       <url>/2021/08/17/%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2%E5%BF%83%E5%BE%97/</url>
       
-        <content type="html"><![CDATA[<h1 id="博客服务维护"><a href="#博客服务维护" class="headerlink" title="博客服务维护"></a>博客服务维护</h1><h1 id="博客上传问题"><a href="#博客上传问题" class="headerlink" title="博客上传问题"></a>博客上传问题</h1><p>如果出现无法上传的时候，请清理一下，然后在进行一个上传的任务操作</p><h2 id="如何解决上传图片问题"><a href="#如何解决上传图片问题" class="headerlink" title="如何解决上传图片问题"></a>如何解决上传图片问题</h2><p>参考文档：<a href="https://www.cnblogs.com/cekaigongchengshi/p/12869226.html" target="_blank" rel="noopener">https://www.cnblogs.com/cekaigongchengshi/p/12869226.html</a></p><p><img src="C:/Users/wmy/AppData/Roaming/Typora/typora-user-images/image-20210821083050255.png" alt="图片上传设置"></p><p><img src="image-20210821084021158.png" alt="image-20210821084021158"></p>]]></content>
+        <content type="html"><![CDATA[<h1 id="博客服务维护"><a href="#博客服务维护" class="headerlink" title="博客服务维护"></a>博客服务维护</h1><h1 id="博客上传问题"><a href="#博客上传问题" class="headerlink" title="博客上传问题"></a>博客上传问题</h1><p>如果出现无法上传的时候，请清理一下，然后在进行一个上传的任务操作</p><h2 id="如何解决上传图片问题"><a href="#如何解决上传图片问题" class="headerlink" title="如何解决上传图片问题"></a>如何解决上传图片问题</h2><p>参考文档：<a href="https://www.cnblogs.com/cekaigongchengshi/p/12869226.html" target="_blank" rel="noopener">https://www.cnblogs.com/cekaigongchengshi/p/12869226.html</a></p><p><a href="https://support.typora.io/Upload-Image/" target="_blank" rel="noopener">Upload Images (typora.io)</a></p><p><img src="C:\Users\wmy\AppData\Roaming\Typora\typora-user-images\image-20210821090744814.png" alt="image-20210821090744814"></p>]]></content>
       
       
       <categories>
