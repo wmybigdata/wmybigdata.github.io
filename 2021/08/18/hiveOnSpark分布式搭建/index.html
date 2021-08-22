@@ -485,7 +485,7 @@
 
 mv mysql-connector-java-5.1.27-bin.jar hive-3.1.2/lib/
 </code></pre>
-<h2 id="hive-site-xml"><a href="#hive-site-xml" class="headerlink" title="hive-site.xml"></a>hive-site.xml</h2><p><img src="hiveOnSpark%E5%88%86%E5%B8%83%E5%BC%8F%E6%90%AD%E5%BB%BA.assets/image-20210818231946565.png" alt="hive所需要的配置文件如下"></p>
+<h2 id="hive-site-xml"><a href="#hive-site-xml" class="headerlink" title="hive-site.xml"></a>hive-site.xml</h2><p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210822162352155.png" alt="image-20210822162352155"></p>
 <p>其实很奇怪的事情就是，我们hive把spark给当作引擎，我们可以不用启动，但是还是必须要有的，不过这个也不奇怪，毕竟在工作当中，一个平台不可能没有Spark的</p>
 <h2 id="capacity-scheduler-xml"><a href="#capacity-scheduler-xml" class="headerlink" title="capacity-scheduler.xml"></a>capacity-scheduler.xml</h2><p>记住，这个要和hadoop配置文件中的都必须是类似的</p>
 <pre class=" language-xml"><code class="language-xml">
@@ -1016,7 +1016,7 @@ spark.yarn.jars hdfs://flink01:9820/spark-jars/*
 <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>configuration</span><span class="token punctuation">></span></span>
 </code></pre>
 <p>如果想要看Spark是怎么安装的也可以写一篇博客来进行记录</p>
-<p><img src="hiveOnSpark%E5%88%86%E5%B8%83%E5%BC%8F%E6%90%AD%E5%BB%BA.assets/image-20210818234044163.png" alt="成功截图"></p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210822162412732.png" alt="image-20210822162412732"></p>
 
                 
             </div>
