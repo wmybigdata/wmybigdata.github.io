@@ -4,6 +4,69 @@
   
     
     <entry>
+      <title>Flink电商实时数仓DWM层业务实现</title>
+      <link href="/2021/08/23/Flink%E7%94%B5%E5%95%86%E5%AE%9E%E6%97%B6%E6%95%B0%E4%BB%93DWM%E5%B1%82%E4%B8%9A%E5%8A%A1%E5%AE%9E%E7%8E%B0/"/>
+      <url>/2021/08/23/Flink%E7%94%B5%E5%95%86%E5%AE%9E%E6%97%B6%E6%95%B0%E4%BB%93DWM%E5%B1%82%E4%B8%9A%E5%8A%A1%E5%AE%9E%E7%8E%B0/</url>
+      
+        <content type="html"><![CDATA[<h1 id="Flink电商实时数仓DWM层业务实现"><a href="#Flink电商实时数仓DWM层业务实现" class="headerlink" title="Flink电商实时数仓DWM层业务实现"></a>Flink电商实时数仓DWM层业务实现</h1><p>DWS是每天的聚合结果，按天做分区，DWT是一个累计的结果聚合</p><p>DWD是不考虑需求，和需求是没有关系的，DWM,DWS是需要考虑需求，日志数据的分流，业务数据的分流</p><p>实时计算指标计算：</p><p>​    1、实时的运维和资源的要求都是很高的</p><p>​    2、在公司中可能是按照主题来进行分析和计算</p><p>​    3、在离线的数仓当中是没有关键词分析的，这里的话，加入了搜索关键字主题分析</p><h2 id="第1章-DWS层与DWM层的设计"><a href="#第1章-DWS层与DWM层的设计" class="headerlink" title="第1章 DWS层与DWM层的设计"></a>第1章 DWS层与DWM层的设计</h2><table><thead><tr><th align="center"><strong>统计主题</strong></th><th align="center"><strong>需求指标</strong></th><th align="center"><strong>输出方式</strong></th><th align="center"><strong>计算来源</strong></th><th align="center"><strong>来源层级</strong></th></tr></thead><tbody><tr><td align="center">访客</td><td align="center">pv</td><td align="center">可视化大屏</td><td align="center">page_log直接可求</td><td align="center">dwd</td></tr><tr><td align="center">uv</td><td align="center">可视化大屏</td><td align="center">需要用page_log过滤去重</td><td align="center">dwm</td><td align="center"></td></tr><tr><td align="center">跳出率</td><td align="center">可视化大屏</td><td align="center">需要通过page_log行为判断</td><td align="center">dwm</td><td align="center"></td></tr><tr><td align="center">进入页面数</td><td align="center">可视化大屏</td><td align="center">需要识别开始访问标识</td><td align="center">dwd</td><td align="center"></td></tr><tr><td align="center">连续访问时长</td><td align="center">可视化大屏</td><td align="center">page_log直接可求</td><td align="center">dwd</td><td align="center"></td></tr><tr><td align="center">商品</td><td align="center">点击</td><td align="center">多维分析</td><td align="center">page_log直接可求</td><td align="center">dwd</td></tr><tr><td align="center">收藏</td><td align="center">多维分析</td><td align="center">收藏表</td><td align="center">dwd</td><td align="center"></td></tr><tr><td align="center">加入购物车</td><td align="center">多维分析</td><td align="center">购物车表</td><td align="center">dwd</td><td align="center"></td></tr><tr><td align="center">下单</td><td align="center">可视化大屏</td><td align="center">订单宽表</td><td align="center">dwm</td><td align="center"></td></tr><tr><td align="center">支付</td><td align="center">多维分析</td><td align="center">支付宽表</td><td align="center">dwm</td><td align="center"></td></tr><tr><td align="center">退款</td><td align="center">多维分析</td><td align="center">退款表</td><td align="center">dwd</td><td align="center"></td></tr><tr><td align="center">评论</td><td align="center">多维分析</td><td align="center">评论表</td><td align="center">dwd</td><td align="center"></td></tr><tr><td align="center">地区</td><td align="center">pv</td><td align="center">多维分析</td><td align="center">page_log直接可求</td><td align="center">dwd</td></tr><tr><td align="center">uv</td><td align="center">多维分析</td><td align="center">需要用page_log过滤去重</td><td align="center">dwm</td><td align="center"></td></tr><tr><td align="center">下单</td><td align="center">可视化大屏</td><td align="center">订单宽表</td><td align="center">dwm</td><td align="center"></td></tr><tr><td align="center">关键词</td><td align="center">搜索关键词</td><td align="center">可视化大屏</td><td align="center">页面访问日志 直接可求</td><td align="center">dwd</td></tr><tr><td align="center">点击商品关键词</td><td align="center">可视化大屏</td><td align="center">商品主题下单再次聚合</td><td align="center">dws</td><td align="center"></td></tr><tr><td align="center">下单商品关键词</td><td align="center">可视化大屏</td><td align="center">商品主题下单再次聚合</td><td align="center">dws</td><td align="center"></td></tr></tbody></table><ul><li><input disabled="" type="checkbox"> 访问UV计算<ul><li><input disabled="" type="checkbox"> 按用户去重，在天的基础上，安装各种维度信息来进行统计UV，DWM作为一个中间表，复用性，中心思想</li></ul></li><li><input disabled="" type="checkbox"> 跳出明细计算</li><li><input disabled="" type="checkbox"> 订单宽表</li><li><input disabled="" type="checkbox"> 支付宽表</li></ul><h2 id="第2章-DWM层-访客UV的计算"><a href="#第2章-DWM层-访客UV的计算" class="headerlink" title="第2章 DWM层-访客UV的计算"></a>第2章 DWM层-访客UV的计算</h2><h3 id="2-1-需求描述"><a href="#2-1-需求描述" class="headerlink" title="2.1 需求描述"></a>2.1 需求描述</h3><pre class=" language-properties"><code class="language-properties"><span class="token attr-name">UV</span> <span class="token attr-value">全称是Unique Visitor，即访客数，对于实时计算中，也可以称为DAU(Daily Active User)，即每日的活跃用户数，因为实时计算中心的UV通常是指当日的访客数</span>那么如何从用户行为日志识别当日的访客：    1、识别出该用户打开的第一个页面，表示这个访客开始进入我们的应用    2、由于访客可以在一天中多次进入应用，我们需要要在一天的范围内进行去重</code></pre><h3 id="2-2-思考点"><a href="#2-2-思考点" class="headerlink" title="2.2 思考点"></a>2.2 思考点</h3><pre class=" language-properties"><code class="language-properties">使用状态编程来对多次进入的用户进行过滤，那么问题来了，状态里面存入什么才能更好的对用户进行一个过滤勒？状态如果为null，说明这个数据是新的，如果状态中存入的是时间，那么和数据中的时间进行比较就可以判断是否是重复的数据</code></pre><h3 id="2-3-如何去清空状态"><a href="#2-3-如何去清空状态" class="headerlink" title="2.3 如何去清空状态"></a>2.3 如何去清空状态</h3><pre class=" language-properties"><code class="language-properties">我们使用TTL的方式来进行清空状态昨天的状态，状态有没有关系都是没有关系，判断的时候一定要进行双重判断，否则会进行数据丢失按天去重，最少也是要保存一天的</code></pre><h3 id="2-4-两种方式的实现"><a href="#2-4-两种方式的实现" class="headerlink" title="2.4 两种方式的实现"></a>2.4 两种方式的实现</h3><pre class=" language-properties"><code class="language-properties">有的公司加入了session会话</code></pre><h3 id="2-5-测试流程"><a href="#2-5-测试流程" class="headerlink" title="2.5 测试流程"></a>2.5 测试流程</h3><pre class=" language-properties"><code class="language-properties">我们在进行测试的时候，一定得清楚数据流是如何进行处理得，如果不能清楚这个得化，是很难能够了解整个业务得，最后可以加一个测试，因为就是那个第一条和第二条都是可以加入测试的<span class="token attr-name">总之这个Flink</span> <span class="token attr-value">UV统计是流计算当中最简单的一个，因为我们只需要判断它是否是活跃或者访问的是进入页面的首页面，然后判断去重就可以直接将数据进行一个输出的操作</span><span class="token attr-name">其中设计到的kafka</span> <span class="token attr-value">topic</span><span class="token attr-name">Window</span><span class="token punctuation">:</span>    BaseLogAPP    UniqueVisitAPPLinux：<span class="token attr-name">    java</span> <span class="token attr-value">-jar gmall2020-mock-log-2020-12-18.jar</span><span class="token attr-name">    java</span> <span class="token attr-value">-jar userBehaviorLog-0.0.1-SNAPSHOT.jar</span>    dwd_page_log    dwm_unique_visit目前系统内存占比是</code></pre><h3 id="2-6-能力提升和项目问题疑问"><a href="#2-6-能力提升和项目问题疑问" class="headerlink" title="2.6 能力提升和项目问题疑问"></a>2.6 能力提升和项目问题疑问</h3><p><a href="https://ci.apache.org/projects/flink/flink-docs-release-1.13/docs/dev/datastream/fault-tolerance/state/" target="_blank" rel="noopener">https://ci.apache.org/projects/flink/flink-docs-release-1.13/docs/dev/datastream/fault-tolerance/state/</a></p><p><a href="https://ci.apache.org/projects/flink/flink-docs-release-1.13/docs/dev/datastream/fault-tolerance/custom_serialization/" target="_blank" rel="noopener">https://ci.apache.org/projects/flink/flink-docs-release-1.13/docs/dev/datastream/fault-tolerance/custom_serialization/</a></p><h4 id="2-6-1-Flink对状态清空的方法"><a href="#2-6-1-Flink对状态清空的方法" class="headerlink" title="2.6.1 Flink对状态清空的方法"></a>2.6.1 Flink对状态清空的方法</h4><ul><li>使用自动的TTL来对状态进行清空</li><li>使用定时器来对状态进行手动的清空</li></ul><h4 id="2-6-2-案例演示"><a href="#2-6-2-案例演示" class="headerlink" title="2.6.2 案例演示"></a>2.6.2 案例演示</h4><h3 id="2-7-使用到的技术点"><a href="#2-7-使用到的技术点" class="headerlink" title="2.7 使用到的技术点"></a>2.7 使用到的技术点</h3><pre class=" language-properties"><code class="language-properties">状态检查点删除检查点动态分流</code></pre><h2 id="第3章-DWM层-跳出明细计算"><a href="#第3章-DWM层-跳出明细计算" class="headerlink" title="第3章 DWM层-跳出明细计算"></a>第3章 DWM层-跳出明细计算</h2><h2 id="第4章-DWM层-订单宽表"><a href="#第4章-DWM层-订单宽表" class="headerlink" title="第4章 DWM层-订单宽表"></a>第4章 DWM层-订单宽表</h2><h2 id="第5章-DWM层支付宽表（练习）"><a href="#第5章-DWM层支付宽表（练习）" class="headerlink" title="第5章 DWM层支付宽表（练习）"></a>第5章 DWM层支付宽表（练习）</h2><h2 id="第6章-总结"><a href="#第6章-总结" class="headerlink" title="第6章 总结"></a>第6章 总结</h2>]]></content>
+      
+      
+      <categories>
+          
+          <category> 数仓 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 数仓 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>笔记演示</title>
+      <link href="/2021/08/22/%E7%AC%94%E8%AE%B0%E6%BC%94%E7%A4%BA/"/>
+      <url>/2021/08/22/%E7%AC%94%E8%AE%B0%E6%BC%94%E7%A4%BA/</url>
+      
+        <content type="html"><![CDATA[<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210822202007347.png" alt="image-20210822202007347"></p>]]></content>
+      
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>MySQL面试必刷</title>
+      <link href="/2021/08/22/MySQL%E9%9D%A2%E8%AF%95%E5%BF%85%E5%88%B7/"/>
+      <url>/2021/08/22/MySQL%E9%9D%A2%E8%AF%95%E5%BF%85%E5%88%B7/</url>
+      
+        <content type="html"><![CDATA[<h1 id="数据库-MySQL"><a href="#数据库-MySQL" class="headerlink" title="数据库-MySQL"></a>数据库-MySQL</h1><p><a href="https://www.mysql.com/" target="_blank" rel="noopener">https://www.mysql.com/</a></p><p><a href="https://www.cs.usfca.edu/~galles/visualization/Algorithms.html" target="_blank" rel="noopener">https://www.cs.usfca.edu/~galles/visualization/Algorithms.html</a></p><h2 id="1、索引的底层数据结构是B还是B-树"><a href="#1、索引的底层数据结构是B还是B-树" class="headerlink" title="1、索引的底层数据结构是B还是B+树"></a>1、索引的底层数据结构是B还是B+树</h2><ul><li>为什么要设计索引</li><li>如果是你，会如何设计索引</li><li>设计索引的时候使用什么数据结构</li><li>MySQL是如何实现的</li></ul><pre class=" language-properties"><code class="language-properties"><span class="token attr-name">OLTP：</span> <span class="token attr-value">业务系统的支持，及时性非常高;</span>OLAP：对历史数据的分析MySQL中使用的是B+树索引，为什么要使用B+树，面试中可能会聊到树的概念官网中有B树，底层是使用的B+树？他们之间有什么区别？MySQL中除了B,B+有其它数据结构？<span class="token attr-name">Hash</span> <span class="token attr-name">存储引擎</span> <span class="token attr-value">---> 不同的数据文件在物理磁盘上的不同的组织形式</span>MySQL的存储引擎</code></pre><p>MySQL中的存储引擎</p><p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210822175643586.png" alt="MySQL的存储引擎"></p><p>默认是使用InnoDB，Memory使用的是Hash索引</p><pre class=" language-properties"><code class="language-properties">InnoDB支持Hash索引，但是是自适应Hash，为什么要使用自适应的Hash</code></pre><p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210822175834821.png" alt="索引的数据结构"></p><p>存储引擎到底是个啥，可以去存储的目录下面去查看这些文件的存储格式，不同的存储引擎的格式是不一样的</p><h2 id="2、MySQL的索引系统"><a href="#2、MySQL的索引系统" class="headerlink" title="2、MySQL的索引系统"></a>2、MySQL的索引系统</h2><pre class=" language-properties"><code class="language-properties">操作系统的支持，数据都是会放到磁盘上，但是对数据进行实际读取的时候，加载内存，然后才能读取到数据，磁盘和内存的读取的速度是不一样的硬件的延迟对应图，内存的数据很快的，需要把磁盘的数据加载到内存中，如果内存是无限大，可以全量的加载，内存的数据是不安全的，因此还是会进行持久化的操作预加载的过程，取一行记录，操作系统的一方面就是磁盘预读，局部性的原理程序有聚集趋向，时间局部性，磁盘预读，读的是某一个页的数据，页的大小和操作系统大小是有关系，一般都是4K，一般都是页的整数倍Hash表和二叉树hash，二叉树，B树，B+树，这个非常重要的，面试面的很多，得举例<span class="token attr-name">Hash</span> <span class="token attr-value">:</span><span class="token attr-name">    1、存在hash碰撞，必须要设置一个非常完美的hash算法，必须有一个</span> <span class="token attr-value">扰动函数</span>    2、hash适合等值查询，不适合范围查询红黑树、B树、B+树红黑树的数据格式：    HashMap里面的东西得结合起来</code></pre><h2 id="3、前缀索引实例说明"><a href="#3、前缀索引实例说明" class="headerlink" title="3、前缀索引实例说明"></a>3、前缀索引实例说明</h2><pre class=" language-properties"><code class="language-properties"><span class="token attr-name">degree</span> <span class="token attr-value">度</span>磁盘块的放取，16K，是磁盘预读，</code></pre>]]></content>
+      
+      
+      <categories>
+          
+          <category> 数据库 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 数据库 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>java设计模式</title>
       <link href="/2021/08/22/java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/"/>
       <url>/2021/08/22/java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/</url>

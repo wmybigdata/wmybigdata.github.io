@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="java设计模式, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
+    <meta name="keywords" content="Flink电商实时数仓DWM层业务实现, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
     <meta name="description" content="本网站是个人兴趣爱好，总结分享经验，记录生活点滴的平台，希望在以后的学习旅途中，走出自己的风景。">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -16,7 +16,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>java设计模式 | 情深骚明大数据之旅</title>
+    <title>Flink电商实时数仓DWM层业务实现 | 情深骚明大数据之旅</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -314,12 +314,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/11.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/19.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">java设计模式</h1>
+                    <h1 class="description center-align post-title">Flink电商实时数仓DWM层业务实现</h1>
                 </div>
             </div>
         </div>
@@ -435,8 +435,8 @@
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/java/">
-                                <span class="chip bg-color">java</span>
+                            <a href="/tags/%E6%95%B0%E4%BB%93/">
+                                <span class="chip bg-color">数仓</span>
                             </a>
                         
                     </div>
@@ -447,8 +447,8 @@
                     <div class="post-cate">
                         <i class="fas fa-bookmark fa-fw icon-category"></i>
                         
-                            <a href="/categories/java/" class="post-category">
-                                java
+                            <a href="/categories/%E6%95%B0%E4%BB%93/" class="post-category">
+                                数仓
                             </a>
                         
                     </div>
@@ -460,7 +460,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2021-08-22
+                    2021-08-23
                 </div>
                 
 
@@ -481,63 +481,200 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h1 id="java设计模式"><a href="#java设计模式" class="headerlink" title="java设计模式"></a>java设计模式</h1><h2 id="1、工厂模式"><a href="#1、工厂模式" class="headerlink" title="1、工厂模式"></a>1、工厂模式</h2><h3 id="1-1-需求设计"><a href="#1-1-需求设计" class="headerlink" title="1.1 需求设计"></a>1.1 需求设计</h3><pre class=" language-properties"><code class="language-properties"><span class="token attr-name">我们将创建一个</span> <span class="token attr-value">Shape 接口和实现 Shape 接口的实体类。下一步是定义工厂类 ShapeFactory。</span>
-
-<span class="token attr-name">FactoryPatternDemo</span> <span class="token attr-value">类使用 ShapeFactory 来获取 Shape 对象。它将向 ShapeFactory 传递信息（circle / rectangle / square），以便获取它所需对象的类型。</span>
-</code></pre>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210822165337756.png" alt="工厂模式设计"></p>
-<h3 id="1-2-工厂设计模式的优点"><a href="#1-2-工厂设计模式的优点" class="headerlink" title="1.2 工厂设计模式的优点"></a>1.2 工厂设计模式的优点</h3><ul>
-<li>面向接口编程，体现了面向对象的思想；</li>
-<li>将创建对象的工作转移到了工厂类；</li>
+                <h1 id="Flink电商实时数仓DWM层业务实现"><a href="#Flink电商实时数仓DWM层业务实现" class="headerlink" title="Flink电商实时数仓DWM层业务实现"></a>Flink电商实时数仓DWM层业务实现</h1><p>DWS是每天的聚合结果，按天做分区，DWT是一个累计的结果聚合</p>
+<p>DWD是不考虑需求，和需求是没有关系的，DWM,DWS是需要考虑需求，日志数据的分流，业务数据的分流</p>
+<p>实时计算指标计算：</p>
+<p>​    1、实时的运维和资源的要求都是很高的</p>
+<p>​    2、在公司中可能是按照主题来进行分析和计算</p>
+<p>​    3、在离线的数仓当中是没有关键词分析的，这里的话，加入了搜索关键字主题分析</p>
+<h2 id="第1章-DWS层与DWM层的设计"><a href="#第1章-DWS层与DWM层的设计" class="headerlink" title="第1章 DWS层与DWM层的设计"></a>第1章 DWS层与DWM层的设计</h2><table>
+<thead>
+<tr>
+<th align="center"><strong>统计主题</strong></th>
+<th align="center"><strong>需求指标</strong></th>
+<th align="center"><strong>输出方式</strong></th>
+<th align="center"><strong>计算来源</strong></th>
+<th align="center"><strong>来源层级</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">访客</td>
+<td align="center">pv</td>
+<td align="center">可视化大屏</td>
+<td align="center">page_log直接可求</td>
+<td align="center">dwd</td>
+</tr>
+<tr>
+<td align="center">uv</td>
+<td align="center">可视化大屏</td>
+<td align="center">需要用page_log过滤去重</td>
+<td align="center">dwm</td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center">跳出率</td>
+<td align="center">可视化大屏</td>
+<td align="center">需要通过page_log行为判断</td>
+<td align="center">dwm</td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center">进入页面数</td>
+<td align="center">可视化大屏</td>
+<td align="center">需要识别开始访问标识</td>
+<td align="center">dwd</td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center">连续访问时长</td>
+<td align="center">可视化大屏</td>
+<td align="center">page_log直接可求</td>
+<td align="center">dwd</td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center">商品</td>
+<td align="center">点击</td>
+<td align="center">多维分析</td>
+<td align="center">page_log直接可求</td>
+<td align="center">dwd</td>
+</tr>
+<tr>
+<td align="center">收藏</td>
+<td align="center">多维分析</td>
+<td align="center">收藏表</td>
+<td align="center">dwd</td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center">加入购物车</td>
+<td align="center">多维分析</td>
+<td align="center">购物车表</td>
+<td align="center">dwd</td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center">下单</td>
+<td align="center">可视化大屏</td>
+<td align="center">订单宽表</td>
+<td align="center">dwm</td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center">支付</td>
+<td align="center">多维分析</td>
+<td align="center">支付宽表</td>
+<td align="center">dwm</td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center">退款</td>
+<td align="center">多维分析</td>
+<td align="center">退款表</td>
+<td align="center">dwd</td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center">评论</td>
+<td align="center">多维分析</td>
+<td align="center">评论表</td>
+<td align="center">dwd</td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center">地区</td>
+<td align="center">pv</td>
+<td align="center">多维分析</td>
+<td align="center">page_log直接可求</td>
+<td align="center">dwd</td>
+</tr>
+<tr>
+<td align="center">uv</td>
+<td align="center">多维分析</td>
+<td align="center">需要用page_log过滤去重</td>
+<td align="center">dwm</td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center">下单</td>
+<td align="center">可视化大屏</td>
+<td align="center">订单宽表</td>
+<td align="center">dwm</td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center">关键词</td>
+<td align="center">搜索关键词</td>
+<td align="center">可视化大屏</td>
+<td align="center">页面访问日志 直接可求</td>
+<td align="center">dwd</td>
+</tr>
+<tr>
+<td align="center">点击商品关键词</td>
+<td align="center">可视化大屏</td>
+<td align="center">商品主题下单再次聚合</td>
+<td align="center">dws</td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center">下单商品关键词</td>
+<td align="center">可视化大屏</td>
+<td align="center">商品主题下单再次聚合</td>
+<td align="center">dws</td>
+<td align="center"></td>
+</tr>
+</tbody></table>
+<ul>
+<li><input disabled="" type="checkbox"> 访问UV计算<ul>
+<li><input disabled="" type="checkbox"> 按用户去重，在天的基础上，安装各种维度信息来进行统计UV，DWM作为一个中间表，复用性，中心思想</li>
 </ul>
-<h3 id="1-3-案例实现"><a href="#1-3-案例实现" class="headerlink" title="1.3 案例实现"></a>1.3 案例实现</h3><p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210822170436248.png" alt="工厂类案例实现"></p>
-<p>这些代码我都会放到github中的，有感兴趣的都可以去查阅</p>
-<h3 id="1-4-JDK-中的工厂设计模式实例"><a href="#1-4-JDK-中的工厂设计模式实例" class="headerlink" title="1.4 JDK 中的工厂设计模式实例"></a>1.4 JDK 中的工厂设计模式实例</h3><ul>
-<li>java.util.Calendar, ResourceBundle and NumberFormat getInstance() 使用了工厂方法模式；</li>
-<li>valueOf() 在包装类中，如Boolean, Integer 也使用了工厂方法模式；</li>
+</li>
+<li><input disabled="" type="checkbox"> 跳出明细计算</li>
+<li><input disabled="" type="checkbox"> 订单宽表</li>
+<li><input disabled="" type="checkbox"> 支付宽表</li>
 </ul>
-<h4 id="1-4-1-Calendar"><a href="#1-4-1-Calendar" class="headerlink" title="1.4.1 Calendar"></a>1.4.1 Calendar</h4><p>让我们一起来了解一下这个Calendar这个类到底是做什么的，是否能够在我们的工作当中能够用到，Java中Calendar类的常用方法</p>
-<h5 id="1-4-1-1-获取时间"><a href="#1-4-1-1-获取时间" class="headerlink" title="1.4.1.1  获取时间"></a>1.4.1.1  获取时间</h5><pre class=" language-java"><code class="language-java"><span class="token annotation punctuation">@Test</span>
-<span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">getTime</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token comment" spellcheck="true">// 使用默认时区和语言获得一个日历</span>
-    Calendar calendar <span class="token operator">=</span> Calendar<span class="token punctuation">.</span><span class="token function">getInstance</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-    <span class="token comment" spellcheck="true">// 年月日时分秒，注意月份要从小标开始，所以取月份要+1</span>
-
-
-    System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>calendar<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>Calendar<span class="token punctuation">.</span>DAY_OF_WEEK<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// 1</span>
-    System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>calendar<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>Calendar<span class="token punctuation">.</span>DAY_OF_YEAR<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// 234</span>
-    System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>calendar<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>Calendar<span class="token punctuation">.</span>DAY_OF_WEEK_IN_MONTH<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// 4</span>
-
-    System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"==========================================="</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"年："</span> <span class="token operator">+</span> calendar<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>Calendar<span class="token punctuation">.</span>YEAR<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// 2021</span>
-    System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"月："</span> <span class="token operator">+</span> <span class="token punctuation">(</span>calendar<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>Calendar<span class="token punctuation">.</span>MONTH<span class="token punctuation">)</span><span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// 8</span>
-    System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"日："</span> <span class="token operator">+</span> calendar<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>Calendar<span class="token punctuation">.</span>DAY_OF_MONTH<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// 22</span>
-    System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"时:"</span> <span class="token operator">+</span> calendar<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>Calendar<span class="token punctuation">.</span>HOUR_OF_DAY<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// 5</span>
-    System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"分："</span> <span class="token operator">+</span> calendar<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>Calendar<span class="token punctuation">.</span>MINUTE<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// 24</span>
-    System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"秒："</span> <span class="token operator">+</span> calendar<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>Calendar<span class="token punctuation">.</span>SECOND<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// 8</span>
-
-    System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>calendar<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>Calendar<span class="token punctuation">.</span>YEAR<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">"/"</span> <span class="token operator">+</span> <span class="token punctuation">(</span>calendar<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>Calendar<span class="token punctuation">.</span>MONTH<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">"/"</span> <span class="token operator">+</span> calendar<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>Calendar<span class="token punctuation">.</span>DAY_OF_MONTH<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">" "</span>
-                       <span class="token operator">+</span> calendar<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>Calendar<span class="token punctuation">.</span>HOUR_OF_DAY<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">":"</span> <span class="token operator">+</span> calendar<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>Calendar<span class="token punctuation">.</span>MINUTE<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">":"</span> <span class="token operator">+</span> calendar<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>Calendar<span class="token punctuation">.</span>SECOND<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
+<h2 id="第2章-DWM层-访客UV的计算"><a href="#第2章-DWM层-访客UV的计算" class="headerlink" title="第2章 DWM层-访客UV的计算"></a>第2章 DWM层-访客UV的计算</h2><h3 id="2-1-需求描述"><a href="#2-1-需求描述" class="headerlink" title="2.1 需求描述"></a>2.1 需求描述</h3><pre class=" language-properties"><code class="language-properties"><span class="token attr-name">UV</span> <span class="token attr-value">全称是Unique Visitor，即访客数，对于实时计算中，也可以称为DAU(Daily Active User)，即每日的活跃用户数，因为实时计算中心的UV通常是指当日的访客数</span>
+那么如何从用户行为日志识别当日的访客：
+    1、识别出该用户打开的第一个页面，表示这个访客开始进入我们的应用
+    2、由于访客可以在一天中多次进入应用，我们需要要在一天的范围内进行去重
 </code></pre>
-<h5 id="1-4-1-2-设置时间"><a href="#1-4-1-2-设置时间" class="headerlink" title="1.4.1.2 设置时间"></a>1.4.1.2 设置时间</h5><pre class=" language-java"><code class="language-java"><span class="token annotation punctuation">@Test</span>
-<span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">setTime</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    Calendar cal <span class="token operator">=</span> Calendar<span class="token punctuation">.</span><span class="token function">getInstance</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token comment" spellcheck="true">// 如果想设置为某个日期，可以一次设置年月日时分秒，由于月份下标从0开始赋值月份要-1</span>
-    <span class="token comment" spellcheck="true">// cal.set(year, month, date, hourOfDay, minute, second);</span>
-    cal<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span><span class="token number">2018</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">15</span><span class="token punctuation">,</span> <span class="token number">23</span><span class="token punctuation">,</span> <span class="token number">59</span><span class="token punctuation">,</span> <span class="token number">59</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token comment" spellcheck="true">// 或者6个字段分别进行设置，由于月份下标从0开始赋值月份要-1</span>
-    System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>cal<span class="token punctuation">.</span><span class="token function">getTime</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-    cal<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span>Calendar<span class="token punctuation">.</span>SECOND<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-    cal<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span>Calendar<span class="token punctuation">.</span>MONTH<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>cal<span class="token punctuation">.</span><span class="token function">getTime</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
+<h3 id="2-2-思考点"><a href="#2-2-思考点" class="headerlink" title="2.2 思考点"></a>2.2 思考点</h3><pre class=" language-properties"><code class="language-properties">使用状态编程来对多次进入的用户进行过滤，那么问题来了，状态里面存入什么才能更好的对用户进行一个过滤勒？
+状态如果为null，说明这个数据是新的，如果状态中存入的是时间，那么和数据中的时间进行比较就可以判断是否是重复的数据
 </code></pre>
-<p>这个是简单的时间的一些计算方式，用到的时候在进行一个查看就好了</p>
+<h3 id="2-3-如何去清空状态"><a href="#2-3-如何去清空状态" class="headerlink" title="2.3 如何去清空状态"></a>2.3 如何去清空状态</h3><pre class=" language-properties"><code class="language-properties">我们使用TTL的方式来进行清空状态
+昨天的状态，状态有没有关系都是没有关系，判断的时候一定要进行双重判断，否则会进行数据丢失
+按天去重，最少也是要保存一天的
+</code></pre>
+<h3 id="2-4-两种方式的实现"><a href="#2-4-两种方式的实现" class="headerlink" title="2.4 两种方式的实现"></a>2.4 两种方式的实现</h3><pre class=" language-properties"><code class="language-properties">有的公司加入了session会话
+</code></pre>
+<h3 id="2-5-测试流程"><a href="#2-5-测试流程" class="headerlink" title="2.5 测试流程"></a>2.5 测试流程</h3><pre class=" language-properties"><code class="language-properties">我们在进行测试的时候，一定得清楚数据流是如何进行处理得，如果不能清楚这个得化，是很难能够了解整个业务得，
+最后可以加一个测试，因为就是那个第一条和第二条都是可以加入测试的
+<span class="token attr-name">总之这个Flink</span> <span class="token attr-value">UV统计是流计算当中最简单的一个，因为我们只需要判断它是否是活跃或者访问的是进入页面的首页面，然后判断去重就可以直接将数据进行一个输出的操作</span>
 
+<span class="token attr-name">其中设计到的kafka</span> <span class="token attr-value">topic</span>
+<span class="token attr-name">Window</span><span class="token punctuation">:</span>
+    BaseLogAPP
+    UniqueVisitAPP
+
+Linux：
+<span class="token attr-name">    java</span> <span class="token attr-value">-jar gmall2020-mock-log-2020-12-18.jar</span>
+<span class="token attr-name">    java</span> <span class="token attr-value">-jar userBehaviorLog-0.0.1-SNAPSHOT.jar</span>
+    dwd_page_log
+    dwm_unique_visit
+目前系统内存占比是
+</code></pre>
+<h3 id="2-6-能力提升和项目问题疑问"><a href="#2-6-能力提升和项目问题疑问" class="headerlink" title="2.6 能力提升和项目问题疑问"></a>2.6 能力提升和项目问题疑问</h3><p><a href="https://ci.apache.org/projects/flink/flink-docs-release-1.13/docs/dev/datastream/fault-tolerance/state/" target="_blank" rel="noopener">https://ci.apache.org/projects/flink/flink-docs-release-1.13/docs/dev/datastream/fault-tolerance/state/</a></p>
+<p><a href="https://ci.apache.org/projects/flink/flink-docs-release-1.13/docs/dev/datastream/fault-tolerance/custom_serialization/" target="_blank" rel="noopener">https://ci.apache.org/projects/flink/flink-docs-release-1.13/docs/dev/datastream/fault-tolerance/custom_serialization/</a></p>
+<h4 id="2-6-1-Flink对状态清空的方法"><a href="#2-6-1-Flink对状态清空的方法" class="headerlink" title="2.6.1 Flink对状态清空的方法"></a>2.6.1 Flink对状态清空的方法</h4><ul>
+<li>使用自动的TTL来对状态进行清空</li>
+<li>使用定时器来对状态进行手动的清空</li>
+</ul>
+<h4 id="2-6-2-案例演示"><a href="#2-6-2-案例演示" class="headerlink" title="2.6.2 案例演示"></a>2.6.2 案例演示</h4><h3 id="2-7-使用到的技术点"><a href="#2-7-使用到的技术点" class="headerlink" title="2.7 使用到的技术点"></a>2.7 使用到的技术点</h3><pre class=" language-properties"><code class="language-properties">状态
+检查点
+删除检查点
+动态分流
+</code></pre>
+<h2 id="第3章-DWM层-跳出明细计算"><a href="#第3章-DWM层-跳出明细计算" class="headerlink" title="第3章 DWM层-跳出明细计算"></a>第3章 DWM层-跳出明细计算</h2><h2 id="第4章-DWM层-订单宽表"><a href="#第4章-DWM层-订单宽表" class="headerlink" title="第4章 DWM层-订单宽表"></a>第4章 DWM层-订单宽表</h2><h2 id="第5章-DWM层支付宽表（练习）"><a href="#第5章-DWM层支付宽表（练习）" class="headerlink" title="第5章 DWM层支付宽表（练习）"></a>第5章 DWM层支付宽表（练习）</h2><h2 id="第6章-总结"><a href="#第6章-总结" class="headerlink" title="第6章 总结"></a>第6章 总结</h2>
                 
             </div>
             <hr/>
@@ -563,7 +700,7 @@
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://github.com/wmybigdata/2021/08/22/java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/">https://github.com/wmybigdata/2021/08/22/java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/</a>
+                    <a href="https://github.com/wmybigdata/2021/08/23/Flink%E7%94%B5%E5%95%86%E5%AE%9E%E6%97%B6%E6%95%B0%E4%BB%93DWM%E5%B1%82%E4%B8%9A%E5%8A%A1%E5%AE%9E%E7%8E%B0/">https://github.com/wmybigdata/2021/08/23/Flink%E7%94%B5%E5%95%86%E5%AE%9E%E6%97%B6%E6%95%B0%E4%BB%93DWM%E5%B1%82%E4%B8%9A%E5%8A%A1%E5%AE%9E%E7%8E%B0/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -601,8 +738,8 @@
                     
                         <div class="article-tag">
                             
-                                <a href="/tags/java/">
-                                    <span class="chip bg-color">java</span>
+                                <a href="/tags/%E6%95%B0%E4%BB%93/">
+                                    <span class="chip bg-color">数仓</span>
                                 </a>
                             
                         </div>
@@ -772,17 +909,18 @@
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+                <i class="far fa-dot-circle"></i>&nbsp;本篇
+            </div>
             <div class="card">
-                <a href="/2021/08/22/MySQL%E9%9D%A2%E8%AF%95%E5%BF%85%E5%88%B7/">
+                <a href="/2021/08/23/Flink%E7%94%B5%E5%95%86%E5%AE%9E%E6%97%B6%E6%95%B0%E4%BB%93DWM%E5%B1%82%E4%B8%9A%E5%8A%A1%E5%AE%9E%E7%8E%B0/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/9.jpg" class="responsive-img" alt="MySQL面试必刷">
+                        <img src="/medias/featureimages/19.jpg" class="responsive-img" alt="Flink电商实时数仓DWM层业务实现">
                         
-                        <span class="card-title">MySQL面试必刷</span>
+                        <span class="card-title">Flink电商实时数仓DWM层业务实现</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -792,26 +930,27 @@
                         
                     </div>
                     <div class="publish-info">
-                        <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2021-08-22
-                        </span>
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-08-23
+                            </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="post-category">
-                                    数据库
+                            <a href="/categories/%E6%95%B0%E4%BB%93/" class="post-category">
+                                    数仓
                                 </a>
                             
                             
                         </span>
                     </div>
                 </div>
+
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">
-                        <span class="chip bg-color">数据库</span>
+                    <a href="/tags/%E6%95%B0%E4%BB%93/">
+                        <span class="chip bg-color">数仓</span>
                     </a>
                     
                 </div>
@@ -825,13 +964,13 @@
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2021/08/22/%E5%8D%9A%E5%AE%A2%E7%BB%B4%E6%8A%A4%E9%97%AE%E9%A2%98/">
+                <a href="/2021/08/22/%E7%AC%94%E8%AE%B0%E6%BC%94%E7%A4%BA/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/22.jpg" class="responsive-img" alt="博客维护问题">
+                        <img src="/medias/featureimages/18.jpg" class="responsive-img" alt="笔记演示">
                         
-                        <span class="card-title">博客维护问题</span>
+                        <span class="card-title">笔记演示</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -846,23 +985,11 @@
                             </span>
                         <span class="publish-author">
                             
-                            <i class="fas fa-bookmark fa-fw icon-category"></i>
-                            
-                            <a href="/categories/%E5%8D%9A%E5%AE%A2%E7%BB%B4%E6%8A%A4/" class="post-category">
-                                    博客维护
-                                </a>
-                            
+                            <i class="fas fa-user fa-fw"></i>
+                            情深骚明
                             
                         </span>
                     </div>
-                </div>
-                
-                <div class="card-action article-tags">
-                    
-                    <a href="/tags/%E5%8D%9A%E5%AE%A2%E7%BB%B4%E6%8A%A4/">
-                        <span class="chip bg-color">博客维护</span>
-                    </a>
-                    
                 </div>
                 
             </div>
