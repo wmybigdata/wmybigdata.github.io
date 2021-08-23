@@ -498,6 +498,24 @@
 <span class="token attr-name">systemctl</span> <span class="token attr-value">stop clickhouse-server</span>
 <span class="token attr-name">clickhouse-client</span> <span class="token attr-value">-h flink01</span>
 </code></pre>
+<h2 id="卸载"><a href="#卸载" class="headerlink" title="卸载"></a>卸载</h2><pre class=" language-properties"><code class="language-properties"><span class="token attr-name">[root@localhost</span> <span class="token attr-value">~]# rpm -qa |grep clickhouse</span>
+<span class="token attr-name">rpm</span> <span class="token attr-value">-e    --nodeps</span>
+ 
+删除数据目录：
+<span class="token attr-name">rm</span> <span class="token attr-value"> -rf   /var/lib/clickhouse</span>
+ 
+删除集群配置文件
+<span class="token attr-name">rm</span> <span class="token attr-value">-rf /etc/metrika.xml</span>
+ 
+删除配置文件
+<span class="token attr-name">rm</span> <span class="token attr-value">-rf  /etc/clickhouse-*</span>
+ 
+删除日志文件
+<span class="token attr-name">rm</span> <span class="token attr-value">-rf  /var/log/clickhouse-server</span>
+ 
+删除zookeeper上clickhouse的数据
+<span class="token attr-name">rm</span> <span class="token attr-value">  /clickhouse</span>
+</code></pre>
 
                 
             </div>
