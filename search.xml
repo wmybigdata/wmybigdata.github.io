@@ -4,6 +4,31 @@
   
     
     <entry>
+      <title>Flink提交流程以及Flinkdebug流程分享</title>
+      <link href="/2021/08/23/Flink%E6%8F%90%E4%BA%A4%E6%B5%81%E7%A8%8B%E4%BB%A5%E5%8F%8AFlinkdebug%E6%B5%81%E7%A8%8B%E5%88%86%E4%BA%AB/"/>
+      <url>/2021/08/23/Flink%E6%8F%90%E4%BA%A4%E6%B5%81%E7%A8%8B%E4%BB%A5%E5%8F%8AFlinkdebug%E6%B5%81%E7%A8%8B%E5%88%86%E4%BA%AB/</url>
+      
+        <content type="html"><![CDATA[<h1 id="Flink提交流程以及Flinkdebug流程分享"><a href="#Flink提交流程以及Flinkdebug流程分享" class="headerlink" title="Flink提交流程以及Flinkdebug流程分享"></a>Flink提交流程以及Flinkdebug流程分享</h1><h2 id="Flink三种提交流程"><a href="#Flink三种提交流程" class="headerlink" title="Flink三种提交流程"></a>Flink三种提交流程</h2><p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210823130021872.png" alt="Flink提交流程"></p><h2 id="为什么引入Application模式"><a href="#为什么引入Application模式" class="headerlink" title="为什么引入Application模式"></a>为什么引入Application模式</h2><p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210823130250657.png" alt="三种模式"></p><p>目前我们公司使用的是PerJob模式，必须得使用接口机来进行上传，会给服务器造成很大的压力，大量的网络IO开销，我们任务是非常多的，Flink1.11之后，引入了Application模式，全部都上传到master上，可以把jar指定在hdfs上，减少上传和部署作业的时间</p><h2 id="Flink提交流程概览"><a href="#Flink提交流程概览" class="headerlink" title="Flink提交流程概览"></a>Flink提交流程概览</h2><p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210823130937087.png" alt="Flink提交流程"></p><h2 id="Flink-Stream-sql客户端提交流程"><a href="#Flink-Stream-sql客户端提交流程" class="headerlink" title="Flink Stream sql客户端提交流程"></a>Flink Stream sql客户端提交流程</h2><p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210823131345554.png" alt="Flink SQL提交流程"></p><p>Flink Stream SQL的源码不是很多，有时间的话，可以去看看</p><p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210823132035655.png" alt="Flink SQL主类"></p><p>Flink SQL中的executor是非常重要的，Flink client提交SQL的一个流程</p><h2 id="Flink-Session-Runtime"><a href="#Flink-Session-Runtime" class="headerlink" title="Flink Session Runtime"></a>Flink Session Runtime</h2><p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210823132427416.png" alt="Flink Session Runtime"></p><p>这些都是可以好好的把Flink 1.12的源码给好好阅读一下，并做好自己的笔记是非常的重要的</p><p>提交和调度，7大点调度任务，作业调度，对象不明确</p><p>Flink 提交源码可以总结成一个流程图，可以根据自己写的类图，启动集群，提交任务，任务调度都可以进行一个完整的程序</p><h2 id="Flink-Debug-流程"><a href="#Flink-Debug-流程" class="headerlink" title="Flink Debug 流程"></a>Flink Debug 流程</h2><p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210823133735059.png" alt="Flink Debug流程"></p><p>多去尝试，多去打断点就好了，可以根据yarn session上面的ip 来进行查看</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> Flink流式引擎 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> Flink流式引擎 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>Flink电商实时数仓DWM层业务实现</title>
       <link href="/2021/08/23/Flink%E7%94%B5%E5%95%86%E5%AE%9E%E6%97%B6%E6%95%B0%E4%BB%93DWM%E5%B1%82%E4%B8%9A%E5%8A%A1%E5%AE%9E%E7%8E%B0/"/>
       <url>/2021/08/23/Flink%E7%94%B5%E5%95%86%E5%AE%9E%E6%97%B6%E6%95%B0%E4%BB%93DWM%E5%B1%82%E4%B8%9A%E5%8A%A1%E5%AE%9E%E7%8E%B0/</url>
