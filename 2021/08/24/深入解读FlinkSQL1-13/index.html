@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="ApacheFlink实战教程CEP实战, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
+    <meta name="keywords" content="深入解读FlinkSQL1.13, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
     <meta name="description" content="本网站是个人兴趣爱好，总结分享经验，记录生活点滴的平台，希望在以后的学习旅途中，走出自己的风景。">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -16,7 +16,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>ApacheFlink实战教程CEP实战 | 情深骚明大数据之旅</title>
+    <title>深入解读FlinkSQL1.13 | 情深骚明大数据之旅</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -314,12 +314,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/2.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/17.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">ApacheFlink实战教程CEP实战</h1>
+                    <h1 class="description center-align post-title">深入解读FlinkSQL1.13</h1>
                 </div>
             </div>
         </div>
@@ -481,189 +481,202 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h1 id="ApacheFlink实战教程CEP实战"><a href="#ApacheFlink实战教程CEP实战" class="headerlink" title="ApacheFlink实战教程CEP实战"></a>ApacheFlink实战教程CEP实战</h1><ol>
-<li>Flink CEP 概念以及使用场景。</li>
-<li>如何使用 Flink CEP。</li>
-<li>如何扩展 Flink CEP。</li>
+                <h1 id="深入解读FlinkSQL1-13"><a href="#深入解读FlinkSQL1-13" class="headerlink" title="深入解读FlinkSQL1.13"></a>深入解读FlinkSQL1.13</h1><p>参考网址：<a href="https://flink-learning.org.cn/article/detail/a8b0895d4271bf6b770927eea214612d" target="_blank" rel="noopener">https://flink-learning.org.cn/article/detail/a8b0895d4271bf6b770927eea214612d</a></p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824113303217.png" alt="Flink SQL核心功能"></p>
+<ol>
+<li>Flink SQL 1.13 概览</li>
+<li>核心 feature 解读</li>
+<li>重要改进解读</li>
+<li>Flink SQL 1.14 未来规划</li>
+<li>总结</li>
 </ol>
-<h2 id="Flink-CEP-概念以及使用场景"><a href="#Flink-CEP-概念以及使用场景" class="headerlink" title="Flink CEP 概念以及使用场景"></a>Flink CEP 概念以及使用场景</h2><h3 id="1-什么是-CEP"><a href="#1-什么是-CEP" class="headerlink" title="1.什么是 CEP"></a>1.什么是 CEP</h3><p>CEP 的意思是复杂事件处理，例如：起床–&gt;洗漱–&gt;吃饭–&gt;上班等一系列串联起来的事件流形成的模式称为 CEP。如果发现某一次起床后没有刷牙洗脸亦或是吃饭就直接上班，就可以把这种非正常的事件流匹配出来进行分析，看看今天是不是起晚了。</p>
-<p>下图中列出了几个例子：</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824104216837.png" alt="Flink CEP Example"></p>
-<ul>
-<li><strong>第一个是异常行为检测的例子：</strong>假设车辆维修的场景中，当一辆车出现故障时，这辆车会被送往维修点维修，然后被重新投放到市场运行。如果这辆车被投放到市场之后还未被使用就又被报障了，那么就有可能之前的维修是无效的。</li>
-<li><strong>第二个是策略营销的例子：</strong>假设打车的场景中，用户在 APP 上规划了一个行程订单，如果这个行程在下单之后超过一定的时间还没有被司机接单的话，那么就需要将这个订单输出到下游做相关的策略调整。</li>
-<li><strong>第三个是运维监控的例子：</strong>通常运维会监控服务器的 CPU、网络 IO 等指标超过阈值时产生相应的告警。但是在实际使用中，后台服务的重启、网络抖动等情况都会造成瞬间的流量毛刺，对非关键链路可以忽略这些毛刺而只对频繁发生的异常进行告警以减少误报。</li>
-</ul>
-<h3 id="2-Flink-CEP-应用场景"><a href="#2-Flink-CEP-应用场景" class="headerlink" title="2.Flink CEP 应用场景"></a>2.Flink CEP 应用场景</h3><ul>
-<li><strong>风险控制：</strong>对用户异常行为模式进行实时检测，当一个用户发生了不该发生的行为，判定这个用户是不是有违规操作的嫌疑。</li>
-<li><strong>策略营销：</strong>用预先定义好的规则对用户的行为轨迹进行实时跟踪，对行为轨迹匹配预定义规则的用户实时发送相应策略的推广。</li>
-<li><strong>运维监控：</strong>灵活配置多指标、多依赖来实现更复杂的监控模式。</li>
-</ul>
-<h3 id="3-Flink-CEP-原理"><a href="#3-Flink-CEP-原理" class="headerlink" title="3.Flink CEP 原理"></a>3.Flink CEP 原理</h3><p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824104701307.png" alt="Flink CEP原理图"></p>
-<p>Flink CEP 内部是用 NFA（非确定有限自动机）来实现的，由点和边组成的一个状态图，以一个初始状态作为起点，经过一系列的中间状态，达到终态。点分为起始状态、中间状态、最终状态三种，边分为 take、ignore、proceed 三种。</p>
-<ul>
-<li><strong>take</strong>：必须存在一个条件判断，当到来的消息满足 take 边条件判断时，把这个消息放入结果集，将状态转移到下一状态。</li>
-<li><strong>ignore</strong>：当消息到来时，可以忽略这个消息，将状态自旋在当前不变，是一个自己到自己的状态转移。</li>
-<li><strong>proceed</strong>：又叫做状态的空转移，当前状态可以不依赖于消息到来而直接转移到下一状态。举个例子，当用户购买商品时，如果购买前有一个咨询客服的行为，需要把咨询客服行为和购买行为两个消息一起放到结果集中向下游输出；如果购买前没有咨询客服的行为，只需把购买行为放到结果集中向下游输出就可以了。 也就是说，如果有咨询客服的行为，就存在咨询客服状态的上的消息保存，如果没有咨询客服的行为，就不存在咨询客服状态的上的消息保存，咨询客服状态是由一条 proceed 边和下游的购买状态相连。</li>
-</ul>
-<p>下面以一个打车的例子来展示状态是如何流转的，规则见下图所示。</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824105008651.png" alt="打车案例"></p>
-<p>以乘客制定行程作为开始，匹配乘客的下单事件，如果这个订单超时还没有被司机接单的话，就把行程事件和下单事件作为结果集往下游输出。</p>
-<p>假如消息到来顺序为：行程–&gt;其他–&gt;下单–&gt;其他。</p>
-<p>状态流转如下：</p>
-<p>1.开始时状态处于行程状态，即等待用户制定行程。</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824105557056.png" alt="image-20210824105557056"></p>
-<p>2.当收到行程事件时，匹配行程状态的条件，把行程事件放到结果集中，通过 take 边将状态往下转移到下单状态。</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824105707540.png" alt="image-20210824105707540"></p>
-<p>3.由于下单状态上有一条 ignore 边，所以可以忽略收到的其他事件，直到收到下单事件时将其匹配，放入结果集中，并且将当前状态往下转移到超时未接单状态。这时候结果集当中有两个事件：制定行程事件和下单事件。</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824105843389.png" alt="image-20210824105843389"></p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824105851550.png" alt="image-20210824105851550"></p>
-<p>4.超时未接单状态时，如果来了一些其他事件，同样可以被 ignore 边忽略，直到超时事件的触发，将状态往下转移到最终状态，这时候整个模式匹配成功，最终将结果集中的制定行程事件和下单事件输出到下游。</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824105952153.png" alt="image-20210824105952153"></p>
-<p>上面是一个匹配成功的例子，如果是不成功的例子会怎么样？</p>
-<p>假如当状态处于超时未接单状态时，收到了一个接单事件，那么就不符合超时未被接单的触发条件，此时整个模式匹配失败，之前放入结果集中的行程事件和下单事件会被清理。</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824110020762.png" alt="image-20210824110020762"></p>
-<h2 id="Flink-CEP-程序开发"><a href="#Flink-CEP-程序开发" class="headerlink" title="Flink CEP 程序开发"></a>Flink CEP 程序开发</h2><p>本节将详细介绍 Flink CEP 的程序结构以及 API。</p>
-<h3 id="1-Flink-CEP-程序结构"><a href="#1-Flink-CEP-程序结构" class="headerlink" title="1.Flink CEP 程序结构"></a>1.Flink CEP 程序结构</h3><p>主要分为两部分：定义事件模式和匹配结果处理。</p>
-<p>官方示例如下：</p>
-<pre class=" language-java"><code class="language-java">DataStream<span class="token operator">&lt;</span>Event<span class="token operator">></span> input <span class="token operator">=</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
-Pattern<span class="token operator">&lt;</span>Event<span class="token punctuation">,</span> <span class="token operator">?</span><span class="token operator">></span> pattern <span class="token operator">=</span> Pattern<span class="token punctuation">.</span>&lt;Event<span class="token operator">></span><span class="token function">begin</span><span class="token punctuation">(</span><span class="token string">"start"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">where</span><span class="token punctuation">(</span>
-        <span class="token keyword">new</span> <span class="token class-name">SimpleCondition</span><span class="token operator">&lt;</span>Event<span class="token operator">></span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-            <span class="token annotation punctuation">@Override</span>
-            <span class="token keyword">public</span> <span class="token keyword">boolean</span> <span class="token function">filter</span><span class="token punctuation">(</span>Event event<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-                <span class="token keyword">return</span> event<span class="token punctuation">.</span><span class="token function">getId</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">42</span><span class="token punctuation">;</span>
-            <span class="token punctuation">}</span>
-        <span class="token punctuation">}</span>
-    <span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">next</span><span class="token punctuation">(</span><span class="token string">"middle"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">subtype</span><span class="token punctuation">(</span>SubEvent<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">where</span><span class="token punctuation">(</span>
-        <span class="token keyword">new</span> <span class="token class-name">SimpleCondition</span><span class="token operator">&lt;</span>SubEvent<span class="token operator">></span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-            <span class="token annotation punctuation">@Override</span>
-            <span class="token keyword">public</span> <span class="token keyword">boolean</span> <span class="token function">filter</span><span class="token punctuation">(</span>SubEvent subEvent<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-                <span class="token keyword">return</span> subEvent<span class="token punctuation">.</span><span class="token function">getVolume</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">>=</span> <span class="token number">10.0</span><span class="token punctuation">;</span>
-            <span class="token punctuation">}</span>
-        <span class="token punctuation">}</span>
-    <span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">followedBy</span><span class="token punctuation">(</span><span class="token string">"end"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">where</span><span class="token punctuation">(</span>
-         <span class="token keyword">new</span> <span class="token class-name">SimpleCondition</span><span class="token operator">&lt;</span>Event<span class="token operator">></span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-            <span class="token annotation punctuation">@Override</span>
-            <span class="token keyword">public</span> <span class="token keyword">boolean</span> <span class="token function">filter</span><span class="token punctuation">(</span>Event event<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-                <span class="token keyword">return</span> event<span class="token punctuation">.</span><span class="token function">getName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">equals</span><span class="token punctuation">(</span><span class="token string">"end"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-            <span class="token punctuation">}</span>
-         <span class="token punctuation">}</span>
-    <span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-PatternStream<span class="token operator">&lt;</span>Event<span class="token operator">></span> patternStream <span class="token operator">=</span> CEP<span class="token punctuation">.</span><span class="token function">pattern</span><span class="token punctuation">(</span>input<span class="token punctuation">,</span> pattern<span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-DataStream<span class="token operator">&lt;</span>Alert<span class="token operator">></span> result <span class="token operator">=</span> patternStream<span class="token punctuation">.</span><span class="token function">select</span><span class="token punctuation">(</span>
-    <span class="token keyword">new</span> <span class="token class-name">PatternProcessFunction</span><span class="token operator">&lt;</span>Event<span class="token punctuation">,</span> Alert<span class="token operator">></span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        <span class="token annotation punctuation">@Override</span>
-        <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">select</span><span class="token punctuation">(</span>
-                Map<span class="token operator">&lt;</span>String<span class="token punctuation">,</span> List<span class="token operator">&lt;</span>Event<span class="token operator">>></span> pattern<span class="token punctuation">,</span>
-                Context ctx<span class="token punctuation">,</span>
-                Collector<span class="token operator">&lt;</span>Alert<span class="token operator">></span> out<span class="token punctuation">)</span> <span class="token keyword">throws</span> Exception <span class="token punctuation">{</span>
-            out<span class="token punctuation">.</span><span class="token function">collect</span><span class="token punctuation">(</span><span class="token function">createAlertFrom</span><span class="token punctuation">(</span>pattern<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token punctuation">}</span>
-    <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<h2 id="一、Flink-SQL-1-13-概览"><a href="#一、Flink-SQL-1-13-概览" class="headerlink" title="一、Flink SQL 1.13 概览"></a>一、Flink SQL 1.13 概览</h2><p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824113358728.png" alt="Flink SQL概览"></p>
+<p>Flink 1.13 是一个社区大版本，解决的 issue 在 1000 个以上，通过上图我们可以看到，解决的问题大部分是关于 Table/SQL 模块，一共 400 多个 issue 占了总体的 37% 左右。这些 issue 主要围绕了 5 个 FLIP 展开，在本文中我们也会根据这 5 个方面进行介绍，它们分别是：</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824113444978.png" alt="Table SQL"></p>
+<p>下面我们对这些 FLIP 进行详细解读。</p>
+<h2 id="二、-核心-feature-解读"><a href="#二、-核心-feature-解读" class="headerlink" title="二、 核心 feature 解读"></a>二、 核心 feature 解读</h2><h3 id="1-FLIP-145：支持-Window-TVF"><a href="#1-FLIP-145：支持-Window-TVF" class="headerlink" title="1. FLIP-145：支持 Window TVF"></a>1. FLIP-145：支持 Window TVF</h3><p>社区的小伙伴应该了解，在腾讯、阿里巴巴、字节跳动等公司的内部分支已经开发了这个功能的基础版本。这次 Flink 社区也在 Flink 1.13 推出了 TVF 的相关支持和优化。下面将从 Window TVF 语法、近实时累计计算场景、 Window 性能优化、多维数据分析，来分析这个新功能。</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824113601029.png" alt="Window TVF"></p>
+<h4 id="1-1-Window-TVF-语法"><a href="#1-1-Window-TVF-语法" class="headerlink" title="1.1 Window TVF 语法"></a>1.1 Window TVF 语法</h4><p>在 1.13 版本前，window 的实现是通过一个特殊的 SqlGroupedWindowFunction：</p>
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">SELECT</span> 
+  TUMBLE_START<span class="token punctuation">(</span>bidtime<span class="token punctuation">,</span>INTERVAL <span class="token string">'10'</span> MINUTE<span class="token punctuation">)</span><span class="token punctuation">,</span>
+  TUMBLE_END<span class="token punctuation">(</span>bidtime<span class="token punctuation">,</span>INTERVAL <span class="token string">'10'</span> MINUTE<span class="token punctuation">)</span><span class="token punctuation">,</span>
+  TUMBLE_ROWTIME<span class="token punctuation">(</span>bidtime<span class="token punctuation">,</span>INTERVAL <span class="token string">'10'</span> MINUTE<span class="token punctuation">)</span><span class="token punctuation">,</span>
+  <span class="token function">SUM</span><span class="token punctuation">(</span>price<span class="token punctuation">)</span>
+<span class="token keyword">FROM</span> MyTable
+<span class="token keyword">GROUP</span> <span class="token keyword">BY</span> TUMBLE<span class="token punctuation">(</span>bidtime<span class="token punctuation">,</span>INTERVAL <span class="token string">'10'</span> MINUTE<span class="token punctuation">)</span>
 </code></pre>
-<p><strong>程序结构分为三部分：</strong>首先需要定义一个模式(<strong>Pattern</strong>)，即第 2 行代码所示，接着把定义好的模式绑定在 DataStream 上（<strong>第 25 行</strong>），最后就可以在具有 CEP 功能的 DataStream 上将匹配的结果进行处理（<strong>第 27 行</strong>）。下面对关键部分做详细讲解：</p>
+<p>在 1.13 版本中，我们对它进行了 Table-Valued Function 的语法标准化：</p>
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">SELECT</span> WINDOW_start<span class="token punctuation">,</span>WINDOW_end<span class="token punctuation">,</span>WINDOW_time<span class="token punctuation">,</span><span class="token function">SUM</span><span class="token punctuation">(</span>price<span class="token punctuation">)</span> 
+<span class="token keyword">FROM</span> <span class="token keyword">Table</span><span class="token punctuation">(</span>TUMBLE<span class="token punctuation">(</span><span class="token keyword">Table</span> myTable<span class="token punctuation">,</span>DESCRIPTOR<span class="token punctuation">(</span>biztime<span class="token punctuation">)</span><span class="token punctuation">,</span>INTERVAL <span class="token string">'10'</span> MINUTE<span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token keyword">GROUP</span> <span class="token keyword">BY</span> WINDOW_start<span class="token punctuation">,</span>WINDOW_end
+</code></pre>
+<p>通过对比两种语法，我们可以发现：TVF 语法更加灵活，不需要必须跟在 GROUP BY 关键字后面，同时 Window TVF 基于关系代数，使得其更加标准。在只需要划分窗口场景时，可以只用 TVF，无需用 GROUP BY 做聚合，这使得 TVF 扩展性和表达能力更强，支持自定义 TVF（例如实现 TOP-N 的 TVF）。</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824113822022.png" alt="TOP-N TVF"></p>
+<p>上图中的示例就是利用 TVF 做的滚动窗口的划分，只需要把数据划分到窗口，无需聚合；如果后续需要聚合，再进行 GROP BY 即可。同时，对于熟悉批 SQL 的用户来说，这种操作是非常自然的，我们不再需要像 1.13 版本之前那样必须要用特殊的 SqlGroupedWindowFunction 将窗口划分和聚合绑定在一起。</p>
+<p>目前 Window TVF 支持 tumble window，hop window，新增了 cumulate window；session window 预计在 1.14 版本也会支持。</p>
+<h4 id="1-2-Cumulate-Window"><a href="#1-2-Cumulate-Window" class="headerlink" title="1.2 Cumulate Window"></a>1.2 Cumulate Window</h4><p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824113914700.png" alt="cumulate window"></p>
+<p>Cumulate window 就是累计窗口，简单来说，以上图里面时间轴上的一个区间为窗口步长。</p>
 <ul>
-<li><strong>定义模式：</strong>上面示例中，分为了三步，首先匹配一个 ID 为 42 的事件，接着匹配一个体积大于等于 10 的事件，最后等待收到一个 name 等于 end 的事件。</li>
-<li><strong>匹配结果输出：</strong>此部分，需要重点注意 select 函数（第 30 行，注：本文基于 Flink 1.7 版本）里边的 Map 类型的 pattern 参数，Key 是一个 pattern 的 name，它的取值是模式定义中的 Begin 节点 start，或者是接下来 next 里面的 middle，或者是第三个步骤的 end。后面的 map 中的 value 是每一步发生的匹配事件。因在每一步中是可以使用循环属性的，可以匹配发生多次，所以 map 中的 value 是匹配发生多次的所有事件的一个集合。</li>
+<li>第一个 window 统计的是一个区间的数据；</li>
+<li>第二个 window 统计的是第一区间和第二个区间的数据；</li>
+<li>第三个 window 统计的是第一区间，第二个区间和第三个区间的数据。</li>
 </ul>
-<h3 id="2-Flink-CEP-构成"><a href="#2-Flink-CEP-构成" class="headerlink" title="2.Flink CEP 构成"></a>2.Flink CEP 构成</h3><p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824110422728.png" alt="image-20210824110422728"></p>
-<p>上图中，蓝色方框代表的是一个个单独的模式；浅黄色的椭圆代表的是这个模式上可以添加的属性，包括模式可以发生的循环次数，或者这个模式是贪婪的还是可选的；橘色的椭圆代表的是模式间的关系，定义了多个模式之间是怎么样串联起来的。通过定义模式，添加相应的属性，将多个模式串联起来三步，就可以构成了一个完整的 Flink CEP 程序。</p>
-<h4 id="2-1-定义模式"><a href="#2-1-定义模式" class="headerlink" title="2.1 定义模式"></a>2.1 定义模式</h4><p>下面是示例代码：</p>
-<pre class=" language-java"><code class="language-java">pattern<span class="token punctuation">.</span><span class="token function">next</span><span class="token punctuation">(</span><span class="token string">"start"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">where</span><span class="token punctuation">(</span>
-        <span class="token keyword">new</span> <span class="token class-name">SimpleCondition</span><span class="token operator">&lt;</span>Event<span class="token operator">></span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-            <span class="token annotation punctuation">@Override</span>
-            <span class="token keyword">public</span> <span class="token keyword">boolean</span> <span class="token function">filter</span><span class="token punctuation">(</span>Event event<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-                <span class="token keyword">return</span> event<span class="token punctuation">.</span><span class="token function">getId</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">42</span><span class="token punctuation">;</span>
-            <span class="token punctuation">}</span>
-        <span class="token punctuation">}</span>
+<p>累积计算在业务场景中非常常见，如累积 UV 场景。在 UV 大盘曲线中：我们每隔 10 分钟统计一次当天累积用户 UV。</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824114137054.png" alt="近实时累计计算"></p>
+<p>在 1.13 版本之前，当需要做这种计算时，我们一般的 SQL 写法如下：</p>
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> cumulative_UV
+<span class="token keyword">SELECT</span> date_str<span class="token punctuation">,</span><span class="token function">MAX</span><span class="token punctuation">(</span>time_str<span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token function">COUNT</span><span class="token punctuation">(</span><span class="token keyword">DISTINCT</span> user_id<span class="token punctuation">)</span> <span class="token keyword">as</span> UV
+<span class="token keyword">FROM</span> <span class="token punctuation">(</span>
+    <span class="token keyword">SELECT</span>
+      DATE_FORMAT<span class="token punctuation">(</span>ts<span class="token punctuation">,</span><span class="token string">'yyyy-MM-dd'</span><span class="token punctuation">)</span> <span class="token keyword">as</span> date_str<span class="token punctuation">,</span>
+      SUBSTR<span class="token punctuation">(</span>DATE_FORMAT<span class="token punctuation">(</span>ts<span class="token punctuation">,</span><span class="token string">'HH:mm'</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">4</span><span class="token punctuation">)</span> <span class="token operator">||</span> <span class="token string">'0'</span> <span class="token keyword">as</span> time_str<span class="token punctuation">,</span>
+      user_id
+  <span class="token keyword">FROM</span> user_behavior
+<span class="token punctuation">)</span>
+<span class="token keyword">GROUP</span> <span class="token keyword">BY</span> date_str
+</code></pre>
+<p>先将每条记录所属的时间窗口字段拼接好，然后再对所有记录按照拼接好的时间窗口字段，通过 GROUP BY 做聚合，从而达到近似累积计算的效果。</p>
+<ul>
+<li>1.13 版本前的写法有很多缺点，首先这个聚合操作是每条记录都会计算一次。其次，在追逆数据的时候，消费堆积的数据时，UV 大盘的曲线就会跳变。</li>
+<li>在 1.13 版本支持了 TVF 写法，基于 cumulate window，我们可以修改为下面的写法，将每条数据按照 Event Time 精确地分到每个 Window 里面, 每个窗口的计算通过 watermark 触发，即使在追数据场景中也不会跳变。</li>
+</ul>
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> cumulative_UV
+<span class="token keyword">SELECT</span> WINDOW_end<span class="token punctuation">,</span><span class="token function">COUNT</span><span class="token punctuation">(</span><span class="token keyword">DISTINCT</span> user_id<span class="token punctuation">)</span> <span class="token keyword">as</span> UV
+<span class="token keyword">FROM</span> <span class="token keyword">Table</span><span class="token punctuation">(</span>
+    CUMULATE<span class="token punctuation">(</span><span class="token keyword">Table</span> user_behavior<span class="token punctuation">,</span>DESCRIPTOR<span class="token punctuation">(</span>ts<span class="token punctuation">)</span><span class="token punctuation">,</span>INTERVAL <span class="token string">'10'</span> MINUTES<span class="token punctuation">,</span>INTERVAL <span class="token string">'1'</span> DAY<span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token punctuation">)</span>
+<span class="token keyword">GROUP</span> <span class="token keyword">BY</span> WINDOW_start<span class="token punctuation">,</span>WINDOW_end
+</code></pre>
+<p>UV 大盘曲线效果如下图所示：</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824114419320.png" alt="UV大盘曲线效果下图所示"></p>
+<h4 id="1-3-Window-性能优化"><a href="#1-3-Window-性能优化" class="headerlink" title="1.3 Window 性能优化"></a>1.3 Window 性能优化</h4><p>Flink 1.13 社区开发者们对 Window TVF 进行了一系列的性能优化，包括：</p>
+<ul>
+<li><strong>内存优化：</strong>通过内存预分配，缓存 window 的数据，通过 window watermark 触发计算，通过申请一些内存 buffer 避免高频的访问 state；</li>
+<li><strong>切片优化：</strong>将 window 切片，尽可能复用已计算结果，如 hop window，cumulate window。计算过的分片数据无需再次计算，只需对切片的计算结果进行复用；</li>
+<li><strong>算子优化：</strong>window 算子支持 local-global 优化；同时支持 count(distinct) 自动解热点优化；</li>
+<li><strong>迟到数据：</strong>支持将迟到数据计算到后续分片，保证数据准确性。</li>
+</ul>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824114505810.png" alt="Window性能优化"></p>
+<p>基于这些优化，我们通过开源 Benchmark (Nexmark) 进行性能测试。结果显示 window 的普适性能有 2x 提升，且在 count(distinct) 场景会有更好的性能提升。</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824114537906.png" alt="Window性能优化"></p>
+<h4 id="1-4-多维数据分析"><a href="#1-4-多维数据分析" class="headerlink" title="1.4 多维数据分析"></a>1.4 多维数据分析</h4><p>语法的标准化带来了更多的灵活性和扩展性，用户可以直接在 window 窗口函数上进行多维分析。如下图所示，可以直接进行 GROUPING SETS、ROLLUP、CUBE 的分析计算。如果是在 1.13 之前的版本，我们可能需要对这些分组进行单独的 SQL 聚合，再对聚合结果做 union 操作才能达到类似的效果。而现在，类似这种多维分析的场景，可以直接在 window TVF 上支持。</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824114730789.png" alt="多维数据分析"></p>
+<h5 id="1-4-1-支持-Window-Top-N"><a href="#1-4-1-支持-Window-Top-N" class="headerlink" title="1.4.1 支持 Window Top-N"></a>1.4.1 <strong>支持 Window Top-N</strong></h5><p>除了多维分析，Window TVF 也支持 Top-N 语法，使得在 Window 上取 Top-N 的写法更加简单。</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824114826337.png" alt="多维数据分析SQL"></p>
+<h3 id="2-FLIP-162：时区和时间函数"><a href="#2-FLIP-162：时区和时间函数" class="headerlink" title="2. FLIP-162：时区和时间函数"></a>2. FLIP-162：时区和时间函数</h3><h4 id="2-1-时区问题分析"><a href="#2-1-时区问题分析" class="headerlink" title="2.1 时区问题分析"></a>2.1 时区问题分析</h4><p>大家在使用 Flink SQL 时反馈了很多时区相关的问题，造成时区问题的原因可以归纳为 3 个：</p>
+<ul>
+<li>PROCTIME() 函数应该考虑时区，但未考虑时区；</li>
+<li>CURRENT_TIMESTAMP/CURRENT_TIME/CURRENT_DATE/NOW() 函数未考虑时区；</li>
+<li>Flink 的时间属性，只支持定义在 TIMESTAMP 这种数据类型上面，这个类型是无时区的，TIMESTAMP 类型不考虑时区，但用户希望是本地时区的时间。</li>
+</ul>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824114929478.png" alt="时区问题分析"></p>
+<p>针对 TIMESTAMP 类型没有考虑时区的问题，我们提议通过TIMESTAMP_LTZ类型支持 (TIMESTAMP_LTZ 是 timestamp with local time zone 的缩写)。可以通过下面的表格来进行和 TIMESTAMP 的对比：</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824115024280.png" alt="时区问题分析"></p>
+<p>TIMESTAMP_LTZ 区别于之前我们使用的 TIMESTAMP，它表示绝对时间的含义。通过对比我们可以发现：</p>
+<ul>
+<li>如果我们配置使用 TIMESTAMP，它可以是字符串类型的。用户不管是从英国还是中国时区来观察，这个值都是一样的；</li>
+<li>但是对于 TIMSTAMP_TLZ 来说，它的来源就是一个 Long 值，表示从时间原点流逝过的时间。同一时刻，从时间原点流逝的时间在所有时区都是相同的，所以这个 Long 值是绝对时间的概念。当我们在不同的时区去观察这个值，我们会用本地的时区去解释成 “年-月-日-时-分-秒” 的可读格式，这就是 TIMSTAMP_TLZ 类型，TIMESTAMP_LTZ 类型也更加符合用户在不同时区下的使用习惯。</li>
+</ul>
+<p>下面的例子展示了 TIMESTAMP 和 TIMESTAMP_LTZ 两个类型的区别。</p>
+<h4 id="2-2-时间函数纠正"><a href="#2-2-时间函数纠正" class="headerlink" title="2.2 时间函数纠正"></a>2.2 时间函数纠正</h4><p><strong>订正 PROCTIME() 函数</strong></p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824115208530.png" alt="时间函数纠正"></p>
+<p>当我们有了 TIMESTAMP_LTZ 这个类型的时候，我们对 PROCTIME() 类型做了纠正：在 1.13 版本之前，它总是返回 UTC 的 TIMESTAMP；而现在，我们把返回类型变为了 TIMESTAMP_LTZ。PROCTIME 除了表示函数之外，也可以表示时间属性的标记。</p>
+<p><strong>订正 CURRENT_TIMESTAMP/CURRENT_TIME/CURRENT_DATE/NOW() 函数</strong></p>
+<p>这些函数在不同时区下出来的值是会发生变化的。例如在英国 UTC 时区时候是凌晨 2 点；但是如果你设置了时区是 UTC+8，时间就是在早上的 10 点。不同时区的实际时间会发生变化，效果如下图：</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824115254981.png" alt="时间函数的纠正"><strong>解决 processing time Window 时区问题</strong></p>
+<p>大家都知道 proctime 可以表示一个时间属性，对 proctime 的 window 操作：</p>
+<ul>
+<li>在 1.13 版本之前，如果我们需要做按天的 window 操作，你需要手动解决时区问题，去做一些 8 小时的偏移然后再减回去；</li>
+<li>在 FLIP-162 中我们解决了这个问题，现在用户使用的时候十分简单，只需要声明 proctime 属性，因为 PROCTIME() 函数的返回值是TIMESTAMP_LTZ，所以结果是会考虑本地的时区。下图的例子显示了在不同的时区下，proctime 属性的 window 的聚合是按照本地时区进行的。</li>
+</ul>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824121417679.png" alt="image-20210824121417679"></p>
+<p><strong>订正 Streaming 和 Batch 模式下函数取值方式</strong></p>
+<p>时间函数其实在流和批上面的表现形式会有所区别，这次修正主要是让其更加符合用户实际的使用习惯。例如以下函数：</p>
+<ul>
+<li>在流模式中是 per-record 计算，即每条数据都计算一次；</li>
+<li>在 Batch 模式是 query-start 计算，即在作业开始前计算一次。例如我们常用的一些 Batch 计算引擎，如 Hive 也是在每一个批开始前计算一次。</li>
+</ul>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824121453936.png" alt="时间函数的纠正"></p>
+<h4 id="2-3-时间类型使用"><a href="#2-3-时间类型使用" class="headerlink" title="2.3 时间类型使用"></a>2.3 时间类型使用</h4><p>在 1.13 版本也支持了在 TIMESTAMP 列上定义 Event time，也就是说Event time 现在既支持定义在 TIMESTAMP 列上，也支持定义在 TIMESTAMP_ LTZ 列上。那么作为用户，具体什么场景用什么类型呢？</p>
+<ul>
+<li>当作业的上游源数据包含了字符串的时间（如：2021-4-15 14:00:00）这样的场景，直接声明为 TIMESTAMP 然后把 Event time 定义在上面即可，窗口在计算的时候会基于时间字符串进行切分，最终会计算出符合你实际想要的预想结果；</li>
+</ul>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824121528721.png" alt="时间类型的使用"></p>
+<p>当上游数据源的打点时间属于 long 值，表示的是一个绝对时间的含义。在 1.13 版本你可以把 Event time 定义在 TIMESTAMP_LTZ 上面。此时定义在 TIMESTAMP_LTZ 类型上的各种 WINDOW 聚合，都能够自动的解决 8 小时的时区偏移问题，无需按照之前的 SQL 写法额外做时区的修改和订正。</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824121559194.png" alt="时间类型使用"></p>
+<p>小提示：Flink SQL 中关于时间函数，时区支持的这些提升，是版本不兼容的。用户在进行版本更新的时候需要留意作业逻辑中是否包含此类函数，避免升级后业务受到影响。</p>
+<h4 id="2-4-夏令时支持"><a href="#2-4-夏令时支持" class="headerlink" title="2.4 夏令时支持"></a>2.4 夏令时支持</h4><p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824121631915.png" alt="夏令时支持"></p>
+<p>在 Flink 1.13 以前，对于国外夏令时时区的用户，做窗口相关的计算操作是十分困难的一件事，因为存在夏令时和冬令时切换的跳变。</p>
+<p>Flink 1.13 通过支持在 TIMESTAMP_LTZ 列上定义时间属性，同时 Flink SQL 在 WINDOW 处理时巧妙地结合 TIMESTAMP 和 TIMESTAMP_LTZ 类型，优雅地支持了夏令时。这对国外夏令时时区用户，以及有海外业务场景的公司比较有用。</p>
+<h2 id="三、重要改进解读"><a href="#三、重要改进解读" class="headerlink" title="三、重要改进解读"></a>三、重要改进解读</h2><h3 id="1-FLIP-152：提升-Hive-语法兼容性"><a href="#1-FLIP-152：提升-Hive-语法兼容性" class="headerlink" title="1. FLIP-152：提升 Hive 语法兼容性"></a>1. FLIP-152：提升 Hive 语法兼容性</h3><p>FLIP-152 主要是做了 Hive 语法的兼容性增强，支持了 Hive 的一些常用 DML 和 DQL 语法，包括：</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824121758967.png" alt="提升hive语法兼容性问题"></p>
+<p>通过 Hive dialect 支持 Hive 常用语法。Hive 有很多的内置函数，Hive dialect 需要配合 HiveCatalog 和 Hive Module 一起使用，Hive Module 提供了 Hive 所有内置函数，加载后可以直接访问。</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824121826256.png" alt="Hivedialect支持hive 常用语法"></p>
+<p>与此同时，我们还可以通过 Hive dialect 创建/删除 Catalog 函数以及一些自定义的函数，这样使得 Flink SQL 与 Hive 的兼容性得到了极大的提升，让熟悉 Hive 的用户使用起来会更加方便。</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824121903273.png" alt="删除函数"></p>
+<h3 id="2-FLIP-163：改进-SQL-Client"><a href="#2-FLIP-163：改进-SQL-Client" class="headerlink" title="2. FLIP-163：改进 SQL Client"></a>2. FLIP-163：改进 SQL Client</h3><p>在 1.13 版本之前，大家觉得 Flink SQL Client 就是周边的一个小工具。但是，FLIP-163 在 1.13 版本进行了重要改进：</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824121932578.png" alt="改进SQL Client"></p>
+<ol>
+<li>通过 -i 的参数，提前把 DDL 一次性加载初始化，方便初始化表的多个 DDL 语句，不需要多次执行命令创建表，替代了之前用 yaml 文件方式创建表；</li>
+<li>支持 -f 参数，其中 SQL 文件支持 DML（insert into）语句；</li>
+<li>支持更多实用的配置：</li>
+</ol>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824121955707.png" alt="SQL client配置"></p>
+<ol>
+<li><ul>
+<li>通过 <strong>SET SQL-client.verbose = true</strong> , 开启 verbose，通过开启 verbose 打印整个信息，相对以前只输出一句话更加容易追踪错误信息；</li>
+<li>通过 <strong>SET execution.runtime-mode=streaming / batch</strong> 支持设置批/流作业模式；</li>
+<li>通过 <strong>SET pipline.name=my_Flink_job</strong> 设置作业名称；</li>
+<li>通过 <strong>SET execution.savepoint.path=/tmp/Flink-savepoints/savepoint-bb0dab</strong> 设置作业 savepoint 路径；</li>
+<li>对于有依赖的多个作业，通过 <strong>SET Table.dml-sync=true</strong> 去选择是否异步执行，例如离线作业，作业 a 跑完才能跑作业 b ，通过设置为 true 实现执行有依赖关系的 pipeline 调度。</li>
+</ul>
+</li>
+</ol>
+<p>4、同时支持 STATEMENT SET语法：</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824122057735.png" alt="sql client"></p>
+<p>有可能我们的一个查询不止写到一个 sink 里面，而是需要输出到多个 sink，比如一个 sink 写到 jdbc，一个 sink 写到 HBase。</p>
+<ul>
+<li>在 1.13 版本之前需要启动 2 个 query 去完成这个作业；</li>
+<li>在 1.13 版本，我们可以把这些放到一个 statement 里面，以一个作业的方式去执行，能够实现节点的复用，节约资源。</li>
+</ul>
+<h3 id="3-FLIP-136：增强-DataStream-和-Table-的转换"><a href="#3-FLIP-136：增强-DataStream-和-Table-的转换" class="headerlink" title="3. FLIP-136：增强 DataStream 和 Table 的转换"></a>3. FLIP-136：增强 DataStream 和 Table 的转换</h3><p>虽然 Flink SQL 大大降低了我们使用实时计算的一些使用门槛，但 Table/SQL 这种高级封装也屏蔽了一些底层实现，如 timer，state 等。不少高级用户希望能够直接操作 DataStream 获得更多的灵活性，这就需要在 Table 和 DataStream 之间进行转换。FLIP-136 增强了 Table 和 DataStream 间的转换，使得用户在两者之间的转换更加容易。</p>
+<ul>
+<li>支持 DataStream 和 Table 转换时传递 EVENT TIME 和 WATERMARK；</li>
+</ul>
+<pre class=" language-java"><code class="language-java">Table Table <span class="token operator">=</span> TableEnv<span class="token punctuation">.</span><span class="token function">fromDataStream</span><span class="token punctuation">(</span>
+    dataStream<span class="token punctuation">,</span>
+  Schema<span class="token punctuation">.</span><span class="token function">newBuilder</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+  <span class="token punctuation">.</span><span class="token function">columnByMetadata</span><span class="token punctuation">(</span><span class="token string">"rowtime"</span><span class="token punctuation">,</span><span class="token string">"TIMESTMP(3)"</span><span class="token punctuation">)</span>
+  <span class="token punctuation">.</span><span class="token function">watermark</span><span class="token punctuation">(</span><span class="token string">"rowtime"</span><span class="token punctuation">,</span><span class="token string">"SOURCE_WATERMARK()"</span><span class="token punctuation">)</span>
+  <span class="token punctuation">.</span><span class="token function">build</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">)</span>
 </code></pre>
-<p>定义模式主要有如下 5 个部分组成：</p>
 <ul>
-<li><strong>pattern</strong>：前一个模式</li>
-<li><strong>next/followedBy/…</strong>：开始一个新的模式</li>
-<li><strong>start</strong>：模式名称</li>
-<li><strong>where</strong>：模式的内容</li>
-<li><strong>filter</strong>：核心处理逻辑</li>
+<li>支持 Changelog 数据流在 Table 和 DataStream 间相互转换。</li>
 </ul>
-<h4 id="2-2-模式的属性"><a href="#2-2-模式的属性" class="headerlink" title="2.2 模式的属性"></a>2.2 模式的属性</h4><p>接下来介绍一下怎样设置模式的属性。模式的属性主要分为循环属性和可选属性。</p>
+<pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">//DATASTREAM 转 Table</span>
+StreamTableEnvironment<span class="token punctuation">.</span><span class="token function">fromChangelogStream</span><span class="token punctuation">(</span>DataStream<span class="token operator">&lt;</span>ROW<span class="token operator">></span><span class="token punctuation">)</span><span class="token operator">:</span> Table
+StreamTableEnvironment<span class="token punctuation">.</span><span class="token function">fromChangelogStream</span><span class="token punctuation">(</span>DataStream<span class="token operator">&lt;</span>ROW<span class="token operator">></span><span class="token punctuation">,</span>Schema<span class="token punctuation">)</span><span class="token operator">:</span> Table
+<span class="token comment" spellcheck="true">//Table 转 DATASTREAM</span>
+StreamTableEnvironment<span class="token punctuation">.</span><span class="token function">toChangelogStream</span><span class="token punctuation">(</span>Table<span class="token punctuation">)</span><span class="token operator">:</span> DataStream<span class="token operator">&lt;</span>ROW<span class="token operator">></span>
+StreamTableEnvironment<span class="token punctuation">.</span><span class="token function">toChangelogStream</span><span class="token punctuation">(</span>Table<span class="token punctuation">,</span>Schema<span class="token punctuation">)</span><span class="token operator">:</span> DataStream<span class="token operator">&lt;</span>ROW<span class="token operator">></span>  
+</code></pre>
+<h2 id="四、Flink-SQL-1-14-未来规划"><a href="#四、Flink-SQL-1-14-未来规划" class="headerlink" title="四、Flink SQL 1.14 未来规划"></a>四、Flink SQL 1.14 未来规划</h2><p>1.14 版本主要有以下几点规划：</p>
 <ul>
-<li>循环属性可以定义模式匹配发生固定次数（<strong>times</strong>），匹配发生一次以上（<strong>oneOrMore</strong>），匹配发生多次以上(<strong>timesOrMore</strong>)。</li>
-<li>可选属性可以设置模式是贪婪的（<strong>greedy</strong>），即匹配最长的串，或设置为可选的（<strong>optional</strong>），有则匹配，无则忽略。</li>
+<li><strong>删除 Legacy Planner</strong>：从 Flink 1.9 开始，在阿里贡献了 Blink-Planner 之后，很多一些新的 Feature 已经基于此 Blink Planner 进行开发，以前旧的 Legacy Planner 会彻底删除；</li>
+<li><strong>完善 Window TVF</strong>：支持 session window，支持 window TVF 的 allow -lateness 等；</li>
+<li><strong>提升 Schema Handling</strong>：全链路的 Schema 处理能力以及关键校验的提升；</li>
+<li><strong>增强 Flink CDC 支持</strong>：增强对上游 CDC 系统的集成能力，Flink SQL 内更多的算子支持 CDC 数据流。</li>
 </ul>
-<h4 id="2-3-模式的有效期"><a href="#2-3-模式的有效期" class="headerlink" title="2.3 模式的有效期"></a>2.3 模式的有效期</h4><p>由于模式的匹配事件存放在状态中进行管理，所以需要设置一个全局的有效期（within）。若不指定有效期，匹配事件会一直保存在状态中不会被清除。至于有效期能开多大，要依据具体使用场景和数据量来衡量，关键要看匹配的事件有多少，随着匹配的事件增多，新到达的消息遍历之前的匹配事件会增加 CPU、内存的消耗，并且随着状态变大，数据倾斜也会越来越严重。</p>
-<h4 id="2-4-模式间的联系"><a href="#2-4-模式间的联系" class="headerlink" title="2.4 模式间的联系"></a>2.4 模式间的联系</h4><p>主要分为三种：严格连续性（next/notNext），宽松连续性（followedBy/notFollowedBy），和非确定宽松连续性（followedByAny）。</p>
-<p>三种模式匹配的差别见下表所示：</p>
-<table>
-<thead>
-<tr>
-<th align="left"><strong>模式&amp;数据流</strong></th>
-<th align="left"><strong>严格连续性</strong></th>
-<th align="left"><strong>宽松连续性</strong></th>
-<th align="left"><strong>非确定宽松连续性</strong></th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="left">Pattern(A B) Streaming(‘a’,’c’,’b1′,’b2′)</td>
-<td align="left">不匹配</td>
-<td align="left">匹配 输出：a,b1</td>
-<td align="left">匹配 输出：a,b1 a,b2</td>
-</tr>
-</tbody></table>
-<p>总结如下：</p>
+<h2 id="五、总结"><a href="#五、总结" class="headerlink" title="五、总结"></a>五、总结</h2><p>本文详细解读了 Flink SQL 1.13 的核心功能和重要改进。</p>
 <ul>
-<li><strong>严格连续性</strong>：需要消息的顺序到达与模式完全一致。</li>
-<li><strong>宽松连续性</strong>：允许忽略不匹配的事件。</li>
-<li><strong>非确定宽松连性</strong>：不仅可以忽略不匹配的事件，也可以忽略已经匹配的事件。</li>
+<li>支持 Window TVF；</li>
+<li>系统地解决时区和时间函数问题；</li>
+<li>提升 Hive 和 Flink 的兼容性；</li>
+<li>改进 SQL Client；</li>
+<li>增强 DataStream 和 Table 的转换。</li>
 </ul>
-<h4 id="2-5-多模式组合"><a href="#2-5-多模式组合" class="headerlink" title="2.5 多模式组合"></a>2.5 多模式组合</h4><p>除了前面提到的模式定义和模式间的联系，还可以把相连的多个模式组合在一起看成一个模式组，类似于视图，可以在这个模式视图上进行相关操作。</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824110937444.png" alt="image-20210824110937444"></p>
-<p>上图这个例子里面，首先匹配了一个登录事件，然后接下来匹配浏览，下单，购买这三个事件反复发生三次的用户。</p>
-<p>如果没有模式组的话，代码里面浏览，下单，购买要写三次。有了模式组，只需把浏览，下单，购买这三个事件当做一个模式组，把相应的属性加上 times(3) 就可以了。</p>
-<h4 id="2-6-处理结果"><a href="#2-6-处理结果" class="headerlink" title="2.6 处理结果"></a>2.6 处理结果</h4><p>处理匹配的结果主要有四个接口：PatternFlatSelectFunction，PatternSelectFunction，PatternFlatTimeoutFunction 和 PatternTimeoutFunction。</p>
-<p>从名字上可以看出，输出可以分为两类：select 和 flatSelect 指定输出一条还是多条，timeoutFunction 和不带 timeout 的 Function 指定可不可以对超时事件进行旁路输出。</p>
-<p>下图是输出的综合示例代码：</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824111048098.png" alt="image-20210824111048098"></p>
-<h4 id="2-7-状态存储优化"><a href="#2-7-状态存储优化" class="headerlink" title="2.7 状态存储优化"></a>2.7 状态存储优化</h4><p>当一个事件到来时，如果这个事件同时符合多个输出的结果集，那么这个事件是如何保存的？</p>
-<p>Flink CEP 通过 Dewey 计数法在多个结果集中共享同一个事件副本，以实现对事件副本进行资源共享。</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824111200461.png" alt="image-20210824111200461"></p>
-<h2 id="Flink-CEP-的扩展"><a href="#Flink-CEP-的扩展" class="headerlink" title="Flink CEP 的扩展"></a>Flink CEP 的扩展</h2><p>本章主要介绍一些 Flink CEP 的扩展，讲述如何做到超时机制的精确管理，以及规则的动态加载与更新。</p>
-<h3 id="1-超时触发机制扩展"><a href="#1-超时触发机制扩展" class="headerlink" title="1.超时触发机制扩展"></a>1.超时触发机制扩展</h3><p>原生 Flink CEP 中超时触发的功能可以通过 within+outputtag 结合来实现，但是在复杂的场景下处理存在问题，如下图所示，在下单事件后还有一个预付款事件，想要得到下单并且预付款后超时未被接单的订单，该如何表示呢？</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824111320576.png" alt="image-20210824111320576"></p>
-<p>参照下单后超时未被接单的做法，把下单并且预付款后超时未被接单规则表示为下单**.followedBy(预付款).followedBy(接单).within(time)**，那么这样实现会存在问题吗？</p>
-<p>这种做法的计算结果是会存在脏数据的，因为这个规则不仅匹配到了下单并且预付款后超时未被接单的订单（想要的结果），同样还匹配到了只有下单行为后超时未被接单的订单（脏数据，没有预付款）。原因是因为超时 within 是控制在整个规则上，而不是某一个状态节点上，所以不论当前的状态是处在哪个状态节点，超时后都会被旁路输出。</p>
-<p>那么就需要考虑能否通过时间来直接对状态转移做到精确的控制，而不是通过规则超时这种曲线救国的方式。于是乎，在通过消息触发状态的转移之外，需要增加通过时间触发状态的转移支持。要实现此功能，需要在原来的状态以及状态转移中，增加时间属性的概念。如下图所示，通过 wait 算子来得到 waiting 状态，然后在 waiting 状态上设置一个十秒的时间属性以定义一个十秒的时间窗口。</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824111450980.png" alt="image-20210824111450980"></p>
-<p>wait 算子对应 NFA 中的 ignore 状态，将在没有到达时间窗口结束时间时自旋，在 ComputationState 中记录 wait 的开始时间，在 NFA 的 doProcess 中，将到来的数据与waiting 状态处理，如果到了 waiting 的结束时间，则进行状态转移。</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824111558511.png" alt="image-20210824111558511"></p>
-<p>上图中红色方框中为 waiting 状态设置了两条 ignore 边：</p>
-<ol>
-<li>waitingStatus.addIgnore(lastSink,waitingCondition)，waitingCondition 中的逻辑是获取当前的时间（支持事件时间），判断有没有超过设置的 waiting 阈值，如果超过就把状态向后转移。</li>
-<li>waitingStatus.addIgnore(waitingCondition)，waitingCondition 中如果未达到设置的 waiting 阈值，就会自旋在当前的 waiting 状态不变。</li>
-</ol>
-<h3 id="2-规则动态注入"><a href="#2-规则动态注入" class="headerlink" title="2.规则动态注入"></a>2.规则动态注入</h3><p>线上运行的 CEP 中肯定经常遇到规则变更的情况，如果每次变更时都将任务重启、重新发布是非常不优雅的。尤其在营销或者风控这种对实时性要求比较高的场景，如果规则窗口过长（一两个星期），状态过大，就会导致重启时间延长，期间就会造成一些想要处理的异常行为不能及时发现。</p>
-<p>那么要怎么样做到规则的动态更新和加载呢？</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824111719312.png" alt="image-20210824111719312"></p>
-<p>梳理一下整体架构，Flink CEP 是运行在 Flink Job 里的，而规则库是放在外部存储中的。首先，需要在运行的 Job 中能及时发现外部存储中规则的变化，即需要在 Job 中提供访问外部库的能力。其次，需要将规则库中变更的规则动态加载到 CEP 中，即把外部规则的描述解析成 Flink CEP 所能识别的 pattern 结构体。最后，把生成的 pattern 转化成 NFA，替换历史 NFA，这样对新到来的消息，就会使用新的规则进行匹配。</p>
-<p>下图就是一个支持将外部规则动态注入、更新的接口。</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824111806820.png" alt="image-20210824111806820"></p>
-<p>这个接口里面主要实现了四个方法：</p>
-<ul>
-<li><strong>initialize</strong>：初始化方法，进行外部库连接的初始化。</li>
-<li><strong>inject</strong>：和外部数据库交互的主要方法，监听外部库变化，获取最新的规则并通过 Groovy 动态加载，返回 pattern。</li>
-<li><strong>getPeriod</strong>：设置轮巡周期，在一些比较简单的实时性要求不高的场景，可以采用轮巡的方式，定期对外部数据库进行检测。</li>
-<li><strong>getNfaKeySelector</strong>：和动态更新无关，用来支持一个流对应多个规则组。</li>
-</ul>
-<h3 id="3-历史匹配结果清理"><a href="#3-历史匹配结果清理" class="headerlink" title="3.历史匹配结果清理"></a>3.历史匹配结果清理</h3><p>新规则动态加载到 Flink CEP 的 Job 中，替换掉原来的 NFA 之后，还需要对历史匹配的结果集进行清理。在 AbstractKeyedCEPPatternOperator 中实现刷新 NFA，注意，历史状态是否需要清理和业务相关：</p>
-<ol>
-<li>修改的逻辑对规则中事件的匹配没有影响，保留历史结果集中的状态。</li>
-<li>修改的逻辑影响到了之前匹配的部分，需要将之前匹配的结果集中的状态数据清除，防止错误的输出。</li>
-</ol>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824111921774.png" alt="image-20210824111921774"></p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824111953602.png" alt="image-20210824111953602"></p>
-<h2 id="总-结"><a href="#总-结" class="headerlink" title="总 结"></a>总 结</h2><p>使用 Flink CEP，熟知其原理是很重要的，特别是 NFA 的状态转移流程，然后再去看源码中的状态图的构建就会很清晰了。</p>
+<p>同时还分享了社区关于 Flink SQL 1.14 的未来规划，相信看完文章的同学可以对 Flink SQL 在这个版本中的变化有更多的了解，在实践过程中大家可以多多关注这些新的改动和变化，感受它们所带来的业务层面上的便捷。</p>
 
                 
             </div>
@@ -690,7 +703,7 @@ DataStream<span class="token operator">&lt;</span>Alert<span class="token operat
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://github.com/wmybigdata/2021/08/24/ApacheFlink%E5%AE%9E%E6%88%98%E6%95%99%E7%A8%8BCEP%E5%AE%9E%E6%88%98/">https://github.com/wmybigdata/2021/08/24/ApacheFlink%E5%AE%9E%E6%88%98%E6%95%99%E7%A8%8BCEP%E5%AE%9E%E6%88%98/</a>
+                    <a href="https://github.com/wmybigdata/2021/08/24/%E6%B7%B1%E5%85%A5%E8%A7%A3%E8%AF%BBFlinkSQL1-13/">https://github.com/wmybigdata/2021/08/24/%E6%B7%B1%E5%85%A5%E8%A7%A3%E8%AF%BBFlinkSQL1-13/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -899,9 +912,10 @@ DataStream<span class="token operator">&lt;</span>Alert<span class="token operat
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+                <i class="far fa-dot-circle"></i>&nbsp;本篇
+            </div>
             <div class="card">
                 <a href="/2021/08/24/%E6%B7%B1%E5%85%A5%E8%A7%A3%E8%AF%BBFlinkSQL1-13/">
                     <div class="card-image">
@@ -919,9 +933,9 @@ DataStream<span class="token operator">&lt;</span>Alert<span class="token operat
                         
                     </div>
                     <div class="publish-info">
-                        <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2021-08-24
-                        </span>
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-08-24
+                            </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
@@ -934,6 +948,7 @@ DataStream<span class="token operator">&lt;</span>Alert<span class="token operat
                         </span>
                     </div>
                 </div>
+
                 
                 <div class="card-action article-tags">
                     
@@ -952,13 +967,13 @@ DataStream<span class="token operator">&lt;</span>Alert<span class="token operat
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2021/08/24/%E4%B8%9A%E5%8A%A1%E6%8C%87%E6%A0%87%E5%BD%92%E7%BA%B3/">
+                <a href="/2021/08/24/ApacheFlink%E5%AE%9E%E6%88%98%E6%95%99%E7%A8%8BCEP%E5%AE%9E%E6%88%98/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/8.jpg" class="responsive-img" alt="业务指标归纳">
+                        <img src="/medias/featureimages/2.jpg" class="responsive-img" alt="ApacheFlink实战教程CEP实战">
                         
-                        <span class="card-title">业务指标归纳</span>
+                        <span class="card-title">ApacheFlink实战教程CEP实战</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -975,8 +990,8 @@ DataStream<span class="token operator">&lt;</span>Alert<span class="token operat
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/%E6%95%B0%E4%BB%93/" class="post-category">
-                                    数仓
+                            <a href="/categories/Flink%E6%B5%81%E5%BC%8F%E5%BC%95%E6%93%8E/" class="post-category">
+                                    Flink流式引擎
                                 </a>
                             
                             
@@ -986,8 +1001,8 @@ DataStream<span class="token operator">&lt;</span>Alert<span class="token operat
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/%E6%95%B0%E4%BB%93/">
-                        <span class="chip bg-color">数仓</span>
+                    <a href="/tags/Flink%E6%B5%81%E5%BC%8F%E5%BC%95%E6%93%8E/">
+                        <span class="chip bg-color">Flink流式引擎</span>
                     </a>
                     
                 </div>
