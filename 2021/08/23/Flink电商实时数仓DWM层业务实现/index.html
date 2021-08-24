@@ -674,7 +674,31 @@ Linux：
 删除检查点
 动态分流
 </code></pre>
-<h2 id="第3章-DWM层-跳出明细计算"><a href="#第3章-DWM层-跳出明细计算" class="headerlink" title="第3章 DWM层-跳出明细计算"></a>第3章 DWM层-跳出明细计算</h2><h2 id="第4章-DWM层-订单宽表"><a href="#第4章-DWM层-订单宽表" class="headerlink" title="第4章 DWM层-订单宽表"></a>第4章 DWM层-订单宽表</h2><h2 id="第5章-DWM层支付宽表（练习）"><a href="#第5章-DWM层支付宽表（练习）" class="headerlink" title="第5章 DWM层支付宽表（练习）"></a>第5章 DWM层支付宽表（练习）</h2><h2 id="第6章-总结"><a href="#第6章-总结" class="headerlink" title="第6章 总结"></a>第6章 总结</h2>
+<h3 id="2-8-思考"><a href="#2-8-思考" class="headerlink" title="2.8 思考"></a>2.8 思考</h3><pre class=" language-properties"><code class="language-properties">如果业务数据库不是MySQL的话，我们可以采取定时去读取的那种方式，今天把它给弄明白，然后彻底的掌握清楚
+</code></pre>
+<h2 id="第3章-DWM层-跳出明细计算"><a href="#第3章-DWM层-跳出明细计算" class="headerlink" title="第3章 DWM层-跳出明细计算"></a>第3章 DWM层-跳出明细计算</h2><h3 id="3-1-需求分析与思路"><a href="#3-1-需求分析与思路" class="headerlink" title="3.1   需求分析与思路"></a>3.1   需求分析与思路</h3><h4 id="3-1-1-什么是跳出"><a href="#3-1-1-什么是跳出" class="headerlink" title="3.1.1 什么是跳出"></a>3.1.1 什么是跳出</h4><pre class=" language-properties"><code class="language-properties">跳出就是用户成功访问了网站的一个页面后就退出，不在继续访问网站的其它页面。而跳出率就是用跳出次数除以访问次数。
+关注跳出率，可以看出引流过来的访客是否能很快的被吸引，渠道引流过来的用户之间的质量对比，对于应用优化前后跳出率的对比也能看出优化改进的成果。
+</code></pre>
+<h4 id="3-1-2-计算跳出行为的思路"><a href="#3-1-2-计算跳出行为的思路" class="headerlink" title="3.1.2 计算跳出行为的思路"></a>3.1.2 计算跳出行为的思路</h4><pre class=" language-properties"><code class="language-properties">首先要识别哪些是跳出行为，要把这些跳出的访客最后一个访问的页面识别出来。那么要抓住几个特征：
+<span class="token attr-name"></span> <span class="token attr-value">   该页面是用户近期访问的第一个页面</span>
+这个可以通过该页面是否有上一个页面（last_page_id）来判断，如果这个表示为空，就说明这是这个访客这次访问的第一个页面。
+<span class="token attr-name"></span> <span class="token attr-value">   首次访问之后很长一段时间（自己设定），用户没继续再有其他页面的访问。</span>
+这第一个特征的识别很简单，保留last_page_id为空的就可以了。但是第二个访问的判断，其实有点麻烦，首先这不是用一条数据就能得出结论的，需要组合判断，要用一条存在的数据和不存在的数据进行组合判断。而且要通过一个不存在的数据求得一条存在的数据。更麻烦的他并不是永远不存在，而是在一定时间范围内不存在。那么如何识别有一定失效的组合行为呢？
+最简单的办法就是Flink自带的CEP技术。这个CEP非常适合通过多条数据组合来识别某个事件。
+用户跳出事件，本质上就是一个条件事件加一个超时事件的组合。
+</code></pre>
+<h3 id="3-2-代码实现"><a href="#3-2-代码实现" class="headerlink" title="3.2    代码实现"></a>3.2    代码实现</h3><h4 id="3-2-1-从kafka的dwd-page-log主题中读取页面日志"><a href="#3-2-1-从kafka的dwd-page-log主题中读取页面日志" class="headerlink" title="3.2.1 从kafka的dwd_page_log主题中读取页面日志"></a>3.2.1 从kafka的dwd_page_log主题中读取页面日志</h4><h4 id="3-2-2-通过Flink的CEP完成跳出判断"><a href="#3-2-2-通过Flink的CEP完成跳出判断" class="headerlink" title="3.2.2 通过Flink的CEP完成跳出判断"></a>3.2.2 通过Flink的CEP完成跳出判断</h4><h5 id="1-确认添加了CEP的依赖包"><a href="#1-确认添加了CEP的依赖包" class="headerlink" title="1)  确认添加了CEP的依赖包"></a>1)  确认添加了CEP的依赖包</h5><h5 id="2-设定时间语义为事件时间并指定数据中的ts字段为事件时间"><a href="#2-设定时间语义为事件时间并指定数据中的ts字段为事件时间" class="headerlink" title="2)  设定时间语义为事件时间并指定数据中的ts字段为事件时间"></a>2)  设定时间语义为事件时间并指定数据中的ts字段为事件时间</h5><h5 id="3-根据日志数据的mid进行分组"><a href="#3-根据日志数据的mid进行分组" class="headerlink" title="3)  根据日志数据的mid进行分组"></a>3)  根据日志数据的mid进行分组</h5><h5 id="4-配置CEP表达式"><a href="#4-配置CEP表达式" class="headerlink" title="4)  配置CEP表达式"></a>4)  配置CEP表达式</h5><h5 id="5-根据表达式筛选流"><a href="#5-根据表达式筛选流" class="headerlink" title="5)  根据表达式筛选流"></a>5)  根据表达式筛选流</h5><h5 id="6-提取命中的数据"><a href="#6-提取命中的数据" class="headerlink" title="6)  提取命中的数据"></a>6)  提取命中的数据</h5><h4 id="3-2-3-将跳出数据写回到kafka的DWM层"><a href="#3-2-3-将跳出数据写回到kafka的DWM层" class="headerlink" title="3.2.3 将跳出数据写回到kafka的DWM层"></a>3.2.3 将跳出数据写回到kafka的DWM层</h4><h4 id="3-2-4-测试"><a href="#3-2-4-测试" class="headerlink" title="3.2.4 测试"></a>3.2.4 测试</h4><pre class=" language-properties"><code class="language-properties"><span class="token attr-name">{"common"</span><span class="token punctuation">:</span><span class="token attr-value">{"ar":"440000","ba":"vivo","ch":"web","is_new":"1","md":"vivo iqoo3","mid":"mid_11","os":"Android 11.0","uid":"23","vc":"v2.1.134"},"page":{"during_time":8488,"page_id":"search"},"ts":1608263563000}</span>
+
+<span class="token attr-name">{"common"</span><span class="token punctuation">:</span><span class="token attr-value">{"ar":"440000","ba":"vivo","ch":"web","is_new":"1","md":"vivo iqoo3","mid":"mid_11","os":"Android 11.0","uid":"23","vc":"v2.1.134"},"page":{"during_time":8488,"page_id":"search"},"ts":1608263564000}</span>
+
+<span class="token attr-name">{"common"</span><span class="token punctuation">:</span><span class="token attr-value">{"ar":"440000","ba":"vivo","ch":"web","is_new":"1","md":"vivo iqoo3","mid":"mid_12","os":"Android 11.0","uid":"23","vc":"v2.1.134"},"page":{"during_time":8488,"page_id":"search"},"ts":1608263564000}</span>
+
+<span class="token attr-name">{"common"</span><span class="token punctuation">:</span><span class="token attr-value">{"ar":"440000","ba":"vivo","ch":"web","is_new":"1","md":"vivo iqoo3","mid":"mid_13","os":"Android 11.0","uid":"23","vc":"v2.1.134"},"page":{"during_time":8488,"page_id":"search"},"ts":1608263570000}</span>
+
+<span class="token attr-name">{"common"</span><span class="token punctuation">:</span><span class="token attr-value">{"ar":"440000","ba":"vivo","ch":"web","is_new":"1","md":"vivo iqoo3","mid":"mid_13","os":"Android 11.0","uid":"23","vc":"v2.1.134"},"page":{"during_time":8488,"page_id":"search"},"ts":1608263574000}</span>
+</code></pre>
+<p>超时事件处理不是很难，主要是业务是比较难得，我们通过处理放到了kafka层</p>
+<h2 id="第4章-DWM层-订单宽表"><a href="#第4章-DWM层-订单宽表" class="headerlink" title="第4章 DWM层-订单宽表"></a>第4章 DWM层-订单宽表</h2><h2 id="第5章-DWM层支付宽表（练习）"><a href="#第5章-DWM层支付宽表（练习）" class="headerlink" title="第5章 DWM层支付宽表（练习）"></a>第5章 DWM层支付宽表（练习）</h2><h2 id="第6章-总结"><a href="#第6章-总结" class="headerlink" title="第6章 总结"></a>第6章 总结</h2>
                 
             </div>
             <hr/>

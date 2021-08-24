@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="实时数仓项目心得, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
+    <meta name="keywords" content="业务指标归纳, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
     <meta name="description" content="本网站是个人兴趣爱好，总结分享经验，记录生活点滴的平台，希望在以后的学习旅途中，走出自己的风景。">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -16,7 +16,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>实时数仓项目心得 | 情深骚明大数据之旅</title>
+    <title>业务指标归纳 | 情深骚明大数据之旅</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -314,12 +314,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/4.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/8.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">实时数仓项目心得</h1>
+                    <h1 class="description center-align post-title">业务指标归纳</h1>
                 </div>
             </div>
         </div>
@@ -460,7 +460,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2021-08-23
+                    2021-08-24
                 </div>
                 
 
@@ -481,11 +481,25 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h1 id="实时数仓项目心得"><a href="#实时数仓项目心得" class="headerlink" title="实时数仓项目心得"></a>实时数仓项目心得</h1><h2 id="搭建环境"><a href="#搭建环境" class="headerlink" title="搭建环境"></a>搭建环境</h2><pre class=" language-properties"><code class="language-properties"><span class="token attr-name">其实实时数仓和离线数仓因该是一个架构两个项目,一个系统既要有实时系统也要有离线系统,周边的可能会跟一些业务系统的数据库和一些java</span> <span class="token attr-value">spring后端的数据接口等等,在大数据中,离线的一般都是hive+spark的方式来进行的</span>
-实时都是flink+kafka+clickhouse+hbase+redis的方式来进行的,目前的话,我是已经搭建好了实时系统和离线系统的,可能现在还有clickhouse+mysql+redis我觉得应该把这些周边的数据库,且不依赖于hadoop的数据库全部都搭建成一个单节点的一个教Dm的虚拟机中,同时我还有一个superset的一个报表系统来进行一个展示这些维度数据库中的数据结果的
+                <h1 id="业务指标归纳"><a href="#业务指标归纳" class="headerlink" title="业务指标归纳"></a>业务指标归纳</h1><h2 id="ODS"><a href="#ODS" class="headerlink" title="ODS"></a>ODS</h2><h3 id="Flink-CDC-读取监听MySQL-binlog日志成广播流"><a href="#Flink-CDC-读取监听MySQL-binlog日志成广播流" class="headerlink" title="Flink CDC 读取监听MySQL binlog日志成广播流"></a>Flink CDC 读取监听MySQL binlog日志成广播流</h3><h3 id="使用定时读取数据库中，转换成对象然后就行计算-—-gt-重点"><a href="#使用定时读取数据库中，转换成对象然后就行计算-—-gt-重点" class="headerlink" title="使用定时读取数据库中，转换成对象然后就行计算  —> 重点"></a>使用定时读取数据库中，转换成对象然后就行计算  —&gt; 重点</h3><h2 id="DWM"><a href="#DWM" class="headerlink" title="DWM"></a>DWM</h2><h3 id="UV访客数"><a href="#UV访客数" class="headerlink" title="UV访客数"></a>UV访客数</h3><h3 id="用户跳出率"><a href="#用户跳出率" class="headerlink" title="用户跳出率"></a>用户跳出率</h3><pre class=" language-properties"><code class="language-properties"><span class="token attr-name">没有上一跳(lastPageId</span> <span class="token punctuation">=</span><span class="token attr-value">= null)，没有下一跳(如何计算,下一跳的数据是没有到来的，但是如果是要是有一个sessionID的话就简单了)</span>
+会话窗口，是想要会话窗口去做一些近似会话的操作
+如果要是会话窗口，间隔时间30秒，使用全量窗口来进行计算，但是这些数据都不是一个精确的数据计算，但是这样的话会造成很多数据重复或者丢失，单纯看时间会有很多的问题，时间不是解决问题的方法
+这些都针对于数据来说的，主要的问题就是如何解决下一跳的问题，是多个问题，复杂事件，是多个简单事件的问题的组合，CEP应该如何去解决
+<span class="token attr-name">begin</span> <span class="token attr-value">解决上一跳为null</span>
+<span class="token attr-name">within(30s)</span> <span class="token attr-value">这个跟会话窗口还是一样的问题，所以这个问题中间是需要加一些特殊条件</span>
+后置条件，中间还得加一些条件，就是在这30秒钟是没有数据的，后置条件的话找出的数据是什么样才能满足我们的跳出的需求
+next这个过滤条件应该如何去解决这个问题
+下一条数据只要不是上一条数据跳转过来的就行，单独的对第二条数据进行判断，不是对第一条的数据进行判断
+如果有watermark的话，可以处理延迟的数据，可以写同样的条件，匹配上，匹配失败，匹配超时
+如果匹配上了这条数据要还是不要，失败的数据是不要的，超时数据的话是需要的不会出现，在一个会话窗口中多次的跳出，在CEP中是能把这些数据给找出的
+
+CEP这个状态是需求很难，代码的话是很简单的
+对用户来进行分组MID进行分组
+
+CEP的编程方式都是比较固定的，还是得注重于业务
 </code></pre>
-<p>搭建好系统之后一定要注意快照和维护,不需要花大量的时间去解决整个环境上,应该花大量的时间在业务和解决问题的能力上面去,希望自己能够不停的做项目的同时能够锻炼自己,同时花时间能够做一个总结是非常有必要的</p>
-<p>养成一个良好的开发习惯,就是每做一次代码的更改都得做一个版本得控制,这样方便能更好回到之前得版本和往上提高版本</p>
+<h3 id="留存率"><a href="#留存率" class="headerlink" title="留存率"></a>留存率</h3><p>优化产品</p>
+<h3 id="新增用户"><a href="#新增用户" class="headerlink" title="新增用户"></a>新增用户</h3><p>优化推广</p>
 
                 
             </div>
@@ -512,7 +526,7 @@
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://github.com/wmybigdata/2021/08/23/%E5%AE%9E%E6%97%B6%E6%95%B0%E4%BB%93%E9%A1%B9%E7%9B%AE%E5%BF%83%E5%BE%97/">https://github.com/wmybigdata/2021/08/23/%E5%AE%9E%E6%97%B6%E6%95%B0%E4%BB%93%E9%A1%B9%E7%9B%AE%E5%BF%83%E5%BE%97/</a>
+                    <a href="https://github.com/wmybigdata/2021/08/24/%E4%B8%9A%E5%8A%A1%E6%8C%87%E6%A0%87%E5%BD%92%E7%BA%B3/">https://github.com/wmybigdata/2021/08/24/%E4%B8%9A%E5%8A%A1%E6%8C%87%E6%A0%87%E5%BD%92%E7%BA%B3/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -725,6 +739,43 @@
             <div class="article-badge left-badge text-color">
                 <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
+                <a href="/2021/08/24/ApacheFlink%E5%AE%9E%E6%88%98%E6%95%99%E7%A8%8BCEP%E5%AE%9E%E6%88%98/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/2.jpg" class="responsive-img" alt="ApacheFlink实战教程CEP实战">
+                        
+                        <span class="card-title">ApacheFlink实战教程CEP实战</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            学习心得记录
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2021-08-24
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-user fa-fw"></i>
+                            情深骚明
+                            
+                        </span>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
                 <a href="/2021/08/23/%E8%8B%B1%E8%AF%AD%E6%97%A5%E5%B8%B8%E5%AD%A6%E4%B9%A0/">
                     <div class="card-image">
                         
@@ -741,9 +792,9 @@
                         
                     </div>
                     <div class="publish-info">
-                        <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2021-08-23
-                        </span>
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-08-23
+                            </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
@@ -761,55 +812,6 @@
                     
                     <a href="/tags/%E8%8B%B1%E8%AF%AD/">
                         <span class="chip bg-color">英语</span>
-                    </a>
-                    
-                </div>
-                
-            </div>
-        </div>
-        
-        
-        <div class="article col s12 m6" data-aos="fade-up">
-            <div class="article-badge right-badge text-color">
-                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
-            </div>
-            <div class="card">
-                <a href="/2021/08/23/Hive%E5%90%AF%E5%8A%A8%E9%97%AE%E9%A2%98/">
-                    <div class="card-image">
-                        
-                        
-                        <img src="/medias/featureimages/21.jpg" class="responsive-img" alt="Hive启动问题">
-                        
-                        <span class="card-title">Hive启动问题</span>
-                    </div>
-                </a>
-                <div class="card-content article-content">
-                    <div class="summary block-with-text">
-                        
-                            学习心得记录
-                        
-                    </div>
-                    <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2021-08-23
-                            </span>
-                        <span class="publish-author">
-                            
-                            <i class="fas fa-bookmark fa-fw icon-category"></i>
-                            
-                            <a href="/categories/%E6%95%B0%E4%BB%93/" class="post-category">
-                                    数仓
-                                </a>
-                            
-                            
-                        </span>
-                    </div>
-                </div>
-                
-                <div class="card-action article-tags">
-                    
-                    <a href="/tags/%E6%95%B0%E4%BB%93/">
-                        <span class="chip bg-color">数仓</span>
                     </a>
                     
                 </div>
