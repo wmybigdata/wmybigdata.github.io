@@ -133,9 +133,21 @@
       <link href="/2021/08/24/Flink1-12-0%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB/"/>
       <url>/2021/08/24/Flink1-12-0%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB/</url>
       
-        <content type="html"><![CDATA[]]></content>
+        <content type="html"><![CDATA[<h1 id="Flink1-12-0源码阅读"><a href="#Flink1-12-0源码阅读" class="headerlink" title="Flink1.12.0源码阅读"></a>Flink1.12.0源码阅读</h1>]]></content>
       
       
+      <categories>
+          
+          <category> Flink流式引擎 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> Flink流式引擎 </tag>
+            
+        </tags>
       
     </entry>
     
