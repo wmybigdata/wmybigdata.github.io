@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="深入解读FlinkSQL1.13, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
+    <meta name="keywords" content="Flink-CDC-2.0-正式发布-详解核心改进, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
     <meta name="description" content="本网站是个人兴趣爱好，总结分享经验，记录生活点滴的平台，希望在以后的学习旅途中，走出自己的风景。">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -16,7 +16,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>深入解读FlinkSQL1.13 | 情深骚明大数据之旅</title>
+    <title>Flink-CDC-2.0-正式发布-详解核心改进 | 情深骚明大数据之旅</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -314,12 +314,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/17.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/16.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">深入解读FlinkSQL1.13</h1>
+                    <h1 class="description center-align post-title">Flink-CDC-2.0-正式发布-详解核心改进</h1>
                 </div>
             </div>
         </div>
@@ -435,8 +435,8 @@
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/Flink%E6%B5%81%E5%BC%8F%E5%BC%95%E6%93%8E/">
-                                <span class="chip bg-color">Flink流式引擎</span>
+                            <a href="/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE%E9%87%87%E9%9B%86%E7%B3%BB%E7%BB%9F/">
+                                <span class="chip bg-color">大数据采集系统</span>
                             </a>
                         
                     </div>
@@ -447,8 +447,8 @@
                     <div class="post-cate">
                         <i class="fas fa-bookmark fa-fw icon-category"></i>
                         
-                            <a href="/categories/Flink%E6%B5%81%E5%BC%8F%E5%BC%95%E6%93%8E/" class="post-category">
-                                Flink流式引擎
+                            <a href="/categories/%E5%A4%A7%E6%95%B0%E6%8D%AE%E9%87%87%E9%9B%86%E7%B3%BB%E7%BB%9F/" class="post-category">
+                                大数据采集系统
                             </a>
                         
                     </div>
@@ -481,202 +481,187 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h1 id="深入解读FlinkSQL1-13"><a href="#深入解读FlinkSQL1-13" class="headerlink" title="深入解读FlinkSQL1.13"></a>深入解读FlinkSQL1.13</h1><p>参考网址：<a href="https://flink-learning.org.cn/article/detail/a8b0895d4271bf6b770927eea214612d" target="_blank" rel="noopener">https://flink-learning.org.cn/article/detail/a8b0895d4271bf6b770927eea214612d</a></p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824113303217.png" alt="Flink SQL核心功能"></p>
-<ol>
-<li>Flink SQL 1.13 概览</li>
-<li>核心 feature 解读</li>
-<li>重要改进解读</li>
-<li>Flink SQL 1.14 未来规划</li>
-<li>总结</li>
-</ol>
-<h2 id="一、Flink-SQL-1-13-概览"><a href="#一、Flink-SQL-1-13-概览" class="headerlink" title="一、Flink SQL 1.13 概览"></a>一、Flink SQL 1.13 概览</h2><p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824113358728.png" alt="Flink SQL概览"></p>
-<p>Flink 1.13 是一个社区大版本，解决的 issue 在 1000 个以上，通过上图我们可以看到，解决的问题大部分是关于 Table/SQL 模块，一共 400 多个 issue 占了总体的 37% 左右。这些 issue 主要围绕了 5 个 FLIP 展开，在本文中我们也会根据这 5 个方面进行介绍，它们分别是：</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824113444978.png" alt="Table SQL"></p>
-<p>下面我们对这些 FLIP 进行详细解读。</p>
-<h2 id="二、-核心-feature-解读"><a href="#二、-核心-feature-解读" class="headerlink" title="二、 核心 feature 解读"></a>二、 核心 feature 解读</h2><h3 id="1-FLIP-145：支持-Window-TVF"><a href="#1-FLIP-145：支持-Window-TVF" class="headerlink" title="1. FLIP-145：支持 Window TVF"></a>1. FLIP-145：支持 Window TVF</h3><p>社区的小伙伴应该了解，在腾讯、阿里巴巴、字节跳动等公司的内部分支已经开发了这个功能的基础版本。这次 Flink 社区也在 Flink 1.13 推出了 TVF 的相关支持和优化。下面将从 Window TVF 语法、近实时累计计算场景、 Window 性能优化、多维数据分析，来分析这个新功能。</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824113601029.png" alt="Window TVF"></p>
-<h4 id="1-1-Window-TVF-语法"><a href="#1-1-Window-TVF-语法" class="headerlink" title="1.1 Window TVF 语法"></a>1.1 Window TVF 语法</h4><p>在 1.13 版本前，window 的实现是通过一个特殊的 SqlGroupedWindowFunction：</p>
-<pre class=" language-sql"><code class="language-sql"><span class="token keyword">SELECT</span> 
-  TUMBLE_START<span class="token punctuation">(</span>bidtime<span class="token punctuation">,</span>INTERVAL <span class="token string">'10'</span> MINUTE<span class="token punctuation">)</span><span class="token punctuation">,</span>
-  TUMBLE_END<span class="token punctuation">(</span>bidtime<span class="token punctuation">,</span>INTERVAL <span class="token string">'10'</span> MINUTE<span class="token punctuation">)</span><span class="token punctuation">,</span>
-  TUMBLE_ROWTIME<span class="token punctuation">(</span>bidtime<span class="token punctuation">,</span>INTERVAL <span class="token string">'10'</span> MINUTE<span class="token punctuation">)</span><span class="token punctuation">,</span>
-  <span class="token function">SUM</span><span class="token punctuation">(</span>price<span class="token punctuation">)</span>
-<span class="token keyword">FROM</span> MyTable
-<span class="token keyword">GROUP</span> <span class="token keyword">BY</span> TUMBLE<span class="token punctuation">(</span>bidtime<span class="token punctuation">,</span>INTERVAL <span class="token string">'10'</span> MINUTE<span class="token punctuation">)</span>
-</code></pre>
-<p>在 1.13 版本中，我们对它进行了 Table-Valued Function 的语法标准化：</p>
-<pre class=" language-sql"><code class="language-sql"><span class="token keyword">SELECT</span> WINDOW_start<span class="token punctuation">,</span>WINDOW_end<span class="token punctuation">,</span>WINDOW_time<span class="token punctuation">,</span><span class="token function">SUM</span><span class="token punctuation">(</span>price<span class="token punctuation">)</span> 
-<span class="token keyword">FROM</span> <span class="token keyword">Table</span><span class="token punctuation">(</span>TUMBLE<span class="token punctuation">(</span><span class="token keyword">Table</span> myTable<span class="token punctuation">,</span>DESCRIPTOR<span class="token punctuation">(</span>biztime<span class="token punctuation">)</span><span class="token punctuation">,</span>INTERVAL <span class="token string">'10'</span> MINUTE<span class="token punctuation">)</span><span class="token punctuation">)</span>
-<span class="token keyword">GROUP</span> <span class="token keyword">BY</span> WINDOW_start<span class="token punctuation">,</span>WINDOW_end
-</code></pre>
-<p>通过对比两种语法，我们可以发现：TVF 语法更加灵活，不需要必须跟在 GROUP BY 关键字后面，同时 Window TVF 基于关系代数，使得其更加标准。在只需要划分窗口场景时，可以只用 TVF，无需用 GROUP BY 做聚合，这使得 TVF 扩展性和表达能力更强，支持自定义 TVF（例如实现 TOP-N 的 TVF）。</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824113822022.png" alt="TOP-N TVF"></p>
-<p>上图中的示例就是利用 TVF 做的滚动窗口的划分，只需要把数据划分到窗口，无需聚合；如果后续需要聚合，再进行 GROP BY 即可。同时，对于熟悉批 SQL 的用户来说，这种操作是非常自然的，我们不再需要像 1.13 版本之前那样必须要用特殊的 SqlGroupedWindowFunction 将窗口划分和聚合绑定在一起。</p>
-<p>目前 Window TVF 支持 tumble window，hop window，新增了 cumulate window；session window 预计在 1.14 版本也会支持。</p>
-<h4 id="1-2-Cumulate-Window"><a href="#1-2-Cumulate-Window" class="headerlink" title="1.2 Cumulate Window"></a>1.2 Cumulate Window</h4><p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824113914700.png" alt="cumulate window"></p>
-<p>Cumulate window 就是累计窗口，简单来说，以上图里面时间轴上的一个区间为窗口步长。</p>
+                <h1 id="Flink-CDC-2-0-正式发布-详解核心改进"><a href="#Flink-CDC-2-0-正式发布-详解核心改进" class="headerlink" title="Flink-CDC-2.0-正式发布-详解核心改进"></a>Flink-CDC-2.0-正式发布-详解核心改进</h1><h2 id="一、CDC-概述"><a href="#一、CDC-概述" class="headerlink" title="一、CDC 概述"></a>一、CDC 概述</h2><p>CDC 的全称是 Change Data Capture ，在广义的概念上，只要是能捕获数据变更的技术，我们都可以称之为 CDC 。目前通常描述的 CDC 技术主要面向数据库的变更，是一种用于捕获数据库中数据变更的技术。CDC 技术的应用场景非常广泛：</p>
 <ul>
-<li>第一个 window 统计的是一个区间的数据；</li>
-<li>第二个 window 统计的是第一区间和第二个区间的数据；</li>
-<li>第三个 window 统计的是第一区间，第二个区间和第三个区间的数据。</li>
+<li><strong>数据同步：</strong>用于备份，容灾；</li>
+<li><strong>数据分发：</strong>一个数据源分发给多个下游系统；</li>
+<li><strong>数据采集：</strong>面向数据仓库 / 数据湖的 ETL 数据集成，是非常重要的数据源。</li>
 </ul>
-<p>累积计算在业务场景中非常常见，如累积 UV 场景。在 UV 大盘曲线中：我们每隔 10 分钟统计一次当天累积用户 UV。</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824114137054.png" alt="近实时累计计算"></p>
-<p>在 1.13 版本之前，当需要做这种计算时，我们一般的 SQL 写法如下：</p>
-<pre class=" language-sql"><code class="language-sql"><span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> cumulative_UV
-<span class="token keyword">SELECT</span> date_str<span class="token punctuation">,</span><span class="token function">MAX</span><span class="token punctuation">(</span>time_str<span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token function">COUNT</span><span class="token punctuation">(</span><span class="token keyword">DISTINCT</span> user_id<span class="token punctuation">)</span> <span class="token keyword">as</span> UV
-<span class="token keyword">FROM</span> <span class="token punctuation">(</span>
-    <span class="token keyword">SELECT</span>
-      DATE_FORMAT<span class="token punctuation">(</span>ts<span class="token punctuation">,</span><span class="token string">'yyyy-MM-dd'</span><span class="token punctuation">)</span> <span class="token keyword">as</span> date_str<span class="token punctuation">,</span>
-      SUBSTR<span class="token punctuation">(</span>DATE_FORMAT<span class="token punctuation">(</span>ts<span class="token punctuation">,</span><span class="token string">'HH:mm'</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">4</span><span class="token punctuation">)</span> <span class="token operator">||</span> <span class="token string">'0'</span> <span class="token keyword">as</span> time_str<span class="token punctuation">,</span>
-      user_id
-  <span class="token keyword">FROM</span> user_behavior
-<span class="token punctuation">)</span>
-<span class="token keyword">GROUP</span> <span class="token keyword">BY</span> date_str
-</code></pre>
-<p>先将每条记录所属的时间窗口字段拼接好，然后再对所有记录按照拼接好的时间窗口字段，通过 GROUP BY 做聚合，从而达到近似累积计算的效果。</p>
+<p>CDC 的技术方案非常多，目前业界主流的实现机制可以分为两种：</p>
 <ul>
-<li>1.13 版本前的写法有很多缺点，首先这个聚合操作是每条记录都会计算一次。其次，在追逆数据的时候，消费堆积的数据时，UV 大盘的曲线就会跳变。</li>
-<li>在 1.13 版本支持了 TVF 写法，基于 cumulate window，我们可以修改为下面的写法，将每条数据按照 Event Time 精确地分到每个 Window 里面, 每个窗口的计算通过 watermark 触发，即使在追数据场景中也不会跳变。</li>
-</ul>
-<pre class=" language-sql"><code class="language-sql"><span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> cumulative_UV
-<span class="token keyword">SELECT</span> WINDOW_end<span class="token punctuation">,</span><span class="token function">COUNT</span><span class="token punctuation">(</span><span class="token keyword">DISTINCT</span> user_id<span class="token punctuation">)</span> <span class="token keyword">as</span> UV
-<span class="token keyword">FROM</span> <span class="token keyword">Table</span><span class="token punctuation">(</span>
-    CUMULATE<span class="token punctuation">(</span><span class="token keyword">Table</span> user_behavior<span class="token punctuation">,</span>DESCRIPTOR<span class="token punctuation">(</span>ts<span class="token punctuation">)</span><span class="token punctuation">,</span>INTERVAL <span class="token string">'10'</span> MINUTES<span class="token punctuation">,</span>INTERVAL <span class="token string">'1'</span> DAY<span class="token punctuation">)</span><span class="token punctuation">)</span>
-<span class="token punctuation">)</span>
-<span class="token keyword">GROUP</span> <span class="token keyword">BY</span> WINDOW_start<span class="token punctuation">,</span>WINDOW_end
-</code></pre>
-<p>UV 大盘曲线效果如下图所示：</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824114419320.png" alt="UV大盘曲线效果下图所示"></p>
-<h4 id="1-3-Window-性能优化"><a href="#1-3-Window-性能优化" class="headerlink" title="1.3 Window 性能优化"></a>1.3 Window 性能优化</h4><p>Flink 1.13 社区开发者们对 Window TVF 进行了一系列的性能优化，包括：</p>
-<ul>
-<li><strong>内存优化：</strong>通过内存预分配，缓存 window 的数据，通过 window watermark 触发计算，通过申请一些内存 buffer 避免高频的访问 state；</li>
-<li><strong>切片优化：</strong>将 window 切片，尽可能复用已计算结果，如 hop window，cumulate window。计算过的分片数据无需再次计算，只需对切片的计算结果进行复用；</li>
-<li><strong>算子优化：</strong>window 算子支持 local-global 优化；同时支持 count(distinct) 自动解热点优化；</li>
-<li><strong>迟到数据：</strong>支持将迟到数据计算到后续分片，保证数据准确性。</li>
-</ul>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824114505810.png" alt="Window性能优化"></p>
-<p>基于这些优化，我们通过开源 Benchmark (Nexmark) 进行性能测试。结果显示 window 的普适性能有 2x 提升，且在 count(distinct) 场景会有更好的性能提升。</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824114537906.png" alt="Window性能优化"></p>
-<h4 id="1-4-多维数据分析"><a href="#1-4-多维数据分析" class="headerlink" title="1.4 多维数据分析"></a>1.4 多维数据分析</h4><p>语法的标准化带来了更多的灵活性和扩展性，用户可以直接在 window 窗口函数上进行多维分析。如下图所示，可以直接进行 GROUPING SETS、ROLLUP、CUBE 的分析计算。如果是在 1.13 之前的版本，我们可能需要对这些分组进行单独的 SQL 聚合，再对聚合结果做 union 操作才能达到类似的效果。而现在，类似这种多维分析的场景，可以直接在 window TVF 上支持。</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824114730789.png" alt="多维数据分析"></p>
-<h5 id="1-4-1-支持-Window-Top-N"><a href="#1-4-1-支持-Window-Top-N" class="headerlink" title="1.4.1 支持 Window Top-N"></a>1.4.1 <strong>支持 Window Top-N</strong></h5><p>除了多维分析，Window TVF 也支持 Top-N 语法，使得在 Window 上取 Top-N 的写法更加简单。</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824114826337.png" alt="多维数据分析SQL"></p>
-<h3 id="2-FLIP-162：时区和时间函数"><a href="#2-FLIP-162：时区和时间函数" class="headerlink" title="2. FLIP-162：时区和时间函数"></a>2. FLIP-162：时区和时间函数</h3><h4 id="2-1-时区问题分析"><a href="#2-1-时区问题分析" class="headerlink" title="2.1 时区问题分析"></a>2.1 时区问题分析</h4><p>大家在使用 Flink SQL 时反馈了很多时区相关的问题，造成时区问题的原因可以归纳为 3 个：</p>
-<ul>
-<li>PROCTIME() 函数应该考虑时区，但未考虑时区；</li>
-<li>CURRENT_TIMESTAMP/CURRENT_TIME/CURRENT_DATE/NOW() 函数未考虑时区；</li>
-<li>Flink 的时间属性，只支持定义在 TIMESTAMP 这种数据类型上面，这个类型是无时区的，TIMESTAMP 类型不考虑时区，但用户希望是本地时区的时间。</li>
-</ul>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824114929478.png" alt="时区问题分析"></p>
-<p>针对 TIMESTAMP 类型没有考虑时区的问题，我们提议通过TIMESTAMP_LTZ类型支持 (TIMESTAMP_LTZ 是 timestamp with local time zone 的缩写)。可以通过下面的表格来进行和 TIMESTAMP 的对比：</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824115024280.png" alt="时区问题分析"></p>
-<p>TIMESTAMP_LTZ 区别于之前我们使用的 TIMESTAMP，它表示绝对时间的含义。通过对比我们可以发现：</p>
-<ul>
-<li>如果我们配置使用 TIMESTAMP，它可以是字符串类型的。用户不管是从英国还是中国时区来观察，这个值都是一样的；</li>
-<li>但是对于 TIMSTAMP_TLZ 来说，它的来源就是一个 Long 值，表示从时间原点流逝过的时间。同一时刻，从时间原点流逝的时间在所有时区都是相同的，所以这个 Long 值是绝对时间的概念。当我们在不同的时区去观察这个值，我们会用本地的时区去解释成 “年-月-日-时-分-秒” 的可读格式，这就是 TIMSTAMP_TLZ 类型，TIMESTAMP_LTZ 类型也更加符合用户在不同时区下的使用习惯。</li>
-</ul>
-<p>下面的例子展示了 TIMESTAMP 和 TIMESTAMP_LTZ 两个类型的区别。</p>
-<h4 id="2-2-时间函数纠正"><a href="#2-2-时间函数纠正" class="headerlink" title="2.2 时间函数纠正"></a>2.2 时间函数纠正</h4><p><strong>订正 PROCTIME() 函数</strong></p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824115208530.png" alt="时间函数纠正"></p>
-<p>当我们有了 TIMESTAMP_LTZ 这个类型的时候，我们对 PROCTIME() 类型做了纠正：在 1.13 版本之前，它总是返回 UTC 的 TIMESTAMP；而现在，我们把返回类型变为了 TIMESTAMP_LTZ。PROCTIME 除了表示函数之外，也可以表示时间属性的标记。</p>
-<p><strong>订正 CURRENT_TIMESTAMP/CURRENT_TIME/CURRENT_DATE/NOW() 函数</strong></p>
-<p>这些函数在不同时区下出来的值是会发生变化的。例如在英国 UTC 时区时候是凌晨 2 点；但是如果你设置了时区是 UTC+8，时间就是在早上的 10 点。不同时区的实际时间会发生变化，效果如下图：</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824115254981.png" alt="时间函数的纠正"><strong>解决 processing time Window 时区问题</strong></p>
-<p>大家都知道 proctime 可以表示一个时间属性，对 proctime 的 window 操作：</p>
-<ul>
-<li>在 1.13 版本之前，如果我们需要做按天的 window 操作，你需要手动解决时区问题，去做一些 8 小时的偏移然后再减回去；</li>
-<li>在 FLIP-162 中我们解决了这个问题，现在用户使用的时候十分简单，只需要声明 proctime 属性，因为 PROCTIME() 函数的返回值是TIMESTAMP_LTZ，所以结果是会考虑本地的时区。下图的例子显示了在不同的时区下，proctime 属性的 window 的聚合是按照本地时区进行的。</li>
-</ul>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824121417679.png" alt="image-20210824121417679"></p>
-<p><strong>订正 Streaming 和 Batch 模式下函数取值方式</strong></p>
-<p>时间函数其实在流和批上面的表现形式会有所区别，这次修正主要是让其更加符合用户实际的使用习惯。例如以下函数：</p>
-<ul>
-<li>在流模式中是 per-record 计算，即每条数据都计算一次；</li>
-<li>在 Batch 模式是 query-start 计算，即在作业开始前计算一次。例如我们常用的一些 Batch 计算引擎，如 Hive 也是在每一个批开始前计算一次。</li>
-</ul>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824121453936.png" alt="时间函数的纠正"></p>
-<h4 id="2-3-时间类型使用"><a href="#2-3-时间类型使用" class="headerlink" title="2.3 时间类型使用"></a>2.3 时间类型使用</h4><p>在 1.13 版本也支持了在 TIMESTAMP 列上定义 Event time，也就是说Event time 现在既支持定义在 TIMESTAMP 列上，也支持定义在 TIMESTAMP_ LTZ 列上。那么作为用户，具体什么场景用什么类型呢？</p>
-<ul>
-<li>当作业的上游源数据包含了字符串的时间（如：2021-4-15 14:00:00）这样的场景，直接声明为 TIMESTAMP 然后把 Event time 定义在上面即可，窗口在计算的时候会基于时间字符串进行切分，最终会计算出符合你实际想要的预想结果；</li>
-</ul>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824121528721.png" alt="时间类型的使用"></p>
-<p>当上游数据源的打点时间属于 long 值，表示的是一个绝对时间的含义。在 1.13 版本你可以把 Event time 定义在 TIMESTAMP_LTZ 上面。此时定义在 TIMESTAMP_LTZ 类型上的各种 WINDOW 聚合，都能够自动的解决 8 小时的时区偏移问题，无需按照之前的 SQL 写法额外做时区的修改和订正。</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824121559194.png" alt="时间类型使用"></p>
-<p>小提示：Flink SQL 中关于时间函数，时区支持的这些提升，是版本不兼容的。用户在进行版本更新的时候需要留意作业逻辑中是否包含此类函数，避免升级后业务受到影响。</p>
-<h4 id="2-4-夏令时支持"><a href="#2-4-夏令时支持" class="headerlink" title="2.4 夏令时支持"></a>2.4 夏令时支持</h4><p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824121631915.png" alt="夏令时支持"></p>
-<p>在 Flink 1.13 以前，对于国外夏令时时区的用户，做窗口相关的计算操作是十分困难的一件事，因为存在夏令时和冬令时切换的跳变。</p>
-<p>Flink 1.13 通过支持在 TIMESTAMP_LTZ 列上定义时间属性，同时 Flink SQL 在 WINDOW 处理时巧妙地结合 TIMESTAMP 和 TIMESTAMP_LTZ 类型，优雅地支持了夏令时。这对国外夏令时时区用户，以及有海外业务场景的公司比较有用。</p>
-<h2 id="三、重要改进解读"><a href="#三、重要改进解读" class="headerlink" title="三、重要改进解读"></a>三、重要改进解读</h2><h3 id="1-FLIP-152：提升-Hive-语法兼容性"><a href="#1-FLIP-152：提升-Hive-语法兼容性" class="headerlink" title="1. FLIP-152：提升 Hive 语法兼容性"></a>1. FLIP-152：提升 Hive 语法兼容性</h3><p>FLIP-152 主要是做了 Hive 语法的兼容性增强，支持了 Hive 的一些常用 DML 和 DQL 语法，包括：</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824121758967.png" alt="提升hive语法兼容性问题"></p>
-<p>通过 Hive dialect 支持 Hive 常用语法。Hive 有很多的内置函数，Hive dialect 需要配合 HiveCatalog 和 Hive Module 一起使用，Hive Module 提供了 Hive 所有内置函数，加载后可以直接访问。</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824121826256.png" alt="Hivedialect支持hive 常用语法"></p>
-<p>与此同时，我们还可以通过 Hive dialect 创建/删除 Catalog 函数以及一些自定义的函数，这样使得 Flink SQL 与 Hive 的兼容性得到了极大的提升，让熟悉 Hive 的用户使用起来会更加方便。</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824121903273.png" alt="删除函数"></p>
-<h3 id="2-FLIP-163：改进-SQL-Client"><a href="#2-FLIP-163：改进-SQL-Client" class="headerlink" title="2. FLIP-163：改进 SQL Client"></a>2. FLIP-163：改进 SQL Client</h3><p>在 1.13 版本之前，大家觉得 Flink SQL Client 就是周边的一个小工具。但是，FLIP-163 在 1.13 版本进行了重要改进：</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824121932578.png" alt="改进SQL Client"></p>
-<ol>
-<li>通过 -i 的参数，提前把 DDL 一次性加载初始化，方便初始化表的多个 DDL 语句，不需要多次执行命令创建表，替代了之前用 yaml 文件方式创建表；</li>
-<li>支持 -f 参数，其中 SQL 文件支持 DML（insert into）语句；</li>
-<li>支持更多实用的配置：</li>
-</ol>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824121955707.png" alt="SQL client配置"></p>
-<ol>
-<li><ul>
-<li>通过 <strong>SET SQL-client.verbose = true</strong> , 开启 verbose，通过开启 verbose 打印整个信息，相对以前只输出一句话更加容易追踪错误信息；</li>
-<li>通过 <strong>SET execution.runtime-mode=streaming / batch</strong> 支持设置批/流作业模式；</li>
-<li>通过 <strong>SET pipline.name=my_Flink_job</strong> 设置作业名称；</li>
-<li>通过 <strong>SET execution.savepoint.path=/tmp/Flink-savepoints/savepoint-bb0dab</strong> 设置作业 savepoint 路径；</li>
-<li>对于有依赖的多个作业，通过 <strong>SET Table.dml-sync=true</strong> 去选择是否异步执行，例如离线作业，作业 a 跑完才能跑作业 b ，通过设置为 true 实现执行有依赖关系的 pipeline 调度。</li>
+<li><strong>基于查询的 CDC：</strong><ul>
+<li>离线调度查询作业，批处理。把一张表同步到其他系统，每次通过查询去获取表中最新的数据；</li>
+<li>无法保障数据一致性，查的过程中有可能数据已经发生了多次变更；</li>
+<li>不保障实时性，基于离线调度存在天然的延迟。</li>
 </ul>
 </li>
-</ol>
-<p>4、同时支持 STATEMENT SET语法：</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824122057735.png" alt="sql client"></p>
-<p>有可能我们的一个查询不止写到一个 sink 里面，而是需要输出到多个 sink，比如一个 sink 写到 jdbc，一个 sink 写到 HBase。</p>
-<ul>
-<li>在 1.13 版本之前需要启动 2 个 query 去完成这个作业；</li>
-<li>在 1.13 版本，我们可以把这些放到一个 statement 里面，以一个作业的方式去执行，能够实现节点的复用，节约资源。</li>
+<li><strong>基于日志的 CDC：</strong><ul>
+<li>实时消费日志，流处理，例如 MySQL 的 binlog 日志完整记录了数据库中的变更，可以把 binlog 文件当作流的数据源；</li>
+<li>保障数据一致性，因为 binlog 文件包含了所有历史变更明细；</li>
+<li>保障实时性，因为类似 binlog 的日志文件是可以流式消费的，提供的是实时数据。</li>
 </ul>
-<h3 id="3-FLIP-136：增强-DataStream-和-Table-的转换"><a href="#3-FLIP-136：增强-DataStream-和-Table-的转换" class="headerlink" title="3. FLIP-136：增强 DataStream 和 Table 的转换"></a>3. FLIP-136：增强 DataStream 和 Table 的转换</h3><p>虽然 Flink SQL 大大降低了我们使用实时计算的一些使用门槛，但 Table/SQL 这种高级封装也屏蔽了一些底层实现，如 timer，state 等。不少高级用户希望能够直接操作 DataStream 获得更多的灵活性，这就需要在 Table 和 DataStream 之间进行转换。FLIP-136 增强了 Table 和 DataStream 间的转换，使得用户在两者之间的转换更加容易。</p>
-<ul>
-<li>支持 DataStream 和 Table 转换时传递 EVENT TIME 和 WATERMARK；</li>
+</li>
 </ul>
-<pre class=" language-java"><code class="language-java">Table Table <span class="token operator">=</span> TableEnv<span class="token punctuation">.</span><span class="token function">fromDataStream</span><span class="token punctuation">(</span>
-    dataStream<span class="token punctuation">,</span>
-  Schema<span class="token punctuation">.</span><span class="token function">newBuilder</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-  <span class="token punctuation">.</span><span class="token function">columnByMetadata</span><span class="token punctuation">(</span><span class="token string">"rowtime"</span><span class="token punctuation">,</span><span class="token string">"TIMESTMP(3)"</span><span class="token punctuation">)</span>
-  <span class="token punctuation">.</span><span class="token function">watermark</span><span class="token punctuation">(</span><span class="token string">"rowtime"</span><span class="token punctuation">,</span><span class="token string">"SOURCE_WATERMARK()"</span><span class="token punctuation">)</span>
-  <span class="token punctuation">.</span><span class="token function">build</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">)</span>
-</code></pre>
+<p>对比常见的开源 CDC 方案，我们可以发现：</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824142945266.png" alt="常见开源CDC方案比较"></p>
 <ul>
-<li>支持 Changelog 数据流在 Table 和 DataStream 间相互转换。</li>
+<li>对比增量同步能力，<ul>
+<li>基于日志的方式，可以很好的做到增量同步；</li>
+<li>而基于查询的方式是很难做到增量同步的。</li>
 </ul>
-<pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">//DATASTREAM 转 Table</span>
-StreamTableEnvironment<span class="token punctuation">.</span><span class="token function">fromChangelogStream</span><span class="token punctuation">(</span>DataStream<span class="token operator">&lt;</span>ROW<span class="token operator">></span><span class="token punctuation">)</span><span class="token operator">:</span> Table
-StreamTableEnvironment<span class="token punctuation">.</span><span class="token function">fromChangelogStream</span><span class="token punctuation">(</span>DataStream<span class="token operator">&lt;</span>ROW<span class="token operator">></span><span class="token punctuation">,</span>Schema<span class="token punctuation">)</span><span class="token operator">:</span> Table
-<span class="token comment" spellcheck="true">//Table 转 DATASTREAM</span>
-StreamTableEnvironment<span class="token punctuation">.</span><span class="token function">toChangelogStream</span><span class="token punctuation">(</span>Table<span class="token punctuation">)</span><span class="token operator">:</span> DataStream<span class="token operator">&lt;</span>ROW<span class="token operator">></span>
-StreamTableEnvironment<span class="token punctuation">.</span><span class="token function">toChangelogStream</span><span class="token punctuation">(</span>Table<span class="token punctuation">,</span>Schema<span class="token punctuation">)</span><span class="token operator">:</span> DataStream<span class="token operator">&lt;</span>ROW<span class="token operator">></span>  
-</code></pre>
-<h2 id="四、Flink-SQL-1-14-未来规划"><a href="#四、Flink-SQL-1-14-未来规划" class="headerlink" title="四、Flink SQL 1.14 未来规划"></a>四、Flink SQL 1.14 未来规划</h2><p>1.14 版本主要有以下几点规划：</p>
+</li>
+<li>对比全量同步能力，基于查询或者日志的 CDC 方案基本都支持，除了 Canal。</li>
+<li>而对比全量 + 增量同步的能力，只有 Flink CDC、Debezium、Oracle Goldengate 支持较好。</li>
+<li>从架构角度去看，该表将架构分为单机和分布式，这里的分布式架构不单纯体现在数据读取能力的水平扩展上，更重要的是在大数据场景下分布式系统接入能力。例如 Flink CDC 的数据入湖或者入仓的时候，下游通常是分布式的系统，如 Hive、HDFS、Iceberg、Hudi 等，那么从对接入分布式系统能力上看，Flink CDC 的架构能够很好地接入此类系统。</li>
+<li>在数据转换 / 数据清洗能力上，当数据进入到 CDC 工具的时候是否能较方便的对数据做一些过滤或者清洗，甚至聚合？<ul>
+<li>在 Flink CDC 上操作相当简单，可以通过 Flink SQL 去操作这些数据；</li>
+<li>但是像 DataX、Debezium 等则需要通过脚本或者模板去做，所以用户的使用门槛会比较高。</li>
+</ul>
+</li>
+<li>另外，在生态方面，这里指的是下游的一些数据库或者数据源的支持。Flink CDC 下游有丰富的 Connector，例如写入到 TiDB、MySQL、Pg、HBase、Kafka、ClickHouse 等常见的一些系统，也支持各种自定义 connector。</li>
+</ul>
+<h2 id="二、Flink-CDC-项目"><a href="#二、Flink-CDC-项目" class="headerlink" title="二、Flink CDC 项目"></a>二、Flink CDC 项目</h2><p>讲到这里，先带大家回顾下开发 Flink CDC 项目的动机。</p>
+<h3 id="1-Dynamic-Table-amp-ChangeLog-Stream"><a href="#1-Dynamic-Table-amp-ChangeLog-Stream" class="headerlink" title="1. Dynamic Table &amp; ChangeLog Stream"></a>1. Dynamic Table &amp; ChangeLog Stream</h3><p>大家都知道 Flink 有两个基础概念：Dynamic Table 和 Changelog Stream。</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824143237941.png" alt="Flink变更日志流"></p>
 <ul>
-<li><strong>删除 Legacy Planner</strong>：从 Flink 1.9 开始，在阿里贡献了 Blink-Planner 之后，很多一些新的 Feature 已经基于此 Blink Planner 进行开发，以前旧的 Legacy Planner 会彻底删除；</li>
-<li><strong>完善 Window TVF</strong>：支持 session window，支持 window TVF 的 allow -lateness 等；</li>
-<li><strong>提升 Schema Handling</strong>：全链路的 Schema 处理能力以及关键校验的提升；</li>
-<li><strong>增强 Flink CDC 支持</strong>：增强对上游 CDC 系统的集成能力，Flink SQL 内更多的算子支持 CDC 数据流。</li>
+<li>Dynamic Table 就是 Flink SQL 定义的动态表，动态表和流的概念是对等的。参照上图，流可以转换成动态表，动态表也可以转换成流。</li>
+<li>在 Flink SQL中，数据在从一个算子流向另外一个算子时都是以 Changelog Stream 的形式，任意时刻的 Changelog Stream 可以翻译为一个表，也可以翻译为一个流。</li>
 </ul>
-<h2 id="五、总结"><a href="#五、总结" class="headerlink" title="五、总结"></a>五、总结</h2><p>本文详细解读了 Flink SQL 1.13 的核心功能和重要改进。</p>
+<p>联想下 MySQL 中的表和 binlog 日志，就会发现：MySQL 数据库的一张表所有的变更都记录在 binlog 日志中，如果一直对表进行更新，binlog 日志流也一直会追加，数据库中的表就相当于 binlog 日志流在某个时刻点物化的结果；日志流就是将表的变更数据持续捕获的结果。这说明 Flink SQL 的 Dynamic Table 是可以非常自然地表示一张不断变化的 MySQL 数据库表。</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824143525924.png" alt="数据格式"></p>
+<p>在此基础上，我们调研了一些 CDC 技术，最终选择了 Debezium 作为 Flink CDC 的底层采集工具。Debezium 支持全量同步，也支持增量同步，也支持全量 + 增量的同步，非常灵活，同时基于日志的 CDC 技术使得提供 Exactly-Once 成为可能。</p>
+<p>将 Flink SQL 的内部数据结构 RowData 和 Debezium 的数据结构进行对比，可以发现两者是非常相似的。</p>
 <ul>
-<li>支持 Window TVF；</li>
-<li>系统地解决时区和时间函数问题；</li>
-<li>提升 Hive 和 Flink 的兼容性；</li>
-<li>改进 SQL Client；</li>
-<li>增强 DataStream 和 Table 的转换。</li>
+<li>每条 RowData 都有一个元数据 RowKind，包括 4 种类型， 分别是插入 (INSERT)、更新前镜像 (UPDATE_BEFORE)、更新后镜像 (UPDATE_AFTER)、删除 (DELETE)，这四种类型和数据库里面的 binlog 概念保持一致。</li>
+<li>而 Debezium 的数据结构，也有一个类似的元数据 op 字段， op 字段的取值也有四种，分别是 c、u、d、r，各自对应 create、update、delete、read。对于代表更新操作的 u，其数据部分同时包含了前镜像 (before) 和后镜像 (after)。</li>
 </ul>
-<p>同时还分享了社区关于 Flink SQL 1.14 的未来规划，相信看完文章的同学可以对 Flink SQL 在这个版本中的变化有更多的了解，在实践过程中大家可以多多关注这些新的改动和变化，感受它们所带来的业务层面上的便捷。</p>
+<p>通过分析两种数据结构，Flink 和 Debezium 两者的底层数据是可以非常方便地对接起来的，大家可以发现 Flink 做 CDC 从技术上是非常合适的。</p>
+<h3 id="2-传统-CDC-ETL-分析"><a href="#2-传统-CDC-ETL-分析" class="headerlink" title="2. 传统 CDC ETL 分析"></a>2. 传统 CDC ETL 分析</h3><p>我们来看下传统 CDC 的 ETL 分析链路，如下图所示：</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824143809866.png" alt="传统的CDC ETL分析"></p>
+<p>目前我们公司就是在使用的是传统的ETL技术来进行实现的</p>
+<p>传统的基于 CDC 的 ETL 分析中，数据采集工具是必须的，国外用户常用 Debezium，国内用户常用阿里开源的 Canal，采集工具负责采集数据库的增量数据，一些采集工具也支持同步全量数据。采集到的数据一般输出到消息中间件如 Kafka，然后 Flink 计算引擎再去消费这一部分数据写入到目的端，目的端可以是各种 DB，数据湖，实时数仓和离线数仓。</p>
+<p>注意，Flink 提供了 changelog-json format，可以将 changelog 数据写入离线数仓如 Hive / HDFS；对于实时数仓，Flink 支持将 changelog 通过 upsert-kafka connector 直接写入 Kafka。</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824144049616.png" alt="image-20210824144049616"></p>
+<p>我们一直在思考是否可以使用 Flink CDC 去替换上图中虚线框内的采集组件和消息队列，从而简化分析链路，降低维护成本。同时更少的组件也意味着数据时效性能够进一步提高。答案是可以的，于是就有了我们基于 Flink CDC 的 ETL 分析流程。</p>
+<h3 id="3-基于-Flink-CDC-的-ETL-分析"><a href="#3-基于-Flink-CDC-的-ETL-分析" class="headerlink" title="3. 基于 Flink CDC 的 ETL 分析"></a>3. 基于 Flink CDC 的 ETL 分析</h3><p>在使用了 Flink CDC 之后，除了组件更少，维护更方便外，另一个优势是通过 Flink SQL 极大地降低了用户使用门槛，可以看下面的例子：</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824144211235.png" alt="Flink CDC ETL分析"></p>
+<p>该例子是通过 Flink CDC 去同步数据库数据并写入到 TiDB，用户直接使用 Flink SQL 创建了产品和订单的 MySQL-CDC 表，然后对数据流进行 JOIN 加工，加工后直接写入到下游数据库。通过一个 Flink SQL 作业就完成了 CDC 的数据分析，加工和同步。</p>
+<p>大家会发现这是一个纯 SQL 作业，这意味着只要会 SQL 的 BI，业务线同学都可以完成此类工作。与此同时，用户也可以利用 Flink SQL 提供的丰富语法进行数据清洗、分析、聚合。</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824144319174.png" alt="Flink CDC的聚合分析"></p>
+<p>而这些能力，对于现有的 CDC 方案来说，进行数据的清洗，分析和聚合是非常困难的。</p>
+<p>此外，利用 <strong>Flink SQL 双流 JOIN、维表 JOIN、UDTF</strong> 语法可以非常容易地完成数据打宽，以及各种业务逻辑加工。</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824144524752.png" alt="Flink如何实现数据打宽"></p>
+<h3 id="4-Flink-CDC-项目发展"><a href="#4-Flink-CDC-项目发展" class="headerlink" title="4. Flink CDC 项目发展"></a>4. Flink CDC 项目发展</h3><ul>
+<li><p>2020 年 7 月由云邪提交了第一个 commit，这是基于个人兴趣孵化的项目；</p>
+</li>
+<li><p>2020 年 7 中旬支持了 MySQL-CDC；</p>
+</li>
+<li><p>2020 年 7 月末支持了 Postgres-CDC；</p>
+</li>
+<li><p>一年的时间，该项目在 GitHub 上的 star 数已经超过 800。</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824144641494.png" alt="image-20210824144641494"></p>
+</li>
+</ul>
+<h2 id="三、Flink-CDC-2-0-详解"><a href="#三、Flink-CDC-2-0-详解" class="headerlink" title="三、Flink CDC 2.0 详解"></a>三、Flink CDC 2.0 详解</h2><h3 id="1-Flink-CDC-痛点"><a href="#1-Flink-CDC-痛点" class="headerlink" title="1. Flink CDC 痛点"></a>1. Flink CDC 痛点</h3><p>MySQL CDC 是 Flink CDC 中使用最多也是最重要的 Connector，本文下述章节描述 Flink CDC Connector 均为 MySQL CDC Connector。</p>
+<p>随着 Flink CDC 项目的发展，得到了很多用户在社区的反馈，主要归纳为三个：</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824144838126.png" alt="Flink CDC痛点"></p>
+<ul>
+<li>全量 + 增量读取的过程需要保证所有数据的一致性，因此需要通过加锁保证，但是加锁在数据库层面上是一个十分高危的操作。底层 Debezium 在保证数据一致性时，需要对读取的库或表加锁，全局锁可能导致数据库锁住，表级锁会锁住表的读，DBA 一般不给锁权限。</li>
+<li>不支持水平扩展，因为 Flink CDC 底层是基于 Debezium，起架构是单节点，所以Flink CDC 只支持单并发。在全量阶段读取阶段，如果表非常大 (亿级别)，读取时间在小时甚至天级别，用户不能通过增加资源去提升作业速度。</li>
+<li>全量读取阶段不支持 checkpoint：CDC 读取分为两个阶段，全量读取和增量读取，目前全量读取阶段是不支持 checkpoint 的，因此会存在一个问题：当我们同步全量数据时，假设需要 5 个小时，当我们同步了 4 小时的时候作业失败，这时候就需要重新开始，再读取 5 个小时。</li>
+</ul>
+<h3 id="2-Debezium-锁分析"><a href="#2-Debezium-锁分析" class="headerlink" title="2. Debezium 锁分析"></a>2. Debezium 锁分析</h3><p>Flink CDC 底层封装了 Debezium， Debezium 同步一张表分为两个阶段：</p>
+<ul>
+<li><strong>全量阶段：</strong>查询当前表中所有记录；</li>
+<li><strong>增量阶段：</strong>从 binlog 消费变更数据。</li>
+</ul>
+<p>大部分用户使用的场景都是全量 + 增量同步，加锁是发生在全量阶段，目的是为了确定全量阶段的初始位点，保证增量 + 全量实现一条不多，一条不少，从而保证数据一致性。从下图中我们可以分析全局锁和表锁的一些加锁流程，左边红色线条是锁的生命周期，右边是 MySQL 开启可重复读事务的生命周期。</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824145148162.png" alt="image-20210824145148162"></p>
+<p>以全局锁为例，首先是获取一个锁，然后再去开启可重复读的事务。这里锁住操作是读取 binlog 的起始位置和当前表的 schema。这样做的目的是保证 binlog 的起始位置和读取到的当前 schema 是可以对应上的，因为表的 schema 是会改变的，比如如删除列或者增加列。在读取这两个信息后，SnapshotReader 会在可重复读事务里读取全量数据，在全量数据读取完成后，会启动 BinlogReader 从读取的 binlog 起始位置开始增量读取，从而保证全量数据 + 增量数据的无缝衔接。</p>
+<p>表锁是全局锁的退化版，因为全局锁的权限会比较高，因此在某些场景，用户只有表锁。表锁锁的时间会更长，因为表锁有个特征：锁提前释放了可重复读的事务默认会提交，所以锁需要等到全量数据读完后才能释放。</p>
+<p>经过上面分析，接下来看看这些锁到底会造成怎样严重的后果</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824145357151.png" alt="image-20210824145357151"></p>
+<p>Flink CDC 1.x 可以不加锁，能够满足大部分场景，但牺牲了一定的数据准确性。Flink CDC 1.x 默认加全局锁，虽然能保证数据一致性，但存在上述 hang 住数据的风险。</p>
+<h3 id="3-Flink-CDC-2-0-设计-以-MySQL-为例"><a href="#3-Flink-CDC-2-0-设计-以-MySQL-为例" class="headerlink" title="3. Flink CDC 2.0 设计 ( 以 MySQL 为例)"></a>3. Flink CDC 2.0 设计 ( 以 MySQL 为例)</h3><p>通过上面的分析，可以知道 2.0 的设计方案，核心要解决上述的三个问题，即支持无锁、水平扩展、checkpoint。</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824145543291.png" alt="image-20210824145543291"></p>
+<p>DBlog 这篇论文里描述的无锁算法如下图所示：</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824150134772.png" alt="image-20210824150134772"></p>
+<p>左边是 Chunk 的切分算法描述，Chunk 的切分算法其实和很多数据库的分库分表原理类似，通过表的主键对表中的数据进行分片。假设每个 Chunk 的步长为 10，按照这个规则进行切分，只需要把这些 Chunk 的区间做成左开右闭或者左闭右开的区间，保证衔接后的区间能够等于表的主键区间即可。</p>
+<p>右边是每个 Chunk 的无锁读算法描述，该算法的核心思想是在划分了 Chunk 后，对于每个 Chunk 的全量读取和增量读取，在不用锁的条件下完成一致性的合并。Chunk 的切分如下图所示：</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824150249154.png" alt="image-20210824150249154"></p>
+<p>因为每个 chunk 只负责自己主键范围内的数据，不难推导，只要能够保证每个 Chunk 读取的一致性，就能保证整张表读取的一致性，这便是无锁算法的基本原理。</p>
+<p>Netflix 的 DBLog 论文中 Chunk 读取算法是通过在 DB 维护一张信号表，再通过信号表在 binlog 文件中打点，记录每个 chunk 读取前的 Low Position (低位点) 和读取结束之后 High Position (高位点) ，在低位点和高位点之间去查询该 Chunk 的全量数据。在读取出这一部分 Chunk 的数据之后，再将这 2 个位点之间的 binlog 增量数据合并到 chunk 所属的全量数据，从而得到高位点时刻，该 chunk 对应的全量数据。</p>
+<p>Flink CDC 结合自身的情况，在 Chunk 读取算法上做了去信号表的改进，不需要额外维护信号表，通过直接读取 binlog 位点替代在 binlog 中做标记的功能，整体的 chunk 读算法描述如下图所示：</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824150514617.png" alt="image-20210824150514617"></p>
+<p>比如正在读取 Chunk-1，Chunk 的区间是 [K1, K10]，首先直接将该区间内的数据 select 出来并把它存在 buffer 中，在 select 之前记录 binlog 的一个位点 (低位点)，select 完成后记录 binlog 的一个位点 (高位点)。然后开始增量部分，消费从低位点到高位点的 binlog。</p>
+<ul>
+<li>图中的 - ( k2,100 ) + ( k2,108 ) 记录表示这条数据的值从 100 更新到 108；</li>
+<li>第二条记录是删除 k3；</li>
+<li>第三条记录是更新 k2 为 119；</li>
+<li>第四条记录是 k5 的数据由原来的 77 变更为 100。</li>
+</ul>
+<p>观察图片中右下角最终的输出，会发现在消费该 chunk 的 binlog 时，出现的 key 是k2、k3、k5，我们前往 buffer 将这些 key 做标记。</p>
+<ul>
+<li>对于 k1、k4、k6、k7 来说，在高位点读取完毕之后，这些记录没有变化过，所以这些数据是可以直接输出的；</li>
+<li>对于改变过的数据，则需要将增量的数据合并到全量的数据中，只保留合并后的最终数据。例如，k2 最终的结果是 119 ，那么只需要输出 +(k2,119)，而不需要中间发生过改变的数据。</li>
+</ul>
+<p>通过这种方式，Chunk 最终的输出就是在高位点是 chunk 中最新的数据。</p>
+<p>上图描述的是单个 Chunk 的一致性读，但是如果有多个表分了很多不同的 Chunk，且这些 Chunk 分发到了不同的 task 中，那么如何分发 Chunk 并保证全局一致性读呢？</p>
+<p>这个就是基于 FLIP-27 来优雅地实现的，通过下图可以看到有 SourceEnumerator 的组件，这个组件主要用于 Chunk 的划分，划分好的 Chunk 会提供给下游的 SourceReader 去读取，通过把 chunk 分发给不同的 SourceReader 便实现了并发读取 Snapshot Chunk 的过程，同时基于 FLIP-27 我们能较为方便地做到 chunk 粒度的 checkpoint。</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824150831713.png" alt="image-20210824150831713"></p>
+<p>当 Snapshot Chunk 读取完成之后，需要有一个汇报的流程，如下图中橘色的汇报信息，将 Snapshot Chunk 完成信息汇报给 SourceEnumerator。</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824151035349.png" alt="image-20210824151035349"></p>
+<p>汇报的主要目的是为了后续分发 binlog chunk (如下图)。因为 Flink CDC 支持全量 + 增量同步，所以当所有 Snapshot Chunk 读取完成之后，还需要消费增量的 binlog，这是通过下发一个 binlog chunk 给任意一个 Source Reader 进行单并发读取实现的。</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824151132414.png" alt="image-20210824151132414"></p>
+<p>对于大部分用户来讲，其实无需过于关注如何无锁算法和分片的细节，了解整体的流程就好。</p>
+<p>整体流程可以概括为，首先通过主键对表进行 Snapshot Chunk 划分，再将 Snapshot Chunk 分发给多个 SourceReader，每个 Snapshot Chunk 读取时通过算法实现无锁条件下的一致性读，SourceReader 读取时支持 chunk 粒度的 checkpoint，在所有 Snapshot Chunk 读取完成后，下发一个 binlog chunk 进行增量部分的 binlog 读取，这便是 Flink CDC 2.0 的整体流程，如下图所示：</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824151250393.png" alt="image-20210824151250393"></p>
+<p>Flink CDC 是一个完全开源的项目，项目所有设计和源码目前都已贡献到开源社区，<a href="https://github.com/ververica/flink-cdc-connectors/releases/tag/release-2.0.0">Flink CDC 2.0</a> 也已经正式发布，此次的核心改进和提升包括：</p>
+<ul>
+<li>提供 MySQL CDC 2.0，核心feature 包括<ul>
+<li>并发读取，全量数据的读取性能可以水平扩展；</li>
+<li>全程无锁，不对线上业务产生锁的风险；</li>
+<li>断点续传，支持全量阶段的 checkpoint。</li>
+</ul>
+</li>
+<li>搭建文档网站，提供多版本文档支持，文档支持关键词搜索</li>
+</ul>
+<p>笔者用 TPC-DS 数据集中的 customer 表进行了测试，Flink 版本是 1.13.1，customer 表的数据量是 6500 万条，Source 并发为 8，全量读取阶段:</p>
+<ul>
+<li>MySQL CDC 2.0 用时 <strong>13</strong> 分钟；</li>
+<li>MySQL CDC 1.4 用时 <strong>89</strong> 分钟；</li>
+<li>读取性能提升 <strong>6.8</strong> 倍。</li>
+</ul>
+<p>为了提供更好的文档支持，Flink CDC 社区搭建了文档网站，网站支持对文档的版本管理：</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824152059965.png" alt="image-20210824152059965"></p>
+<p>文档网站支持关键字搜索功能，非常实用：</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824152117345.png" alt="image-20210824152117345"></p>
+<h2 id="四、未来规划"><a href="#四、未来规划" class="headerlink" title="四、未来规划"></a>四、未来规划</h2><p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210824152546448.png" alt="image-20210824152546448"></p>
+<p>关于 CDC 项目的未来规划，我们希望围绕稳定性，进阶 feature 和生态集成三个方面展开。</p>
+<ul>
+<li><strong>稳定性</strong><ul>
+<li>通过社区的方式吸引更多的开发者，公司的开源力量提升 Flink CDC 的成熟度；</li>
+<li>支持 Lazy Assigning。Lazy Assigning 的思路是将 chunk 先划分一批，而不是一次性进行全部划分。当前 Source Reader 对数据读取进行分片是一次性全部划分好所有 chunk，例如有 1 万个 chunk，可以先划分 1 千个 chunk，而不是一次性全部划分，在 SourceReader 读取完 1 千 chunk 后再继续划分，节约划分 chunk 的时间。</li>
+</ul>
+</li>
+<li><strong>进阶 Feature</strong><ul>
+<li>支持 Schema Evolution。这个场景是：当同步数据库的过程中，突然在表中添加了一个字段，并且希望后续同步下游系统的时候能够自动加入这个字段；</li>
+<li>支持 Watermark Pushdown 通过 CDC 的 binlog 获取到一些心跳信息，这些心跳的信息可以作为一个 Watermark，通过这个心跳信息可以知道到这个流当前消费的一些进度；</li>
+<li>支持 META 数据，分库分表的场景下，有可能需要元数据知道这条数据来源哪个库哪个表，在下游系统入湖入仓可以有更多的灵活操作；</li>
+<li>整库同步：用户要同步整个数据库只需一行 SQL 语法即可完成，而不用每张表定义一个 DDL 和 query。</li>
+</ul>
+</li>
+<li><strong>生态集成</strong><ul>
+<li>集成更多上游数据库，如 Oracle，MS SqlServer。Cloudera 目前正在积极贡献 oracle-cdc connector；</li>
+<li>在入湖层面，Hudi 和 Iceberg 写入上有一定的优化空间，例如在高 QPS 入湖的时候，数据分布有比较大的性能影响，这一点可以通过与生态打通和集成继续优化。</li>
+</ul>
+</li>
+</ul>
+<p>最后，欢迎大家加入 Flink CDC 用户群一起交流。</p>
+<h2 id="五、附录"><a href="#五、附录" class="headerlink" title="五、附录"></a>五、附录</h2><p><a href="https://github.com/ververica/flink-cdc-connectors?spm=a2csy.flink.0.0.49493bdcI4Avjy"><font color="red">[1]&nbsp; &nbsp; Flink CDC 项目地址</font></a></p>
+<p><a href="https://ververica.github.io/flink-cdc-connectors/master/" target="_blank" rel="noopener"><font color="red">[2]&nbsp; &nbsp; Flink CDC 文档网站</font></a></p>
+<p><a href="https://www.percona.com/blog/2014/03/11/introducing-backup-locks-percona-server-2/?spm=a2csy..0.0.55796c2e2qSuAf" target="_blank" rel="noopener"><font color="red">[3]&nbsp; &nbsp; Percona MySQL 全局锁时间分析</font></a></p>
+<p><a href="https://cwiki.apache.org/confluence/display/FLINK/FLIP-27%3A+Refactor+Source+Interface?spm=a2csy..0.0.55796c2e2qSuAf" target="_blank" rel="noopener"><font color="red">[4]&nbsp; &nbsp; Flink FLIP-27设计文档</font></a></p>
 
                 
             </div>
@@ -703,7 +688,7 @@ StreamTableEnvironment<span class="token punctuation">.</span><span class="token
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://github.com/wmybigdata/2021/08/24/%E6%B7%B1%E5%85%A5%E8%A7%A3%E8%AF%BBFlinkSQL1-13/">https://github.com/wmybigdata/2021/08/24/%E6%B7%B1%E5%85%A5%E8%A7%A3%E8%AF%BBFlinkSQL1-13/</a>
+                    <a href="https://github.com/wmybigdata/2021/08/24/Flink-CDC-2-0-%E6%AD%A3%E5%BC%8F%E5%8F%91%E5%B8%83-%E8%AF%A6%E8%A7%A3%E6%A0%B8%E5%BF%83%E6%94%B9%E8%BF%9B/">https://github.com/wmybigdata/2021/08/24/Flink-CDC-2-0-%E6%AD%A3%E5%BC%8F%E5%8F%91%E5%B8%83-%E8%AF%A6%E8%A7%A3%E6%A0%B8%E5%BF%83%E6%94%B9%E8%BF%9B/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -741,8 +726,8 @@ StreamTableEnvironment<span class="token punctuation">.</span><span class="token
                     
                         <div class="article-tag">
                             
-                                <a href="/tags/Flink%E6%B5%81%E5%BC%8F%E5%BC%95%E6%93%8E/">
-                                    <span class="chip bg-color">Flink流式引擎</span>
+                                <a href="/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE%E9%87%87%E9%9B%86%E7%B3%BB%E7%BB%9F/">
+                                    <span class="chip bg-color">大数据采集系统</span>
                                 </a>
                             
                         </div>
@@ -916,13 +901,13 @@ StreamTableEnvironment<span class="token punctuation">.</span><span class="token
             <div class="article-badge left-badge text-color">
                 <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2021/08/24/Flink-CDC-2-0-%E6%AD%A3%E5%BC%8F%E5%8F%91%E5%B8%83-%E8%AF%A6%E8%A7%A3%E6%A0%B8%E5%BF%83%E6%94%B9%E8%BF%9B/">
+                <a href="/2021/08/24/MySQLbinlog%E6%97%A5%E5%BF%97%E5%AD%A6%E4%B9%A0/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/16.jpg" class="responsive-img" alt="Flink-CDC-2.0-正式发布-详解核心改进">
+                        <img src="/medias/featureimages/21.jpg" class="responsive-img" alt="MySQLbinlog日志学习">
                         
-                        <span class="card-title">Flink-CDC-2.0-正式发布-详解核心改进</span>
+                        <span class="card-title">MySQLbinlog日志学习</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -937,23 +922,11 @@ StreamTableEnvironment<span class="token punctuation">.</span><span class="token
                         </span>
                         <span class="publish-author">
                             
-                            <i class="fas fa-bookmark fa-fw icon-category"></i>
-                            
-                            <a href="/categories/%E5%A4%A7%E6%95%B0%E6%8D%AE%E9%87%87%E9%9B%86%E7%B3%BB%E7%BB%9F/" class="post-category">
-                                    大数据采集系统
-                                </a>
-                            
+                            <i class="fas fa-user fa-fw"></i>
+                            情深骚明
                             
                         </span>
                     </div>
-                </div>
-                
-                <div class="card-action article-tags">
-                    
-                    <a href="/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE%E9%87%87%E9%9B%86%E7%B3%BB%E7%BB%9F/">
-                        <span class="chip bg-color">大数据采集系统</span>
-                    </a>
-                    
                 </div>
                 
             </div>
@@ -965,13 +938,13 @@ StreamTableEnvironment<span class="token punctuation">.</span><span class="token
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2021/08/24/ApacheFlink%E5%AE%9E%E6%88%98%E6%95%99%E7%A8%8BCEP%E5%AE%9E%E6%88%98/">
+                <a href="/2021/08/24/%E6%B7%B1%E5%85%A5%E8%A7%A3%E8%AF%BBFlinkSQL1-13/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/2.jpg" class="responsive-img" alt="ApacheFlink实战教程CEP实战">
+                        <img src="/medias/featureimages/17.jpg" class="responsive-img" alt="深入解读FlinkSQL1.13">
                         
-                        <span class="card-title">ApacheFlink实战教程CEP实战</span>
+                        <span class="card-title">深入解读FlinkSQL1.13</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
