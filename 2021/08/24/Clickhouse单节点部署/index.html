@@ -481,7 +481,17 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                
+                <h1 id="Clickhouse环境搭建"><a href="#Clickhouse环境搭建" class="headerlink" title="Clickhouse环境搭建"></a>Clickhouse环境搭建</h1><pre class=" language-properties"><code class="language-properties"><span class="token attr-name">sudo</span> <span class="token attr-value">rpm -ivh *.rpm</span>
+
+<span class="token attr-name"> sudo</span> <span class="token attr-value">vim /etc/clickhouse-server/config.xml</span>
+ 
+<span class="token attr-name"> &lt;listen_host></span><span class="token punctuation">:</span><span class="token attr-value">:&lt;/listen_host></span>
+ 
+<span class="token attr-name"> sudo</span> <span class="token attr-value">systemctl start clickhouse-server</span>
+<span class="token attr-name"> sudo</span> <span class="token attr-value">systemctl stop clickhouse-server</span>
+ 
+</code></pre>
+
                 
             </div>
             <hr/>
@@ -716,18 +726,17 @@
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="far fa-dot-circle"></i>&nbsp;本篇
-            </div>
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2021/08/24/Clickhouse%E5%8D%95%E8%8A%82%E7%82%B9%E9%83%A8%E7%BD%B2/">
+                <a href="/2021/08/24/superset%E6%90%AD%E5%BB%BA/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/22.jpg" class="responsive-img" alt="Clickhouse单节点部署">
+                        <img src="/medias/featureimages/4.jpg" class="responsive-img" alt="superset搭建">
                         
-                        <span class="card-title">Clickhouse单节点部署</span>
+                        <span class="card-title">superset搭建</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -737,9 +746,9 @@
                         
                     </div>
                     <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2021-08-24
-                            </span>
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2021-08-24
+                        </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
@@ -752,7 +761,6 @@
                         </span>
                     </div>
                 </div>
-
                 
                 <div class="card-action article-tags">
                     
