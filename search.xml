@@ -154,44 +154,6 @@
     
     
     <entry>
-      <title>CommonBeanutils</title>
-      <link href="/2021/08/25/CommonBeanutils/"/>
-      <url>/2021/08/25/CommonBeanutils/</url>
-      
-        <content type="html"><![CDATA[<h1 id="CommonBeanutils"><a href="#CommonBeanutils" class="headerlink" title="CommonBeanutils"></a>CommonBeanutils</h1><p>对象关系映射</p><h2 id="BeanUtils-setProperty"><a href="#BeanUtils-setProperty" class="headerlink" title="BeanUtils.setProperty"></a>BeanUtils.setProperty</h2>]]></content>
-      
-      
-      <categories>
-          
-          <category> java </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> java </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>CaseFormat</title>
-      <link href="/2021/08/25/CaseFormat/"/>
-      <url>/2021/08/25/CaseFormat/</url>
-      
-        <content type="html"><![CDATA[]]></content>
-      
-      
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title>SimpleDateFormat线程安全问题</title>
       <link href="/2021/08/25/SimpleDateFormat%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8%E9%97%AE%E9%A2%98/"/>
       <url>/2021/08/25/SimpleDateFormat%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8%E9%97%AE%E9%A2%98/</url>
