@@ -8,7 +8,7 @@
       <link href="/2021/08/25/Hive%E9%AB%98%E7%BA%A7%E6%BA%90%E7%A0%81/"/>
       <url>/2021/08/25/Hive%E9%AB%98%E7%BA%A7%E6%BA%90%E7%A0%81/</url>
       
-        <content type="html"><![CDATA[<h1 id="Hive高级源码"><a href="#Hive高级源码" class="headerlink" title="Hive高级源码"></a>Hive高级源码</h1>]]></content>
+        <content type="html"><![CDATA[<h1 id="Hive高级源码"><a href="#Hive高级源码" class="headerlink" title="Hive高级源码"></a>Hive高级源码</h1><ul><li><input disabled="" type="checkbox"> 组件分析和核心流程 重点</li><li><input disabled="" type="checkbox"> Hive源码解读 —&gt; 分支解读</li><li><input disabled="" type="checkbox"> Hive Debug —&gt; MR,Spark,Tez —&gt; 某个分支解读</li></ul><h2 id="第-1-章-HQL-是如何转换为-MR-任务的"><a href="#第-1-章-HQL-是如何转换为-MR-任务的" class="headerlink" title="第 1 章 HQL 是如何转换为 MR 任务的"></a>第 1 章 HQL 是如何转换为 MR 任务的</h2><h3 id="1-1-Hive-的核心组成介绍"><a href="#1-1-Hive-的核心组成介绍" class="headerlink" title="1.1 Hive 的核心组成介绍"></a>1.1 Hive 的核心组成介绍</h3><p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210825153641750.png" alt="hive架构"></p><h4 id="1）用户接口：Client"><a href="#1）用户接口：Client" class="headerlink" title="1）用户接口：Client"></a>1）用户接口：Client</h4><p>​    CLI（command-line interface）、JDBC/ODBC(jdbc 访问 hive)、WEBUI（浏览器访问 hive）</p><h4 id="2）元数据：Metastore"><a href="#2）元数据：Metastore" class="headerlink" title="2）元数据：Metastore"></a>2）元数据：Metastore</h4><p>​    元数据包括：表名、表所属的数据库（默认是 default）、表的拥有者、列/分区字段、表 的类型（是否是外部表）、表的数据所在目录等； 默认存储在自带的 derby 数据库中，推荐使用 MySQL 存储 Metastore</p><h4 id="3）Hadoop"><a href="#3）Hadoop" class="headerlink" title="3）Hadoop"></a>3）Hadoop</h4><p>​    使用 HDFS 进行存储，使用 MapReduce 进行计算。</p><h4 id="4）驱动器：Driver"><a href="#4）驱动器：Driver" class="headerlink" title="4）驱动器：Driver"></a>4）驱动器：Driver</h4><h4 id="5）解析器（SQL-Parser）"><a href="#5）解析器（SQL-Parser）" class="headerlink" title="5）解析器（SQL Parser）"></a>5）解析器（SQL Parser）</h4><p>​    将 SQL 字符串转换成抽象语法树 AST，这一步一般都用第三方工具库完成，比如 antlr； 对 AST 进行语法分析，比如表是否存在、字段是否存在、SQL 语义是否有误</p><h4 id="6）编译器（Physical-Plan）"><a href="#6）编译器（Physical-Plan）" class="headerlink" title="6）编译器（Physical Plan）"></a>6）编译器（Physical Plan）</h4><p>​    将 AST 编译生成逻辑执行计划。</p><h4 id="7）优化器（Query-Optimizer）"><a href="#7）优化器（Query-Optimizer）" class="headerlink" title="7）优化器（Query Optimizer）"></a>7）优化器（Query Optimizer）</h4><p>​    对逻辑执行计划进行优化。</p><h4 id="8）执行器（Execution）"><a href="#8）执行器（Execution）" class="headerlink" title="8）执行器（Execution）"></a>8）执行器（Execution）</h4><p>​    把逻辑执行计划转换成可以运行的物理计划。对于 Hive 来说，就是 MR/Spark。</p><h3 id="1-2-HQL-转换为-MR-任务流程说明"><a href="#1-2-HQL-转换为-MR-任务流程说明" class="headerlink" title="1.2 HQL 转换为 MR 任务流程说明"></a>1.2 HQL 转换为 MR 任务流程说明</h3><ul><li><input disabled="" type="checkbox"> 1.进入程序，利用Antlr框架定义HQL的语法规则，对HQL完成词法语法解析，将HQL转换为为AST（抽象语法树）；</li><li><input disabled="" type="checkbox"> 2.遍历AST，抽象出查询的基本组成单元QueryBlock（查询块），可以理解为最小的查询执行单元；</li><li><input disabled="" type="checkbox"> 3.遍历QueryBlock，将其转换为OperatorTree（操作树，也就是逻辑执行计划），可以理解为不可拆分的一个逻辑执行单元；</li><li><input disabled="" type="checkbox"> 4.使用逻辑优化器对OperatorTree（操作树）进行逻辑优化。例如合并不必要的ReduceSinkOperator，减少Shuffle数据量；</li><li><input disabled="" type="checkbox"> 5.遍历OperatorTree，转换为TaskTree。也就是翻译为MR任务的流程，将逻辑执行计划转换为物理执行计划；</li><li><input disabled="" type="checkbox"> 6.使用物理优化器对TaskTree进行物理优化；</li><li><input disabled="" type="checkbox"> 7.生成最终的执行计划，提交任务到Hadoop集群运行</li></ul><p>总结：解析，查询块，操作树，逻辑优化，任务树，物理优化，提交任务执行</p>]]></content>
       
       
       <categories>
@@ -243,56 +243,6 @@
     
     
     <entry>
-      <title>Flink中的UDTF</title>
-      <link href="/2021/08/24/Flink%E4%B8%AD%E7%9A%84UDTF/"/>
-      <url>/2021/08/24/Flink%E4%B8%AD%E7%9A%84UDTF/</url>
-      
-        <content type="html"><![CDATA[]]></content>
-      
-      
-      <categories>
-          
-          <category> Flink流式引擎 </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> Flink流式引擎 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>Flink维表JOIN</title>
-      <link href="/2021/08/24/Flink%E7%BB%B4%E8%A1%A8JOIN/"/>
-      <url>/2021/08/24/Flink%E7%BB%B4%E8%A1%A8JOIN/</url>
-      
-        <content type="html"><![CDATA[]]></content>
-      
-      
-      <categories>
-          
-          <category> Flink流式引擎 </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> Flink流式引擎 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title>Flink-SQL-双流-JOIN</title>
       <link href="/2021/08/24/Flink-SQL-%E5%8F%8C%E6%B5%81-JOIN/"/>
       <url>/2021/08/24/Flink-SQL-%E5%8F%8C%E6%B5%81-JOIN/</url>
@@ -394,31 +344,6 @@
     
     
     <entry>
-      <title>业务指标归纳</title>
-      <link href="/2021/08/24/%E4%B8%9A%E5%8A%A1%E6%8C%87%E6%A0%87%E5%BD%92%E7%BA%B3/"/>
-      <url>/2021/08/24/%E4%B8%9A%E5%8A%A1%E6%8C%87%E6%A0%87%E5%BD%92%E7%BA%B3/</url>
-      
-        <content type="html"><![CDATA[<h1 id="业务指标归纳"><a href="#业务指标归纳" class="headerlink" title="业务指标归纳"></a>业务指标归纳</h1><h2 id="ODS"><a href="#ODS" class="headerlink" title="ODS"></a>ODS</h2><h3 id="Flink-CDC-读取监听MySQL-binlog日志成广播流"><a href="#Flink-CDC-读取监听MySQL-binlog日志成广播流" class="headerlink" title="Flink CDC 读取监听MySQL binlog日志成广播流"></a>Flink CDC 读取监听MySQL binlog日志成广播流</h3><h3 id="使用定时读取数据库中，转换成对象然后就行计算-—-gt-重点"><a href="#使用定时读取数据库中，转换成对象然后就行计算-—-gt-重点" class="headerlink" title="使用定时读取数据库中，转换成对象然后就行计算  —> 重点"></a>使用定时读取数据库中，转换成对象然后就行计算  —&gt; 重点</h3><h2 id="DWM"><a href="#DWM" class="headerlink" title="DWM"></a>DWM</h2><h3 id="UV访客数"><a href="#UV访客数" class="headerlink" title="UV访客数"></a>UV访客数</h3><h3 id="用户跳出率"><a href="#用户跳出率" class="headerlink" title="用户跳出率"></a>用户跳出率</h3><pre class=" language-properties"><code class="language-properties"><span class="token attr-name">没有上一跳(lastPageId</span> <span class="token punctuation">=</span><span class="token attr-value">= null)，没有下一跳(如何计算,下一跳的数据是没有到来的，但是如果是要是有一个sessionID的话就简单了)</span>会话窗口，是想要会话窗口去做一些近似会话的操作如果要是会话窗口，间隔时间30秒，使用全量窗口来进行计算，但是这些数据都不是一个精确的数据计算，但是这样的话会造成很多数据重复或者丢失，单纯看时间会有很多的问题，时间不是解决问题的方法这些都针对于数据来说的，主要的问题就是如何解决下一跳的问题，是多个问题，复杂事件，是多个简单事件的问题的组合，CEP应该如何去解决<span class="token attr-name">begin</span> <span class="token attr-value">解决上一跳为null</span><span class="token attr-name">within(30s)</span> <span class="token attr-value">这个跟会话窗口还是一样的问题，所以这个问题中间是需要加一些特殊条件</span>后置条件，中间还得加一些条件，就是在这30秒钟是没有数据的，后置条件的话找出的数据是什么样才能满足我们的跳出的需求next这个过滤条件应该如何去解决这个问题下一条数据只要不是上一条数据跳转过来的就行，单独的对第二条数据进行判断，不是对第一条的数据进行判断如果有watermark的话，可以处理延迟的数据，可以写同样的条件，匹配上，匹配失败，匹配超时如果匹配上了这条数据要还是不要，失败的数据是不要的，超时数据的话是需要的不会出现，在一个会话窗口中多次的跳出，在CEP中是能把这些数据给找出的CEP这个状态是需求很难，代码的话是很简单的对用户来进行分组MID进行分组CEP的编程方式都是比较固定的，还是得注重于业务</code></pre><h3 id="留存率"><a href="#留存率" class="headerlink" title="留存率"></a>留存率</h3><p>优化产品</p><h3 id="新增用户"><a href="#新增用户" class="headerlink" title="新增用户"></a>新增用户</h3><p>优化推广</p>]]></content>
-      
-      
-      <categories>
-          
-          <category> 数仓 </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> 数仓 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title>英语日常学习</title>
       <link href="/2021/08/23/%E8%8B%B1%E8%AF%AD%E6%97%A5%E5%B8%B8%E5%AD%A6%E4%B9%A0/"/>
       <url>/2021/08/23/%E8%8B%B1%E8%AF%AD%E6%97%A5%E5%B8%B8%E5%AD%A6%E4%B9%A0/</url>
@@ -436,56 +361,6 @@
         <tags>
             
             <tag> 英语 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>实时数仓项目心得</title>
-      <link href="/2021/08/23/%E5%AE%9E%E6%97%B6%E6%95%B0%E4%BB%93%E9%A1%B9%E7%9B%AE%E5%BF%83%E5%BE%97/"/>
-      <url>/2021/08/23/%E5%AE%9E%E6%97%B6%E6%95%B0%E4%BB%93%E9%A1%B9%E7%9B%AE%E5%BF%83%E5%BE%97/</url>
-      
-        <content type="html"><![CDATA[<h1 id="实时数仓项目心得"><a href="#实时数仓项目心得" class="headerlink" title="实时数仓项目心得"></a>实时数仓项目心得</h1><h2 id="搭建环境"><a href="#搭建环境" class="headerlink" title="搭建环境"></a>搭建环境</h2><pre class=" language-properties"><code class="language-properties"><span class="token attr-name">其实实时数仓和离线数仓因该是一个架构两个项目,一个系统既要有实时系统也要有离线系统,周边的可能会跟一些业务系统的数据库和一些java</span> <span class="token attr-value">spring后端的数据接口等等,在大数据中,离线的一般都是hive+spark的方式来进行的</span>实时都是flink+kafka+clickhouse+hbase+redis的方式来进行的,目前的话,我是已经搭建好了实时系统和离线系统的,可能现在还有clickhouse+mysql+redis我觉得应该把这些周边的数据库,且不依赖于hadoop的数据库全部都搭建成一个单节点的一个教Dm的虚拟机中,同时我还有一个superset的一个报表系统来进行一个展示这些维度数据库中的数据结果的</code></pre><p>搭建好系统之后一定要注意快照和维护,不需要花大量的时间去解决整个环境上,应该花大量的时间在业务和解决问题的能力上面去,希望自己能够不停的做项目的同时能够锻炼自己,同时花时间能够做一个总结是非常有必要的</p><p>养成一个良好的开发习惯,就是每做一次代码的更改都得做一个版本得控制,这样方便能更好回到之前得版本和往上提高版本</p>]]></content>
-      
-      
-      <categories>
-          
-          <category> 数仓 </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> 数仓 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>Hive启动问题</title>
-      <link href="/2021/08/23/Hive%E5%90%AF%E5%8A%A8%E9%97%AE%E9%A2%98/"/>
-      <url>/2021/08/23/Hive%E5%90%AF%E5%8A%A8%E9%97%AE%E9%A2%98/</url>
-      
-        <content type="html"><![CDATA[<h1 id="Hive启动问题"><a href="#Hive启动问题" class="headerlink" title="Hive启动问题"></a>Hive启动问题</h1><h2 id="连接拒绝"><a href="#连接拒绝" class="headerlink" title="连接拒绝"></a>连接拒绝</h2><p>org.apache.hadoop.hive.metastore.api.MetaException: Could not connect to meta store using any of the URIs provided</p><p>MetaException(message:Could not connect to meta store using any of the URIs provided.</p><p>2021-08-23 15:23:55,198 INFO  [pool-9-thread-1] HiveMetaStore.audit (HiveMetaStore.java:logAuditEvent(347)) - ugi=root    ip=192.168.21.151    cmd=source:192.168.21.151 get_tables: db=@hive#default pat=.*</p><p>ugi=root    ip=unknown-ip-addr    cmd=get_multi_table : db=default tbls=</p>]]></content>
-      
-      
-      <categories>
-          
-          <category> 数仓 </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> 数仓 </tag>
             
         </tags>
       
@@ -553,14 +428,14 @@
       
       <categories>
           
-          <category> 数仓 </category>
+          <category> 企业级数据仓库 </category>
           
       </categories>
       
       
         <tags>
             
-            <tag> 数仓 </tag>
+            <tag> 企业级数据仓库 </tag>
             
         </tags>
       
