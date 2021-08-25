@@ -4,6 +4,44 @@
   
     
     <entry>
+      <title>Flink内存管理</title>
+      <link href="/2021/08/25/Flink%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/"/>
+      <url>/2021/08/25/Flink%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Flink安装和配置</title>
+      <link href="/2021/08/25/Flink%E5%AE%89%E8%A3%85%E5%92%8C%E9%85%8D%E7%BD%AE/"/>
+      <url>/2021/08/25/Flink%E5%AE%89%E8%A3%85%E5%92%8C%E9%85%8D%E7%BD%AE/</url>
+      
+        <content type="html"><![CDATA[<h1 id="Flink安装和配置"><a href="#Flink安装和配置" class="headerlink" title="Flink安装和配置"></a>Flink安装和配置</h1><h2 id="1、Flink安装和配置"><a href="#1、Flink安装和配置" class="headerlink" title="1、Flink安装和配置"></a>1、Flink安装和配置</h2><p>flink的安装是非常简单的，其中只需要配置一些文件和参数就好了</p><p>flink的运行时环境是非常重要的</p><p>RPC是远程过程调用，这样的RPC调用过程</p><p>Jobmanager是配置运行的JVM进程，堆内存的 大小，TaskManager的大小，定义的，和堆内存是有区别的，Flink集群是有状态的流式计算，如果要让Flink管理的内存是放在堆外的空间，堆内存创建的对象都是放到里面去，堆内存=堆内内存 + 堆外内存</p><p>heap.size堆内存，堆外内存很难区分，后面就分开了</p><p>问题，TaskManager &gt;  Jobmanager</p><pre class=" language-properties"><code class="language-properties"><span class="token attr-name">numberOfTaskSlots</span> <span class="token attr-value"> ---> 当前的并行处理，一个taskmanager如何多线程勒，运行独立的线程，一个节点只有要给槽位，多线程执行的话只能一个执行，这样的就是要给并行执行的，这个是静态的能力</span>这个是针对于一个taskmanager来进行决定的<span class="token attr-name">最大的并行能力</span> <span class="token punctuation">=</span> <span class="token attr-value">ts * numberOfTaskSlots</span></code></pre><pre class=" language-properties"><code class="language-properties"><span class="token attr-name">workers</span> <span class="token attr-value">这个是对于taskmanager</span>记住在新版本中，主节点是单独的作为要给节点的</code></pre>]]></content>
+      
+      
+      <categories>
+          
+          <category> Flink流式引擎 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> Flink流式引擎 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>0005-数据开发规范</title>
       <link href="/2021/08/25/0005-%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E8%A7%84%E8%8C%83/"/>
       <url>/2021/08/25/0005-%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E8%A7%84%E8%8C%83/</url>
