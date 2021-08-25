@@ -481,7 +481,55 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h1 id="Flink1-12-0源码阅读"><a href="#Flink1-12-0源码阅读" class="headerlink" title="Flink1.12.0源码阅读"></a>Flink1.12.0源码阅读</h1>
+                <h1 id="Flink1-12-0源码阅读"><a href="#Flink1-12-0源码阅读" class="headerlink" title="Flink1.12.0源码阅读"></a>Flink1.12.0源码阅读</h1><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><h3 id="一、任务提交流程"><a href="#一、任务提交流程" class="headerlink" title="一、任务提交流程"></a>一、任务提交流程</h3><ol>
+<li>命令行提交命令</li>
+<li>20多个步骤、几十个类、数千行代码，关键源码加注释</li>
+<li>16个小节</li>
+<li>PPT动图</li>
+</ol>
+<h3 id="二、组件通信"><a href="#二、组件通信" class="headerlink" title="二、组件通信"></a>二、组件通信</h3><ol>
+<li>actor模型，Akka基本原理和实现</li>
+<li>5大关键角色</li>
+<li>代理转发、处理细节</li>
+<li>PPT动图</li>
+</ol>
+<h3 id="三、任务调度"><a href="#三、任务调度" class="headerlink" title="三、任务调度"></a>三、任务调度</h3><ol>
+<li>图：流图、作业图、执行图、物理执行图</li>
+<li>调用位置、如何转换</li>
+<li>task调度：调度器、调度策略、调度模型</li>
+<li>task执行、以map算子为例</li>
+</ol>
+<h3 id="四、内存管理"><a href="#四、内存管理" class="headerlink" title="四、内存管理"></a>四、内存管理</h3><ol>
+<li>Flink 1.10之后的管理模型：jobmanager,taskmanager</li>
+<li>模型有效避免JVM内存的不足</li>
+<li>分配过程、内存管理的概念、数据结构，特有的管理器</li>
+<li>网络传输的内存管理，数据传输</li>
+<li>反压过程</li>
+</ol>
+<h2 id="一、任务提交流程-1"><a href="#一、任务提交流程-1" class="headerlink" title="一、任务提交流程"></a>一、任务提交流程</h2><h3 id="1、程序入口"><a href="#1、程序入口" class="headerlink" title="1、程序入口"></a>1、程序入口</h3><pre class=" language-properties"><code class="language-properties"><span class="token attr-name">flink</span> <span class="token attr-value">run >>> 里面有很多的依赖环境，有脚本的获取</span>
+CliFrontend
+YarnJobClusterEntrypoint
+<span class="token attr-name">TaskExecutorRunner</span> <span class="token attr-value">>>> TaskManagerRunner(Standalone)</span>
+
+org.apache.flink.client.cli.CliFrontend
+<span class="token attr-name">config.sh</span> <span class="token attr-value">环境信息获取</span>
+</code></pre>
+<h3 id="2、提交流程参数解析"><a href="#2、提交流程参数解析" class="headerlink" title="2、提交流程参数解析"></a>2、提交流程参数解析</h3><p>Ctrl + N —&gt; CliFrontend</p>
+<p>Ctrl + F12 可以快速的筛选，然后直接输入main就可以快速的找到了</p>
+<pre class=" language-properties"><code class="language-properties">1、获取flink的conf目录的路径
+<span class="token attr-name">main</span> <span class="token attr-value">-> getConfigurationDirectoryFromEnv</span>
+
+2、根据conf路径，加载配置
+<span class="token attr-name">loadConfiguration，我们不是配置了Flink</span> <span class="token attr-value">yaml文件吗</span>
+
+3、封装命令行接口：按顺序Generic、Yarn、Default，如何区分是什么集群
+loadCustomCommandLines
+
+<span class="token attr-name">4、runSecured</span> <span class="token attr-value">// 对封装好的参数进行解析</span>
+<span class="token attr-name">    ---></span> <span class="token attr-value">run ---> CliFrontendParser</span>
+<span class="token attr-name">    对我们提交的参数进行解析</span> <span class="token attr-value">-t -s -d 具体的赋值，参数值</span>
+</code></pre>
+<h3 id="3、提交流程，选择哪种命令行客户端"><a href="#3、提交流程，选择哪种命令行客户端" class="headerlink" title="3、提交流程，选择哪种命令行客户端"></a>3、提交流程，选择哪种命令行客户端</h3>
                 
             </div>
             <hr/>

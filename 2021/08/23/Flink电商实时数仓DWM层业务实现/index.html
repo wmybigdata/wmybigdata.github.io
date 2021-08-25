@@ -698,7 +698,13 @@ Linux：
 <span class="token attr-name">{"common"</span><span class="token punctuation">:</span><span class="token attr-value">{"ar":"440000","ba":"vivo","ch":"web","is_new":"1","md":"vivo iqoo3","mid":"mid_13","os":"Android 11.0","uid":"23","vc":"v2.1.134"},"page":{"during_time":8488,"page_id":"search"},"ts":1608263574000}</span>
 </code></pre>
 <p>超时事件处理不是很难，主要是业务是比较难得，我们通过处理放到了kafka层</p>
-<h2 id="第4章-DWM层-订单宽表"><a href="#第4章-DWM层-订单宽表" class="headerlink" title="第4章 DWM层-订单宽表"></a>第4章 DWM层-订单宽表</h2><h2 id="第5章-DWM层支付宽表（练习）"><a href="#第5章-DWM层支付宽表（练习）" class="headerlink" title="第5章 DWM层支付宽表（练习）"></a>第5章 DWM层支付宽表（练习）</h2><h2 id="第6章-总结"><a href="#第6章-总结" class="headerlink" title="第6章 总结"></a>第6章 总结</h2>
+<h2 id="第4章-DWM层-订单宽表"><a href="#第4章-DWM层-订单宽表" class="headerlink" title="第4章 DWM层-订单宽表"></a>第4章 DWM层-订单宽表</h2><p>重点：旁路缓存，异步IO</p>
+<p>GMV做分时统计</p>
+<p>这里有一个疑问就是，table_process表里面的数据和kafka的字段的信息是不一样的，出现了问题了，这里需要排查一下</p>
+<p>订单宽表是整个数仓当中最难的整个了</p>
+<p>Phoenix构建表的时候也是非常关键的</p>
+<p>列，值，对象，如何去结合在一起，将属性和值设置给对象 commonBeanutils</p>
+<h2 id="第5章-DWM层支付宽表（练习）"><a href="#第5章-DWM层支付宽表（练习）" class="headerlink" title="第5章 DWM层支付宽表（练习）"></a>第5章 DWM层支付宽表（练习）</h2><h2 id="第6章-总结"><a href="#第6章-总结" class="headerlink" title="第6章 总结"></a>第6章 总结</h2>
                 
             </div>
             <hr/>
