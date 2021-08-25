@@ -4,6 +4,131 @@
   
     
     <entry>
+      <title>0005-数据开发规范</title>
+      <link href="/2021/08/25/0005-%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E8%A7%84%E8%8C%83/"/>
+      <url>/2021/08/25/0005-%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E8%A7%84%E8%8C%83/</url>
+      
+        <content type="html"><![CDATA[<h1 id="0005-数据开发规范"><a href="#0005-数据开发规范" class="headerlink" title="0005-数据开发规范"></a>0005-数据开发规范</h1><p>话说，无规矩不成方圆，在数据开发领域同样也是适用的。</p><p>是不是经常听到这样的抱怨：</p><ul><li><p>我擦，这张表怎么特么的注释都没有？</p></li><li><p>我日，这个字段命名怎么是拼音全称？</p></li><li><p>怎么这张表的订单id是string类型，那张表的是订单id是bigint类型？</p></li><li><p>害，烦死了，这是谁开发的任务，库名/项目名都没写，我这去其他项目下跑还得一个个加上。</p></li><li><p>这代码谁写的？2张表join获取相关字段，也不写一下表的别名，我哪知道这是这是取自哪张表的 ？</p></li><li><p>运维任务又报错了？ 这是谁写的select * ，union all呀，害死人，上游表加字段了，这搞的。</p></li></ul><h2 id="一-词根"><a href="#一-词根" class="headerlink" title="一 词根"></a>一 词根</h2><p>词根的作用就是大家在对字段，表，指标等命名的时候作为查询使用，需要陆续完善</p><table><thead><tr><th>中文名</th><th>英文</th><th>评审时间</th><th>负责人</th></tr></thead><tbody><tr><td>数量</td><td>cnt</td><td>20210816</td><td>数据研发工程师</td></tr></tbody></table><h2 id="二-词典"><a href="#二-词典" class="headerlink" title="二 词典"></a>二 词典</h2><p>词典比词根更近一步，大家在对字段命名的时候，首先可以参考词典，以及可以参考其字段类型，使各个开发对同一个中文的字段命名及类型全部一致</p><table><thead><tr><th>中文名</th><th>英文名</th><th>字段类型</th><th>评审时间</th></tr></thead><tbody><tr><td>订单id</td><td>order_id</td><td>String</td><td>20210816</td></tr></tbody></table><h2 id="三-命名规范"><a href="#三-命名规范" class="headerlink" title="三 命名规范"></a>三 命名规范</h2><p>表命名</p><p>ods层</p><p>dwd层</p><p>dim层</p><p>dws层</p><p>ads层</p><p>临时表</p><p>手工表</p><p>表命名一般需要加入一及数据域，二级数据域，所以最开始需要划分数据域/主题域</p><p>然后详细的命名方式，根据每家公司有所不同</p><p>任务命名</p><p>一般情况下，任务名与输出表名一致</p><p>字段命名</p><p>参考 词根，词典</p><p>指标命名</p><p>略，之后讲指标平台的时候详细讲</p><h2 id="四-ddl规范"><a href="#四-ddl规范" class="headerlink" title="四 ddl规范"></a>四 ddl规范</h2><p>需不需要加生命周期</p><p>需不需要加创建人，创建时间</p><p>ddl语句需不需要单独维护</p><h2 id="五-sql编写规范"><a href="#五-sql编写规范" class="headerlink" title="五 sql编写规范"></a>五 sql编写规范</h2><p>关于缩进，大小写，空格，注释啥的细节就不说了，讲一下重点</p><p>多表关联时，需要使用别名来引用列 如： t1.user_id</p><p>表名前面需要加上库名/项目名，如 ods.test</p><p>不要出现select * 操作</p><p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210825170806956.png" alt="数据开发规范"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 新数据仓库体系 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 新数据仓库体系 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>0004-数据清洗</title>
+      <link href="/2021/08/25/0004-%E6%95%B0%E6%8D%AE%E6%B8%85%E6%B4%97/"/>
+      <url>/2021/08/25/0004-%E6%95%B0%E6%8D%AE%E6%B8%85%E6%B4%97/</url>
+      
+        <content type="html"><![CDATA[<h1 id="0004-数据清洗"><a href="#0004-数据清洗" class="headerlink" title="0004-数据清洗"></a>0004-数据清洗</h1><p>在我们想尽各种办法把数据弄进数据仓库ods层后，接下来的事情就比较有意思了，并且比较重要，对后续的数据模型建设，数据质量的保证，甚至影响管理层的决策(就问你怕不怕？)</p><p>那么，对于ETL过程中的数据清洗，你一般会怎么做呢？但凡你真正的做过数仓，我认为这些都是轻车熟路的，因为这是数据研发的必经之路</p><p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210825164340099.png" alt="ETL"></p><p>我在对候选人进行考察的时候，也经常会问到这个问题，主要是看一下候选人有没有真实工作经验，然后在开发过程中有没有独立思考，并且知其然更知其所以然，但是候选人回答的都比较片面，比如只是处理空值，可能是公司数据质量的原因，但是就算公司业务库数据质量比较高，我们也应该需要全面的了解一些数据清洗规范。</p><p>那么我就来跟大家分享一下，工作中一般的数据清洗包含哪些并且一般怎么处理的吧。</p><p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210825164432662.png" alt="数据清洗"></p><h2 id="一-空值处理"><a href="#一-空值处理" class="headerlink" title="一 空值处理"></a>一 空值处理</h2><p>什么是空值，就是我们数据抽过来之后，发现有很多的字段为空，为了保证数据完整性或者方面后续的数据处理，这些我们都是需要预先处理的。一般使用默认值或者中位数，使用默认值的成本更低一点吧。</p><p>那么我们需要怎么处理呢，这个就要区分字段类型了。</p><table><thead><tr><th>类型</th><th>默认值</th><th>备注</th></tr></thead><tbody><tr><td>string</td><td>‘未知’，’unkown’，’-999’</td><td>描述，姓名</td></tr><tr><td>int</td><td>0</td><td>次数</td></tr><tr><td>bigint</td><td>0</td><td>次数</td></tr><tr><td>smallint/tinyint</td><td>0</td><td>是否</td></tr><tr><td>double</td><td>0</td><td>金额</td></tr><tr><td>decimal(16,4)</td><td>0</td><td>金额</td></tr><tr><td>datetime</td><td>1970-01-01 00:00:00</td><td>时间</td></tr></tbody></table><p>以上会有一个小问题，string类型给了默认值之后，如果是主键，在进行join操作的时候，本来关联不上的，由于给了默认值，就能关联上了，这种情况可能要单独处理一下。</p><p>但是每种类型的默认值需要和数据分析师，业务方，需求方等其他部门同步一下，避免出现懵逼情况，比如 1970-01-01 00:00:00是个啥</p><h2 id="二-数据格式处理"><a href="#二-数据格式处理" class="headerlink" title="二 数据格式处理"></a>二 数据格式处理</h2><p>数据格式处理，主要包含2个方面，一个是复杂数据类型的解析处理，比如json解析等</p><p>另一方面是内容的统一，对于日期字段数据格式，可以统一为 yyyy-MM-dd</p><h2 id="三-枚举值处理"><a href="#三-枚举值处理" class="headerlink" title="三 枚举值处理"></a>三 枚举值处理</h2><p>我们的数据源可能会来自很多系统，业务开发的习惯可能不太相同，导致枚举值也不太一样，举个例子  a表的 1 代表 男，2代表女，b表的1代表女，2代表男，如果不统一一下的话，将来使用数据的时候就会产生误解，当作为关联条件去关联的时候，更会直接导致数据错误</p><h2 id="四-字段类型处理"><a href="#四-字段类型处理" class="headerlink" title="四 字段类型处理"></a>四 字段类型处理</h2><p>对于同一个字段，他们的字段类型我们需要做到统一，比如 订单id，不能a表是string类型，b表是bigint类型，统一为string类型不好吗？</p><h2 id="五-注释处理"><a href="#五-注释处理" class="headerlink" title="五 注释处理"></a>五 注释处理</h2><p>主要是对业务库没有注释的表或者字段进行补充完善。自己不太确定的需要及时找业务开发确认清楚。</p><h2 id="六-敏感数据处理"><a href="#六-敏感数据处理" class="headerlink" title="六 敏感数据处理"></a>六 敏感数据处理</h2><p>理论上来说数仓的敏感数据都是需要加密的，直到输出到业务库或者其他服务于业务方的存储系统，我们在同步的时候需要解密传输。</p><p>对于姓名，手机号，身份证号，邮箱，银行卡号这些，我们都需要通过自带的加密函数或者udf函数进行加密，保证数据安全。</p><h2 id="七-数据单位统一"><a href="#七-数据单位统一" class="headerlink" title="七 数据单位统一"></a>七 数据单位统一</h2><p>数据单位统一，这个比较好理解了，比如金额，一张表是美元，一张表是人民币，你在对2张表的金额做操作的时候，是不是会有问题，所以这个需要提前定好，统一清洗。</p><h2 id="八-逻辑错误清洗"><a href="#八-逻辑错误清洗" class="headerlink" title="八 逻辑错误清洗"></a>八 逻辑错误清洗</h2><p>举几个简单的例子：年龄不可能超过200岁吧，身份证号不可能是5位吧？</p><p>这个具体怎么清洗，需要根据实际的业务场景。</p><p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210825165711383.png" alt="数据清洗流程"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 新数据仓库体系 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 新数据仓库体系 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>0003-数据同步策略</title>
+      <link href="/2021/08/25/0003-%E6%95%B0%E6%8D%AE%E5%90%8C%E6%AD%A5%E7%AD%96%E7%95%A5/"/>
+      <url>/2021/08/25/0003-%E6%95%B0%E6%8D%AE%E5%90%8C%E6%AD%A5%E7%AD%96%E7%95%A5/</url>
+      
+        <content type="html"><![CDATA[<h1 id="0003-数据同步策略"><a href="#0003-数据同步策略" class="headerlink" title="0003-数据同步策略"></a>0003-数据同步策略</h1><p>我们要搭建数据仓库，那么数据是来自哪里呢？</p><p>答案很明显，一般来说，数据会来自3个方向，业务库数据，日志数据及爬虫数据，对于爬虫数据，我们就不做过多的分析，一般就是爬一些竞品信息，维表信息。</p><p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210825163624184.png" alt="数据同步"></p><p>业务库数据</p><p>什么是业务库数据，指的是业务系统产生的数据，这个业务系统可以是你们公司的官网，app或者小程序。</p><p>对于业务库数据，如果是t+1同步抽取的话，我们一般会选择sqoop或者datax，当然，有些传统企业会使用kettle，不过个人认为kettle还是比较重的，而且好像也不太方便，所以不是很推荐；</p><p>如果是需要实时同步的话，我们一般使用开启binlog，采用canal+kafka的模式实时监听同步。或者使用flink-cdc都是可以实现的</p><p>对于离线抽取，不管是使用什么工具，都会设计到一个抽取策略问题，比如500数据，5万数据，30万数据，1000万数据分别需要怎么存储？</p><p>对于1000万数据来说，我们肯定是需要增量进行抽取的，但是业务库一般来说需要满足如下3个条件，我们才能进行增量抽取：</p><ul><li><p>主键唯一</p></li><li><p>有更新时间并且数据更新时，该时间也会改变</p></li><li><p>不存在物理删除的情况</p></li></ul><p>那么500数据，5w数据和30万数据呢？这个不能拍脑袋就决定了，需要综合考虑，比如该业务上线时长，该业务预期的数据增长等，这个需要与业务方和对应的业务开发进行沟通</p><p>比如50条数据是维表数据，那么全量抽取问题不大，如果是刚上线的业务，且可预见的后期数据量会爆发式增长，那么还是增量抽取比较靠谱，免得后期频繁的修改抽取任务</p><p>日志数据</p><p>日志数据一般来说指的是埋点日志，但是有些ng日志或者其他的日志也会上报进行采集。</p><p>对于日志数据，目前主流的工具可能是flume和logstash，这个好像就没啥特别好说的了，生产环境对于日志数据的要求不会太高，多一点少一点其实问题都不太大。</p><p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210825164015829.png" alt="数据同步"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 新数据仓库体系 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 新数据仓库体系 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>0002-数据探查</title>
+      <link href="/2021/08/25/0002-%E6%95%B0%E6%8D%AE%E6%8E%A2%E6%9F%A5/"/>
+      <url>/2021/08/25/0002-%E6%95%B0%E6%8D%AE%E6%8E%A2%E6%9F%A5/</url>
+      
+        <content type="html"><![CDATA[<h1 id="0002-数据探查"><a href="#0002-数据探查" class="headerlink" title="0002-数据探查"></a>0002-数据探查</h1><p><font color="blue">给你一个需求或者一条新的业务线可能需要搭建数仓，做数据处理，然后提供一些指标数据给到需求方，你这边会怎么开始呢？</font></p><p><font color="blue">当你接到这个需求的时候，直接开干？抽表，清洗，分层，建模？</font></p><p><font color="blue">呵呵，这就是瞎搞。啥也不知道不了解的情况下，对数据源一无所知的情况下，是谁给你勇气直接开干的？</font></p><p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210825161712447.png" alt="数据探查"></p><p>正常情况下，接到新的数据需求或者任务的时候，我们最开始应该需要做一下数据调研，或者说数据探查。</p><p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210825162346421.png" alt="数据调研"></p><p>那么问题来了，具体我们应该做些啥呢？就拿接到一个需求来举例说明吧：</p><p>那么问题来了，具体我们应该做些啥呢？就拿接到一个需求来举例说明吧：</p><p>业务方让你统计一些数据指标，给了你相关口径，表给没给这个就不清楚了，理论上是要给的，但是如果他自己也不知道，那这个也是没办法的。</p><p>给了的话还好，你直接去业务库查看这些表，但是没给的话，你可能要多一些步骤，可能要去找对应的产品经理或者业务开发帮你一起找。最后，你终于找到需要的那些表了。</p><p>拿到表之后怎么办？慌了吗？</p><p>duck不必，我们可以开心的做数据探查了，对数据有一个整体的把控。</p><p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210825163205224.png" alt="整体把控"></p><ul><li><p>了解数据表字段能不能满足需求发需求，看看字段有没有少，如果发现少了或者提供的数据源没法满足需求，需要及时找对应的人员沟通，可别自己瞎搞或者跑路了</p></li><li><p>看一下相关表的数据结构，有没有json数据或者或者其他比较复杂的数据，便于数仓处理</p></li><li><p>看一下数据内容，是不是有些字段毫无意义，不需要存储在数仓，或者看一下是不是有很多空置的情况，脏数据情况，其实就是探查一下业务库的数据质量，通过这些我们可以大概判断在数仓会有多少的清洗机制</p></li><li><p>看一下数据量，方便我们在抽取的时候选择增量抽取或者全量抽取，甚至可以问一下业务方业务增长情况，更能准确的决定数据抽取策略。</p></li></ul><p>全部探查完以后，你就可以继续以下的步骤了。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 新数据仓库体系 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 新数据仓库体系 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>0001-数据仓库体系</title>
+      <link href="/2021/08/25/0001-%E6%95%B0%E6%8D%AE%E4%BB%93%E5%BA%93%E4%BD%93%E7%B3%BB/"/>
+      <url>/2021/08/25/0001-%E6%95%B0%E6%8D%AE%E4%BB%93%E5%BA%93%E4%BD%93%E7%B3%BB/</url>
+      
+        <content type="html"><![CDATA[<h1 id="0001-数据仓库体系"><a href="#0001-数据仓库体系" class="headerlink" title="0001-数据仓库体系"></a>0001-数据仓库体系</h1><p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210825160959524.png" alt="数据仓库体系"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 新数据仓库体系 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 新数据仓库体系 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>Hive高级源码</title>
       <link href="/2021/08/25/Hive%E9%AB%98%E7%BA%A7%E6%BA%90%E7%A0%81/"/>
       <url>/2021/08/25/Hive%E9%AB%98%E7%BA%A7%E6%BA%90%E7%A0%81/</url>
@@ -23,19 +148,6 @@
             <tag> hive </tag>
             
         </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>Flink二次开发经验</title>
-      <link href="/2021/08/25/Flink%E4%BA%8C%E6%AC%A1%E5%BC%80%E5%8F%91%E7%BB%8F%E9%AA%8C/"/>
-      <url>/2021/08/25/Flink%E4%BA%8C%E6%AC%A1%E5%BC%80%E5%8F%91%E7%BB%8F%E9%AA%8C/</url>
-      
-        <content type="html"><![CDATA[]]></content>
-      
-      
       
     </entry>
     
@@ -243,19 +355,6 @@
     
     
     <entry>
-      <title>Flink-SQL-双流-JOIN</title>
-      <link href="/2021/08/24/Flink-SQL-%E5%8F%8C%E6%B5%81-JOIN/"/>
-      <url>/2021/08/24/Flink-SQL-%E5%8F%8C%E6%B5%81-JOIN/</url>
-      
-        <content type="html"><![CDATA[]]></content>
-      
-      
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title>MySQLbinlog日志学习</title>
       <link href="/2021/08/24/MySQLbinlog%E6%97%A5%E5%BF%97%E5%AD%A6%E4%B9%A0/"/>
       <url>/2021/08/24/MySQLbinlog%E6%97%A5%E5%BF%97%E5%AD%A6%E4%B9%A0/</url>
@@ -438,19 +537,6 @@
             <tag> 企业级数据仓库 </tag>
             
         </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>笔记演示</title>
-      <link href="/2021/08/22/%E7%AC%94%E8%AE%B0%E6%BC%94%E7%A4%BA/"/>
-      <url>/2021/08/22/%E7%AC%94%E8%AE%B0%E6%BC%94%E7%A4%BA/</url>
-      
-        <content type="html"><![CDATA[<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210822202007347.png" alt="image-20210822202007347"></p>]]></content>
-      
-      
       
     </entry>
     

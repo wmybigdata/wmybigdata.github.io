@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="笔记演示, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
+    <meta name="keywords" content="0004-数据清洗, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
     <meta name="description" content="本网站是个人兴趣爱好，总结分享经验，记录生活点滴的平台，希望在以后的学习旅途中，走出自己的风景。">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -16,7 +16,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>笔记演示 | 情深骚明大数据之旅</title>
+    <title>0004-数据清洗 | 情深骚明大数据之旅</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -314,12 +314,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/18.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/15.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">笔记演示</h1>
+                    <h1 class="description center-align post-title">0004-数据清洗</h1>
                 </div>
             </div>
         </div>
@@ -433,12 +433,25 @@
             <div class="row tag-cate">
                 <div class="col s7">
                     
-                          <div class="article-tag">
-                            <span class="chip bg-color">无标签</span>
-                          </div>
+                    <div class="article-tag">
+                        
+                            <a href="/tags/%E6%96%B0%E6%95%B0%E6%8D%AE%E4%BB%93%E5%BA%93%E4%BD%93%E7%B3%BB/">
+                                <span class="chip bg-color">新数据仓库体系</span>
+                            </a>
+                        
+                    </div>
                     
                 </div>
                 <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/%E6%96%B0%E6%95%B0%E6%8D%AE%E4%BB%93%E5%BA%93%E4%BD%93%E7%B3%BB/" class="post-category">
+                                新数据仓库体系
+                            </a>
+                        
+                    </div>
                     
                 </div>
             </div>
@@ -447,7 +460,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2021-08-22
+                    2021-08-25
                 </div>
                 
 
@@ -468,7 +481,71 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210822202007347.png" alt="image-20210822202007347"></p>
+                <h1 id="0004-数据清洗"><a href="#0004-数据清洗" class="headerlink" title="0004-数据清洗"></a>0004-数据清洗</h1><p>在我们想尽各种办法把数据弄进数据仓库ods层后，接下来的事情就比较有意思了，并且比较重要，对后续的数据模型建设，数据质量的保证，甚至影响管理层的决策(就问你怕不怕？)</p>
+<p>那么，对于ETL过程中的数据清洗，你一般会怎么做呢？但凡你真正的做过数仓，我认为这些都是轻车熟路的，因为这是数据研发的必经之路</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210825164340099.png" alt="ETL"></p>
+<p>我在对候选人进行考察的时候，也经常会问到这个问题，主要是看一下候选人有没有真实工作经验，然后在开发过程中有没有独立思考，并且知其然更知其所以然，但是候选人回答的都比较片面，比如只是处理空值，可能是公司数据质量的原因，但是就算公司业务库数据质量比较高，我们也应该需要全面的了解一些数据清洗规范。</p>
+<p>那么我就来跟大家分享一下，工作中一般的数据清洗包含哪些并且一般怎么处理的吧。</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210825164432662.png" alt="数据清洗"></p>
+<h2 id="一-空值处理"><a href="#一-空值处理" class="headerlink" title="一 空值处理"></a>一 空值处理</h2><p>什么是空值，就是我们数据抽过来之后，发现有很多的字段为空，为了保证数据完整性或者方面后续的数据处理，这些我们都是需要预先处理的。一般使用默认值或者中位数，使用默认值的成本更低一点吧。</p>
+<p>那么我们需要怎么处理呢，这个就要区分字段类型了。</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>默认值</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>string</td>
+<td>‘未知’，’unkown’，’-999’</td>
+<td>描述，姓名</td>
+</tr>
+<tr>
+<td>int</td>
+<td>0</td>
+<td>次数</td>
+</tr>
+<tr>
+<td>bigint</td>
+<td>0</td>
+<td>次数</td>
+</tr>
+<tr>
+<td>smallint/tinyint</td>
+<td>0</td>
+<td>是否</td>
+</tr>
+<tr>
+<td>double</td>
+<td>0</td>
+<td>金额</td>
+</tr>
+<tr>
+<td>decimal(16,4)</td>
+<td>0</td>
+<td>金额</td>
+</tr>
+<tr>
+<td>datetime</td>
+<td>1970-01-01 00:00:00</td>
+<td>时间</td>
+</tr>
+</tbody></table>
+<p>以上会有一个小问题，string类型给了默认值之后，如果是主键，在进行join操作的时候，本来关联不上的，由于给了默认值，就能关联上了，这种情况可能要单独处理一下。</p>
+<p>但是每种类型的默认值需要和数据分析师，业务方，需求方等其他部门同步一下，避免出现懵逼情况，比如 1970-01-01 00:00:00是个啥</p>
+<h2 id="二-数据格式处理"><a href="#二-数据格式处理" class="headerlink" title="二 数据格式处理"></a>二 数据格式处理</h2><p>数据格式处理，主要包含2个方面，一个是复杂数据类型的解析处理，比如json解析等</p>
+<p>另一方面是内容的统一，对于日期字段数据格式，可以统一为 yyyy-MM-dd</p>
+<h2 id="三-枚举值处理"><a href="#三-枚举值处理" class="headerlink" title="三 枚举值处理"></a>三 枚举值处理</h2><p>我们的数据源可能会来自很多系统，业务开发的习惯可能不太相同，导致枚举值也不太一样，举个例子  a表的 1 代表 男，2代表女，b表的1代表女，2代表男，如果不统一一下的话，将来使用数据的时候就会产生误解，当作为关联条件去关联的时候，更会直接导致数据错误</p>
+<h2 id="四-字段类型处理"><a href="#四-字段类型处理" class="headerlink" title="四 字段类型处理"></a>四 字段类型处理</h2><p>对于同一个字段，他们的字段类型我们需要做到统一，比如 订单id，不能a表是string类型，b表是bigint类型，统一为string类型不好吗？</p>
+<h2 id="五-注释处理"><a href="#五-注释处理" class="headerlink" title="五 注释处理"></a>五 注释处理</h2><p>主要是对业务库没有注释的表或者字段进行补充完善。自己不太确定的需要及时找业务开发确认清楚。</p>
+<h2 id="六-敏感数据处理"><a href="#六-敏感数据处理" class="headerlink" title="六 敏感数据处理"></a>六 敏感数据处理</h2><p>理论上来说数仓的敏感数据都是需要加密的，直到输出到业务库或者其他服务于业务方的存储系统，我们在同步的时候需要解密传输。</p>
+<p>对于姓名，手机号，身份证号，邮箱，银行卡号这些，我们都需要通过自带的加密函数或者udf函数进行加密，保证数据安全。</p>
+<h2 id="七-数据单位统一"><a href="#七-数据单位统一" class="headerlink" title="七 数据单位统一"></a>七 数据单位统一</h2><p>数据单位统一，这个比较好理解了，比如金额，一张表是美元，一张表是人民币，你在对2张表的金额做操作的时候，是不是会有问题，所以这个需要提前定好，统一清洗。</p>
+<h2 id="八-逻辑错误清洗"><a href="#八-逻辑错误清洗" class="headerlink" title="八 逻辑错误清洗"></a>八 逻辑错误清洗</h2><p>举几个简单的例子：年龄不可能超过200岁吧，身份证号不可能是5位吧？</p>
+<p>这个具体怎么清洗，需要根据实际的业务场景。</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210825165711383.png" alt="数据清洗流程"></p>
 
                 
             </div>
@@ -495,7 +572,7 @@
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://github.com/wmybigdata/2021/08/22/%E7%AC%94%E8%AE%B0%E6%BC%94%E7%A4%BA/">https://github.com/wmybigdata/2021/08/22/%E7%AC%94%E8%AE%B0%E6%BC%94%E7%A4%BA/</a>
+                    <a href="https://github.com/wmybigdata/2021/08/25/0004-%E6%95%B0%E6%8D%AE%E6%B8%85%E6%B4%97/">https://github.com/wmybigdata/2021/08/25/0004-%E6%95%B0%E6%8D%AE%E6%B8%85%E6%B4%97/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -532,7 +609,11 @@
                 <div class="post-meta__tag-list" style="display: inline-block;">
                     
                         <div class="article-tag">
-                            <span class="chip bg-color">无标签</span>
+                            
+                                <a href="/tags/%E6%96%B0%E6%95%B0%E6%8D%AE%E4%BB%93%E5%BA%93%E4%BD%93%E7%B3%BB/">
+                                    <span class="chip bg-color">新数据仓库体系</span>
+                                </a>
+                            
                         </div>
                     
                 </div>
@@ -704,13 +785,13 @@
             <div class="article-badge left-badge text-color">
                 <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2021/08/23/Flink%E7%94%B5%E5%95%86%E5%AE%9E%E6%97%B6%E6%95%B0%E4%BB%93DWM%E5%B1%82%E4%B8%9A%E5%8A%A1%E5%AE%9E%E7%8E%B0/">
+                <a href="/2021/08/25/0005-%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E8%A7%84%E8%8C%83/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/19.jpg" class="responsive-img" alt="Flink电商实时数仓DWM层业务实现">
+                        <img src="/medias/featureimages/22.jpg" class="responsive-img" alt="0005-数据开发规范">
                         
-                        <span class="card-title">Flink电商实时数仓DWM层业务实现</span>
+                        <span class="card-title">0005-数据开发规范</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -721,14 +802,14 @@
                     </div>
                     <div class="publish-info">
                         <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2021-08-23
+                            <i class="far fa-clock fa-fw icon-date"></i>2021-08-25
                         </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/%E4%BC%81%E4%B8%9A%E7%BA%A7%E6%95%B0%E6%8D%AE%E4%BB%93%E5%BA%93/" class="post-category">
-                                    企业级数据仓库
+                            <a href="/categories/%E6%96%B0%E6%95%B0%E6%8D%AE%E4%BB%93%E5%BA%93%E4%BD%93%E7%B3%BB/" class="post-category">
+                                    新数据仓库体系
                                 </a>
                             
                             
@@ -738,8 +819,8 @@
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/%E4%BC%81%E4%B8%9A%E7%BA%A7%E6%95%B0%E6%8D%AE%E4%BB%93%E5%BA%93/">
-                        <span class="chip bg-color">企业级数据仓库</span>
+                    <a href="/tags/%E6%96%B0%E6%95%B0%E6%8D%AE%E4%BB%93%E5%BA%93%E4%BD%93%E7%B3%BB/">
+                        <span class="chip bg-color">新数据仓库体系</span>
                     </a>
                     
                 </div>
@@ -753,13 +834,13 @@
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2021/08/22/MySQL%E9%9D%A2%E8%AF%95%E5%BF%85%E5%88%B7/">
+                <a href="/2021/08/25/0003-%E6%95%B0%E6%8D%AE%E5%90%8C%E6%AD%A5%E7%AD%96%E7%95%A5/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/9.jpg" class="responsive-img" alt="MySQL面试必刷">
+                        <img src="/medias/featureimages/0.jpg" class="responsive-img" alt="0003-数据同步策略">
                         
-                        <span class="card-title">MySQL面试必刷</span>
+                        <span class="card-title">0003-数据同步策略</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -770,14 +851,14 @@
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2021-08-22
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-08-25
                             </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="post-category">
-                                    数据库
+                            <a href="/categories/%E6%96%B0%E6%95%B0%E6%8D%AE%E4%BB%93%E5%BA%93%E4%BD%93%E7%B3%BB/" class="post-category">
+                                    新数据仓库体系
                                 </a>
                             
                             
@@ -787,8 +868,8 @@
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">
-                        <span class="chip bg-color">数据库</span>
+                    <a href="/tags/%E6%96%B0%E6%95%B0%E6%8D%AE%E4%BB%93%E5%BA%93%E4%BD%93%E7%B3%BB/">
+                        <span class="chip bg-color">新数据仓库体系</span>
                     </a>
                     
                 </div>

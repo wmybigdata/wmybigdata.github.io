@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="Hive高级源码, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
+    <meta name="keywords" content="0003-数据同步策略, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
     <meta name="description" content="本网站是个人兴趣爱好，总结分享经验，记录生活点滴的平台，希望在以后的学习旅途中，走出自己的风景。">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -16,7 +16,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>Hive高级源码 | 情深骚明大数据之旅</title>
+    <title>0003-数据同步策略 | 情深骚明大数据之旅</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -314,12 +314,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/8.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/0.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">Hive高级源码</h1>
+                    <h1 class="description center-align post-title">0003-数据同步策略</h1>
                 </div>
             </div>
         </div>
@@ -435,8 +435,8 @@
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/hive/">
-                                <span class="chip bg-color">hive</span>
+                            <a href="/tags/%E6%96%B0%E6%95%B0%E6%8D%AE%E4%BB%93%E5%BA%93%E4%BD%93%E7%B3%BB/">
+                                <span class="chip bg-color">新数据仓库体系</span>
                             </a>
                         
                     </div>
@@ -447,8 +447,8 @@
                     <div class="post-cate">
                         <i class="fas fa-bookmark fa-fw icon-category"></i>
                         
-                            <a href="/categories/hive/" class="post-category">
-                                hive
+                            <a href="/categories/%E6%96%B0%E6%95%B0%E6%8D%AE%E4%BB%93%E5%BA%93%E4%BD%93%E7%B3%BB/" class="post-category">
+                                新数据仓库体系
                             </a>
                         
                     </div>
@@ -481,29 +481,29 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h1 id="Hive高级源码"><a href="#Hive高级源码" class="headerlink" title="Hive高级源码"></a>Hive高级源码</h1><ul>
-<li><input disabled="" type="checkbox"> 组件分析和核心流程 重点</li>
-<li><input disabled="" type="checkbox"> Hive源码解读 —&gt; 分支解读</li>
-<li><input disabled="" type="checkbox"> Hive Debug —&gt; MR,Spark,Tez —&gt; 某个分支解读</li>
+                <h1 id="0003-数据同步策略"><a href="#0003-数据同步策略" class="headerlink" title="0003-数据同步策略"></a>0003-数据同步策略</h1><p>我们要搭建数据仓库，那么数据是来自哪里呢？</p>
+<p>答案很明显，一般来说，数据会来自3个方向，业务库数据，日志数据及爬虫数据，对于爬虫数据，我们就不做过多的分析，一般就是爬一些竞品信息，维表信息。</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210825163624184.png" alt="数据同步"></p>
+<p>业务库数据</p>
+<p>什么是业务库数据，指的是业务系统产生的数据，这个业务系统可以是你们公司的官网，app或者小程序。</p>
+<p>对于业务库数据，如果是t+1同步抽取的话，我们一般会选择sqoop或者datax，当然，有些传统企业会使用kettle，不过个人认为kettle还是比较重的，而且好像也不太方便，所以不是很推荐；</p>
+<p>如果是需要实时同步的话，我们一般使用开启binlog，采用canal+kafka的模式实时监听同步。或者使用flink-cdc都是可以实现的</p>
+<p>对于离线抽取，不管是使用什么工具，都会设计到一个抽取策略问题，比如500数据，5万数据，30万数据，1000万数据分别需要怎么存储？</p>
+<p>对于1000万数据来说，我们肯定是需要增量进行抽取的，但是业务库一般来说需要满足如下3个条件，我们才能进行增量抽取：</p>
+<ul>
+<li><p>主键唯一</p>
+</li>
+<li><p>有更新时间并且数据更新时，该时间也会改变</p>
+</li>
+<li><p>不存在物理删除的情况</p>
+</li>
 </ul>
-<h2 id="第-1-章-HQL-是如何转换为-MR-任务的"><a href="#第-1-章-HQL-是如何转换为-MR-任务的" class="headerlink" title="第 1 章 HQL 是如何转换为 MR 任务的"></a>第 1 章 HQL 是如何转换为 MR 任务的</h2><h3 id="1-1-Hive-的核心组成介绍"><a href="#1-1-Hive-的核心组成介绍" class="headerlink" title="1.1 Hive 的核心组成介绍"></a>1.1 Hive 的核心组成介绍</h3><p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210825153641750.png" alt="hive架构"></p>
-<h4 id="1）用户接口：Client"><a href="#1）用户接口：Client" class="headerlink" title="1）用户接口：Client"></a>1）用户接口：Client</h4><p>​    CLI（command-line interface）、JDBC/ODBC(jdbc 访问 hive)、WEBUI（浏览器访问 hive）</p>
-<h4 id="2）元数据：Metastore"><a href="#2）元数据：Metastore" class="headerlink" title="2）元数据：Metastore"></a>2）元数据：Metastore</h4><p>​    元数据包括：表名、表所属的数据库（默认是 default）、表的拥有者、列/分区字段、表 的类型（是否是外部表）、表的数据所在目录等； 默认存储在自带的 derby 数据库中，推荐使用 MySQL 存储 Metastore</p>
-<h4 id="3）Hadoop"><a href="#3）Hadoop" class="headerlink" title="3）Hadoop"></a>3）Hadoop</h4><p>​    使用 HDFS 进行存储，使用 MapReduce 进行计算。</p>
-<h4 id="4）驱动器：Driver"><a href="#4）驱动器：Driver" class="headerlink" title="4）驱动器：Driver"></a>4）驱动器：Driver</h4><h4 id="5）解析器（SQL-Parser）"><a href="#5）解析器（SQL-Parser）" class="headerlink" title="5）解析器（SQL Parser）"></a>5）解析器（SQL Parser）</h4><p>​    将 SQL 字符串转换成抽象语法树 AST，这一步一般都用第三方工具库完成，比如 antlr； 对 AST 进行语法分析，比如表是否存在、字段是否存在、SQL 语义是否有误</p>
-<h4 id="6）编译器（Physical-Plan）"><a href="#6）编译器（Physical-Plan）" class="headerlink" title="6）编译器（Physical Plan）"></a>6）编译器（Physical Plan）</h4><p>​    将 AST 编译生成逻辑执行计划。</p>
-<h4 id="7）优化器（Query-Optimizer）"><a href="#7）优化器（Query-Optimizer）" class="headerlink" title="7）优化器（Query Optimizer）"></a>7）优化器（Query Optimizer）</h4><p>​    对逻辑执行计划进行优化。</p>
-<h4 id="8）执行器（Execution）"><a href="#8）执行器（Execution）" class="headerlink" title="8）执行器（Execution）"></a>8）执行器（Execution）</h4><p>​    把逻辑执行计划转换成可以运行的物理计划。对于 Hive 来说，就是 MR/Spark。</p>
-<h3 id="1-2-HQL-转换为-MR-任务流程说明"><a href="#1-2-HQL-转换为-MR-任务流程说明" class="headerlink" title="1.2 HQL 转换为 MR 任务流程说明"></a>1.2 HQL 转换为 MR 任务流程说明</h3><ul>
-<li><input disabled="" type="checkbox"> 1.进入程序，利用Antlr框架定义HQL的语法规则，对HQL完成词法语法解析，将HQL转换为为AST（抽象语法树）；</li>
-<li><input disabled="" type="checkbox"> 2.遍历AST，抽象出查询的基本组成单元QueryBlock（查询块），可以理解为最小的查询执行单元；</li>
-<li><input disabled="" type="checkbox"> 3.遍历QueryBlock，将其转换为OperatorTree（操作树，也就是逻辑执行计划），可以理解为不可拆分的一个逻辑执行单元；</li>
-<li><input disabled="" type="checkbox"> 4.使用逻辑优化器对OperatorTree（操作树）进行逻辑优化。例如合并不必要的ReduceSinkOperator，减少Shuffle数据量；</li>
-<li><input disabled="" type="checkbox"> 5.遍历OperatorTree，转换为TaskTree。也就是翻译为MR任务的流程，将逻辑执行计划转换为物理执行计划；</li>
-<li><input disabled="" type="checkbox"> 6.使用物理优化器对TaskTree进行物理优化；</li>
-<li><input disabled="" type="checkbox"> 7.生成最终的执行计划，提交任务到Hadoop集群运行</li>
-</ul>
-<p>总结：解析，查询块，操作树，逻辑优化，任务树，物理优化，提交任务执行</p>
+<p>那么500数据，5w数据和30万数据呢？这个不能拍脑袋就决定了，需要综合考虑，比如该业务上线时长，该业务预期的数据增长等，这个需要与业务方和对应的业务开发进行沟通</p>
+<p>比如50条数据是维表数据，那么全量抽取问题不大，如果是刚上线的业务，且可预见的后期数据量会爆发式增长，那么还是增量抽取比较靠谱，免得后期频繁的修改抽取任务</p>
+<p>日志数据</p>
+<p>日志数据一般来说指的是埋点日志，但是有些ng日志或者其他的日志也会上报进行采集。</p>
+<p>对于日志数据，目前主流的工具可能是flume和logstash，这个好像就没啥特别好说的了，生产环境对于日志数据的要求不会太高，多一点少一点其实问题都不太大。</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210825164015829.png" alt="数据同步"></p>
 
                 
             </div>
@@ -530,7 +530,7 @@
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://github.com/wmybigdata/2021/08/25/Hive%E9%AB%98%E7%BA%A7%E6%BA%90%E7%A0%81/">https://github.com/wmybigdata/2021/08/25/Hive%E9%AB%98%E7%BA%A7%E6%BA%90%E7%A0%81/</a>
+                    <a href="https://github.com/wmybigdata/2021/08/25/0003-%E6%95%B0%E6%8D%AE%E5%90%8C%E6%AD%A5%E7%AD%96%E7%95%A5/">https://github.com/wmybigdata/2021/08/25/0003-%E6%95%B0%E6%8D%AE%E5%90%8C%E6%AD%A5%E7%AD%96%E7%95%A5/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -568,8 +568,8 @@
                     
                         <div class="article-tag">
                             
-                                <a href="/tags/hive/">
-                                    <span class="chip bg-color">hive</span>
+                                <a href="/tags/%E6%96%B0%E6%95%B0%E6%8D%AE%E4%BB%93%E5%BA%93%E4%BD%93%E7%B3%BB/">
+                                    <span class="chip bg-color">新数据仓库体系</span>
                                 </a>
                             
                         </div>
@@ -743,13 +743,13 @@
             <div class="article-badge left-badge text-color">
                 <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2021/08/25/0001-%E6%95%B0%E6%8D%AE%E4%BB%93%E5%BA%93%E4%BD%93%E7%B3%BB/">
+                <a href="/2021/08/25/0004-%E6%95%B0%E6%8D%AE%E6%B8%85%E6%B4%97/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/2.jpg" class="responsive-img" alt="0001-数据仓库体系">
+                        <img src="/medias/featureimages/15.jpg" class="responsive-img" alt="0004-数据清洗">
                         
-                        <span class="card-title">0001-数据仓库体系</span>
+                        <span class="card-title">0004-数据清洗</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -792,13 +792,13 @@
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2021/08/25/CommonBeanutils/">
+                <a href="/2021/08/25/0002-%E6%95%B0%E6%8D%AE%E6%8E%A2%E6%9F%A5/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/2.jpg" class="responsive-img" alt="CommonBeanutils">
+                        <img src="/medias/featureimages/4.jpg" class="responsive-img" alt="0002-数据探查">
                         
-                        <span class="card-title">CommonBeanutils</span>
+                        <span class="card-title">0002-数据探查</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -815,8 +815,8 @@
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/java/" class="post-category">
-                                    java
+                            <a href="/categories/%E6%96%B0%E6%95%B0%E6%8D%AE%E4%BB%93%E5%BA%93%E4%BD%93%E7%B3%BB/" class="post-category">
+                                    新数据仓库体系
                                 </a>
                             
                             
@@ -826,8 +826,8 @@
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/java/">
-                        <span class="chip bg-color">java</span>
+                    <a href="/tags/%E6%96%B0%E6%95%B0%E6%8D%AE%E4%BB%93%E5%BA%93%E4%BD%93%E7%B3%BB/">
+                        <span class="chip bg-color">新数据仓库体系</span>
                     </a>
                     
                 </div>

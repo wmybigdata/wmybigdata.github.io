@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="Flink二次开发经验, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
+    <meta name="keywords" content="0005-数据开发规范, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
     <meta name="description" content="本网站是个人兴趣爱好，总结分享经验，记录生活点滴的平台，希望在以后的学习旅途中，走出自己的风景。">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -16,7 +16,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>Flink二次开发经验 | 情深骚明大数据之旅</title>
+    <title>0005-数据开发规范 | 情深骚明大数据之旅</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -314,12 +314,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/11.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/22.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">Flink二次开发经验</h1>
+                    <h1 class="description center-align post-title">0005-数据开发规范</h1>
                 </div>
             </div>
         </div>
@@ -433,12 +433,25 @@
             <div class="row tag-cate">
                 <div class="col s7">
                     
-                          <div class="article-tag">
-                            <span class="chip bg-color">无标签</span>
-                          </div>
+                    <div class="article-tag">
+                        
+                            <a href="/tags/%E6%96%B0%E6%95%B0%E6%8D%AE%E4%BB%93%E5%BA%93%E4%BD%93%E7%B3%BB/">
+                                <span class="chip bg-color">新数据仓库体系</span>
+                            </a>
+                        
+                    </div>
                     
                 </div>
                 <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/%E6%96%B0%E6%95%B0%E6%8D%AE%E4%BB%93%E5%BA%93%E4%BD%93%E7%B3%BB/" class="post-category">
+                                新数据仓库体系
+                            </a>
+                        
+                    </div>
                     
                 </div>
             </div>
@@ -468,7 +481,81 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                
+                <h1 id="0005-数据开发规范"><a href="#0005-数据开发规范" class="headerlink" title="0005-数据开发规范"></a>0005-数据开发规范</h1><p>话说，无规矩不成方圆，在数据开发领域同样也是适用的。</p>
+<p>是不是经常听到这样的抱怨：</p>
+<ul>
+<li><p>我擦，这张表怎么特么的注释都没有？</p>
+</li>
+<li><p>我日，这个字段命名怎么是拼音全称？</p>
+</li>
+<li><p>怎么这张表的订单id是string类型，那张表的是订单id是bigint类型？</p>
+</li>
+<li><p>害，烦死了，这是谁开发的任务，库名/项目名都没写，我这去其他项目下跑还得一个个加上。</p>
+</li>
+<li><p>这代码谁写的？2张表join获取相关字段，也不写一下表的别名，我哪知道这是这是取自哪张表的 ？</p>
+</li>
+<li><p>运维任务又报错了？ 这是谁写的select * ，union all呀，害死人，上游表加字段了，这搞的。</p>
+</li>
+</ul>
+<h2 id="一-词根"><a href="#一-词根" class="headerlink" title="一 词根"></a>一 词根</h2><p>词根的作用就是大家在对字段，表，指标等命名的时候作为查询使用，需要陆续完善</p>
+<table>
+<thead>
+<tr>
+<th>中文名</th>
+<th>英文</th>
+<th>评审时间</th>
+<th>负责人</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>数量</td>
+<td>cnt</td>
+<td>20210816</td>
+<td>数据研发工程师</td>
+</tr>
+</tbody></table>
+<h2 id="二-词典"><a href="#二-词典" class="headerlink" title="二 词典"></a>二 词典</h2><p>词典比词根更近一步，大家在对字段命名的时候，首先可以参考词典，以及可以参考其字段类型，使各个开发对同一个中文的字段命名及类型全部一致</p>
+<table>
+<thead>
+<tr>
+<th>中文名</th>
+<th>英文名</th>
+<th>字段类型</th>
+<th>评审时间</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>订单id</td>
+<td>order_id</td>
+<td>String</td>
+<td>20210816</td>
+</tr>
+</tbody></table>
+<h2 id="三-命名规范"><a href="#三-命名规范" class="headerlink" title="三 命名规范"></a>三 命名规范</h2><p>表命名</p>
+<p>ods层</p>
+<p>dwd层</p>
+<p>dim层</p>
+<p>dws层</p>
+<p>ads层</p>
+<p>临时表</p>
+<p>手工表</p>
+<p>表命名一般需要加入一及数据域，二级数据域，所以最开始需要划分数据域/主题域</p>
+<p>然后详细的命名方式，根据每家公司有所不同</p>
+<p>任务命名</p>
+<p>一般情况下，任务名与输出表名一致</p>
+<p>字段命名</p>
+<p>参考 词根，词典</p>
+<p>指标命名</p>
+<p>略，之后讲指标平台的时候详细讲</p>
+<h2 id="四-ddl规范"><a href="#四-ddl规范" class="headerlink" title="四 ddl规范"></a>四 ddl规范</h2><p>需不需要加生命周期</p>
+<p>需不需要加创建人，创建时间</p>
+<p>ddl语句需不需要单独维护</p>
+<h2 id="五-sql编写规范"><a href="#五-sql编写规范" class="headerlink" title="五 sql编写规范"></a>五 sql编写规范</h2><p>关于缩进，大小写，空格，注释啥的细节就不说了，讲一下重点</p>
+<p>多表关联时，需要使用别名来引用列 如： t1.user_id</p>
+<p>表名前面需要加上库名/项目名，如 ods.test</p>
+<p>不要出现select * 操作</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210825170806956.png" alt="数据开发规范"></p>
+
                 
             </div>
             <hr/>
@@ -494,7 +581,7 @@
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://github.com/wmybigdata/2021/08/25/Flink%E4%BA%8C%E6%AC%A1%E5%BC%80%E5%8F%91%E7%BB%8F%E9%AA%8C/">https://github.com/wmybigdata/2021/08/25/Flink%E4%BA%8C%E6%AC%A1%E5%BC%80%E5%8F%91%E7%BB%8F%E9%AA%8C/</a>
+                    <a href="https://github.com/wmybigdata/2021/08/25/0005-%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E8%A7%84%E8%8C%83/">https://github.com/wmybigdata/2021/08/25/0005-%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E8%A7%84%E8%8C%83/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -531,7 +618,11 @@
                 <div class="post-meta__tag-list" style="display: inline-block;">
                     
                         <div class="article-tag">
-                            <span class="chip bg-color">无标签</span>
+                            
+                                <a href="/tags/%E6%96%B0%E6%95%B0%E6%8D%AE%E4%BB%93%E5%BA%93%E4%BD%93%E7%B3%BB/">
+                                    <span class="chip bg-color">新数据仓库体系</span>
+                                </a>
+                            
                         </div>
                     
                 </div>
@@ -699,66 +790,18 @@
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+                <i class="far fa-dot-circle"></i>&nbsp;本篇
+            </div>
             <div class="card">
-                <a href="/2021/08/25/Hive%E9%AB%98%E7%BA%A7%E6%BA%90%E7%A0%81/">
+                <a href="/2021/08/25/0005-%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E8%A7%84%E8%8C%83/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/8.jpg" class="responsive-img" alt="Hive高级源码">
+                        <img src="/medias/featureimages/22.jpg" class="responsive-img" alt="0005-数据开发规范">
                         
-                        <span class="card-title">Hive高级源码</span>
-                    </div>
-                </a>
-                <div class="card-content article-content">
-                    <div class="summary block-with-text">
-                        
-                            学习心得记录
-                        
-                    </div>
-                    <div class="publish-info">
-                        <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2021-08-25
-                        </span>
-                        <span class="publish-author">
-                            
-                            <i class="fas fa-bookmark fa-fw icon-category"></i>
-                            
-                            <a href="/categories/hive/" class="post-category">
-                                    hive
-                                </a>
-                            
-                            
-                        </span>
-                    </div>
-                </div>
-                
-                <div class="card-action article-tags">
-                    
-                    <a href="/tags/hive/">
-                        <span class="chip bg-color">hive</span>
-                    </a>
-                    
-                </div>
-                
-            </div>
-        </div>
-        
-        
-        <div class="article col s12 m6" data-aos="fade-up">
-            <div class="article-badge right-badge text-color">
-                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
-            </div>
-            <div class="card">
-                <a href="/2021/08/25/CommonBeanutils/">
-                    <div class="card-image">
-                        
-                        
-                        <img src="/medias/featureimages/2.jpg" class="responsive-img" alt="CommonBeanutils">
-                        
-                        <span class="card-title">CommonBeanutils</span>
+                        <span class="card-title">0005-数据开发规范</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -775,8 +818,58 @@
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/java/" class="post-category">
-                                    java
+                            <a href="/categories/%E6%96%B0%E6%95%B0%E6%8D%AE%E4%BB%93%E5%BA%93%E4%BD%93%E7%B3%BB/" class="post-category">
+                                    新数据仓库体系
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/%E6%96%B0%E6%95%B0%E6%8D%AE%E4%BB%93%E5%BA%93%E4%BD%93%E7%B3%BB/">
+                        <span class="chip bg-color">新数据仓库体系</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2021/08/25/0004-%E6%95%B0%E6%8D%AE%E6%B8%85%E6%B4%97/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/15.jpg" class="responsive-img" alt="0004-数据清洗">
+                        
+                        <span class="card-title">0004-数据清洗</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            学习心得记录
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-08-25
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E6%96%B0%E6%95%B0%E6%8D%AE%E4%BB%93%E5%BA%93%E4%BD%93%E7%B3%BB/" class="post-category">
+                                    新数据仓库体系
                                 </a>
                             
                             
@@ -786,8 +879,8 @@
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/java/">
-                        <span class="chip bg-color">java</span>
+                    <a href="/tags/%E6%96%B0%E6%95%B0%E6%8D%AE%E4%BB%93%E5%BA%93%E4%BD%93%E7%B3%BB/">
+                        <span class="chip bg-color">新数据仓库体系</span>
                     </a>
                     
                 </div>

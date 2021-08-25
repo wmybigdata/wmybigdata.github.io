@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="Flink-SQL-双流-JOIN, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
+    <meta name="keywords" content="0002-数据探查, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
     <meta name="description" content="本网站是个人兴趣爱好，总结分享经验，记录生活点滴的平台，希望在以后的学习旅途中，走出自己的风景。">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -16,7 +16,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>Flink-SQL-双流-JOIN | 情深骚明大数据之旅</title>
+    <title>0002-数据探查 | 情深骚明大数据之旅</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -314,12 +314,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/22.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/4.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">Flink-SQL-双流-JOIN</h1>
+                    <h1 class="description center-align post-title">0002-数据探查</h1>
                 </div>
             </div>
         </div>
@@ -433,12 +433,25 @@
             <div class="row tag-cate">
                 <div class="col s7">
                     
-                          <div class="article-tag">
-                            <span class="chip bg-color">无标签</span>
-                          </div>
+                    <div class="article-tag">
+                        
+                            <a href="/tags/%E6%96%B0%E6%95%B0%E6%8D%AE%E4%BB%93%E5%BA%93%E4%BD%93%E7%B3%BB/">
+                                <span class="chip bg-color">新数据仓库体系</span>
+                            </a>
+                        
+                    </div>
                     
                 </div>
                 <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/%E6%96%B0%E6%95%B0%E6%8D%AE%E4%BB%93%E5%BA%93%E4%BD%93%E7%B3%BB/" class="post-category">
+                                新数据仓库体系
+                            </a>
+                        
+                    </div>
                     
                 </div>
             </div>
@@ -447,7 +460,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2021-08-24
+                    2021-08-25
                 </div>
                 
 
@@ -468,7 +481,31 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                
+                <h1 id="0002-数据探查"><a href="#0002-数据探查" class="headerlink" title="0002-数据探查"></a>0002-数据探查</h1><p><font color="blue">给你一个需求或者一条新的业务线可能需要搭建数仓，做数据处理，然后提供一些指标数据给到需求方，你这边会怎么开始呢？</font></p>
+<p><font color="blue">当你接到这个需求的时候，直接开干？抽表，清洗，分层，建模？</font></p>
+<p><font color="blue">呵呵，这就是瞎搞。啥也不知道不了解的情况下，对数据源一无所知的情况下，是谁给你勇气直接开干的？</font></p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210825161712447.png" alt="数据探查"></p>
+<p>正常情况下，接到新的数据需求或者任务的时候，我们最开始应该需要做一下数据调研，或者说数据探查。</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210825162346421.png" alt="数据调研"></p>
+<p>那么问题来了，具体我们应该做些啥呢？就拿接到一个需求来举例说明吧：</p>
+<p>那么问题来了，具体我们应该做些啥呢？就拿接到一个需求来举例说明吧：</p>
+<p>业务方让你统计一些数据指标，给了你相关口径，表给没给这个就不清楚了，理论上是要给的，但是如果他自己也不知道，那这个也是没办法的。</p>
+<p>给了的话还好，你直接去业务库查看这些表，但是没给的话，你可能要多一些步骤，可能要去找对应的产品经理或者业务开发帮你一起找。最后，你终于找到需要的那些表了。</p>
+<p>拿到表之后怎么办？慌了吗？</p>
+<p>duck不必，我们可以开心的做数据探查了，对数据有一个整体的把控。</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210825163205224.png" alt="整体把控"></p>
+<ul>
+<li><p>了解数据表字段能不能满足需求发需求，看看字段有没有少，如果发现少了或者提供的数据源没法满足需求，需要及时找对应的人员沟通，可别自己瞎搞或者跑路了</p>
+</li>
+<li><p>看一下相关表的数据结构，有没有json数据或者或者其他比较复杂的数据，便于数仓处理</p>
+</li>
+<li><p>看一下数据内容，是不是有些字段毫无意义，不需要存储在数仓，或者看一下是不是有很多空置的情况，脏数据情况，其实就是探查一下业务库的数据质量，通过这些我们可以大概判断在数仓会有多少的清洗机制</p>
+</li>
+<li><p>看一下数据量，方便我们在抽取的时候选择增量抽取或者全量抽取，甚至可以问一下业务方业务增长情况，更能准确的决定数据抽取策略。</p>
+</li>
+</ul>
+<p>全部探查完以后，你就可以继续以下的步骤了。</p>
+
                 
             </div>
             <hr/>
@@ -494,7 +531,7 @@
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://github.com/wmybigdata/2021/08/24/Flink-SQL-%E5%8F%8C%E6%B5%81-JOIN/">https://github.com/wmybigdata/2021/08/24/Flink-SQL-%E5%8F%8C%E6%B5%81-JOIN/</a>
+                    <a href="https://github.com/wmybigdata/2021/08/25/0002-%E6%95%B0%E6%8D%AE%E6%8E%A2%E6%9F%A5/">https://github.com/wmybigdata/2021/08/25/0002-%E6%95%B0%E6%8D%AE%E6%8E%A2%E6%9F%A5/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -531,7 +568,11 @@
                 <div class="post-meta__tag-list" style="display: inline-block;">
                     
                         <div class="article-tag">
-                            <span class="chip bg-color">无标签</span>
+                            
+                                <a href="/tags/%E6%96%B0%E6%95%B0%E6%8D%AE%E4%BB%93%E5%BA%93%E4%BD%93%E7%B3%BB/">
+                                    <span class="chip bg-color">新数据仓库体系</span>
+                                </a>
+                            
                         </div>
                     
                 </div>
@@ -703,13 +744,13 @@
             <div class="article-badge left-badge text-color">
                 <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2021/08/24/Flink1-12-0%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB/">
+                <a href="/2021/08/25/0003-%E6%95%B0%E6%8D%AE%E5%90%8C%E6%AD%A5%E7%AD%96%E7%95%A5/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/23.jpg" class="responsive-img" alt="Flink1.12.0源码阅读">
+                        <img src="/medias/featureimages/0.jpg" class="responsive-img" alt="0003-数据同步策略">
                         
-                        <span class="card-title">Flink1.12.0源码阅读</span>
+                        <span class="card-title">0003-数据同步策略</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -720,14 +761,14 @@
                     </div>
                     <div class="publish-info">
                         <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2021-08-24
+                            <i class="far fa-clock fa-fw icon-date"></i>2021-08-25
                         </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Flink%E6%B5%81%E5%BC%8F%E5%BC%95%E6%93%8E/" class="post-category">
-                                    Flink流式引擎
+                            <a href="/categories/%E6%96%B0%E6%95%B0%E6%8D%AE%E4%BB%93%E5%BA%93%E4%BD%93%E7%B3%BB/" class="post-category">
+                                    新数据仓库体系
                                 </a>
                             
                             
@@ -737,8 +778,8 @@
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/Flink%E6%B5%81%E5%BC%8F%E5%BC%95%E6%93%8E/">
-                        <span class="chip bg-color">Flink流式引擎</span>
+                    <a href="/tags/%E6%96%B0%E6%95%B0%E6%8D%AE%E4%BB%93%E5%BA%93%E4%BD%93%E7%B3%BB/">
+                        <span class="chip bg-color">新数据仓库体系</span>
                     </a>
                     
                 </div>
@@ -752,13 +793,13 @@
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2021/08/24/MySQLbinlog%E6%97%A5%E5%BF%97%E5%AD%A6%E4%B9%A0/">
+                <a href="/2021/08/25/0001-%E6%95%B0%E6%8D%AE%E4%BB%93%E5%BA%93%E4%BD%93%E7%B3%BB/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/21.jpg" class="responsive-img" alt="MySQLbinlog日志学习">
+                        <img src="/medias/featureimages/2.jpg" class="responsive-img" alt="0001-数据仓库体系">
                         
-                        <span class="card-title">MySQLbinlog日志学习</span>
+                        <span class="card-title">0001-数据仓库体系</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -769,15 +810,27 @@
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2021-08-24
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-08-25
                             </span>
                         <span class="publish-author">
                             
-                            <i class="fas fa-user fa-fw"></i>
-                            情深骚明
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E6%96%B0%E6%95%B0%E6%8D%AE%E4%BB%93%E5%BA%93%E4%BD%93%E7%B3%BB/" class="post-category">
+                                    新数据仓库体系
+                                </a>
+                            
                             
                         </span>
                     </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/%E6%96%B0%E6%95%B0%E6%8D%AE%E4%BB%93%E5%BA%93%E4%BD%93%E7%B3%BB/">
+                        <span class="chip bg-color">新数据仓库体系</span>
+                    </a>
+                    
                 </div>
                 
             </div>
