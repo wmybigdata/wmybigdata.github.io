@@ -4,6 +4,31 @@
   
     
     <entry>
+      <title>Flink部署模式</title>
+      <link href="/2021/08/26/Flink%E9%83%A8%E7%BD%B2%E6%A8%A1%E5%BC%8F/"/>
+      <url>/2021/08/26/Flink%E9%83%A8%E7%BD%B2%E6%A8%A1%E5%BC%8F/</url>
+      
+        <content type="html"><![CDATA[<p>Flink部署模式</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> Flink流式引擎 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> Flink流式引擎 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>FlinkCDC读取mysql中时间类型</title>
       <link href="/2021/08/26/FlinkCDC%E8%AF%BB%E5%8F%96mysql%E4%B8%AD%E6%97%B6%E9%97%B4%E7%B1%BB%E5%9E%8B/"/>
       <url>/2021/08/26/FlinkCDC%E8%AF%BB%E5%8F%96mysql%E4%B8%AD%E6%97%B6%E9%97%B4%E7%B1%BB%E5%9E%8B/</url>
