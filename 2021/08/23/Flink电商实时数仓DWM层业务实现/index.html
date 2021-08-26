@@ -704,6 +704,55 @@ Linux：
 <p>订单宽表是整个数仓当中最难的整个了</p>
 <p>Phoenix构建表的时候也是非常关键的</p>
 <p>列，值，对象，如何去结合在一起，将属性和值设置给对象 commonBeanutils</p>
+<h3 id="4-1-Dimutil-和-PhoenixUtils的编写"><a href="#4-1-Dimutil-和-PhoenixUtils的编写" class="headerlink" title="4.1 Dimutil 和 PhoenixUtils的编写"></a>4.1 Dimutil 和 PhoenixUtils的编写</h3><p>我们通过工具类直接在hbase中读取维度数据，但是我现在想要通过Redis来做一次缓存，所以中间的话，我 加入了Redis来进行一个缓存的操作的</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210826093647190.png" alt="旁路缓存数据库"></p>
+<pre class=" language-properties"><code class="language-properties">先查询Redis数据，
+Redis有什么数据,JSONString
+使用什么类型？以及RedisKey设计成什么样子？
+RedisKey?
+<span class="token attr-name">Hash</span> <span class="token attr-value">String Set List Zset</span>
+
+<span class="token attr-name">Hash</span><span class="token punctuation">:</span>
+<span class="token attr-name">    RedisKey</span><span class="token punctuation">:</span> <span class="token attr-value">tableName</span>
+<span class="token attr-name">    HashKey</span><span class="token punctuation">:</span> <span class="token attr-value">value</span>
+<span class="token attr-name">根据Hash</span> <span class="token attr-value">Key来进行获取数据</span>
+
+<span class="token attr-name">String</span><span class="token punctuation">:</span> <span class="token attr-value">tableName: value</span>
+
+<span class="token attr-name">List</span> <span class="token attr-value">| Set ---> 不太合适，不能单条数据进行查询，一查的话就是一个集合</span>
+hash可以可以它的hashKey来进行获取数据
+</code></pre>
+<p>Redis使用来存储热点数据，对单个用户来进行设置超时时间，最后我们使用String 来进行存储</p>
+<p>进行维度关联的时候是一条数据吗</p>
+<p>如果说MySQL中的数据变化。hbase中的数据也进行变化，那么Redis中的数据会发生改变吗</p>
+<p>问题就是，Redis中的数据只要不过时，那么就还是会原来的数据，加一个方法就是如果是更新数据的话，那么就把Redis中的数据删掉，然后在重新的进行插入就好了</p>
+<p>在DimSinkFunction的时候进行开发，做项目的时候都是一步步的进行完善的操作</p>
+<p>—raw 这是显示中文的</p>
+<p>注意就是在查询的时候，注意要转入成大写的，否则的话会出现表名不一致的情况</p>
+<h4 id="4-1-1-旁路缓存-扩展RedisBitMap"><a href="#4-1-1-旁路缓存-扩展RedisBitMap" class="headerlink" title="4.1.1  旁路缓存 扩展RedisBitMap"></a>4.1.1  旁路缓存 扩展RedisBitMap</h4><pre class=" language-properties"><code class="language-properties">布隆过滤器，三种不同的Hash算法，减少Hash碰撞，足够长
+Redis直接操作bit位
+</code></pre>
+<p>把Redis给好好的学习，对面试只有好处，没有坏处</p>
+<h4 id="4-1-2-Redis三大问题"><a href="#4-1-2-Redis三大问题" class="headerlink" title="4.1.2 Redis三大问题"></a>4.1.2 Redis三大问题</h4><pre class=" language-properties"><code class="language-properties">读写分离：热点数据
+    缓存穿透
+    缓存击穿
+    缓存雪崩
+面试的重点和概念
+</code></pre>
+<h4 id="4-1-3-缓存穿透"><a href="#4-1-3-缓存穿透" class="headerlink" title="4.1.3  缓存穿透"></a>4.1.3  缓存穿透</h4><pre class=" language-properties"><code class="language-properties">查询的Key不存在，大量的访问数据库
+</code></pre>
+<h4 id="4-1-4-缓存击穿"><a href="#4-1-4-缓存击穿" class="headerlink" title="4.1.4 缓存击穿"></a>4.1.4 缓存击穿</h4><pre class=" language-properties"><code class="language-properties">热点Key突然失效，大量的访问到数据库
+</code></pre>
+<h4 id="4-1-5-缓存雪崩"><a href="#4-1-5-缓存雪崩" class="headerlink" title="4.1.5 缓存雪崩"></a>4.1.5 缓存雪崩</h4><pre class=" language-properties"><code class="language-properties">很多Key同时失效，大量的访问数据库
+</code></pre>
+<h3 id="4-2-异步查询"><a href="#4-2-异步查询" class="headerlink" title="4.2 异步查询"></a>4.2 异步查询</h3><p>有时间下去去查看一下，利用抽象类的方式来进行一个动态的传参的过程</p>
+<p>不要盲目的去学习设计模式，用到了在去学习</p>
+<p>BIRTHDAY，这个数据类型写成varchar，Flink CDC在封装数据的时候和我们想要的不一样</p>
+<h3 id="4-3-出生年月转换成年龄，这个可以进行查询一下"><a href="#4-3-出生年月转换成年龄，这个可以进行查询一下" class="headerlink" title="4.3 出生年月转换成年龄，这个可以进行查询一下"></a>4.3 出生年月转换成年龄，这个可以进行查询一下</h3><p>simpledateFormat相差8个小时，用到了时间，DateTime，读到的并不是字符串</p>
+<p>计算的时候注意看是否超精度了</p>
+<p>Flink CDC读取DateTime数据的时候是有问题的</p>
+<p>FlinkCDC读取时间类型的数据，会自动进行一个解析，那个毫秒数是否会差八小时，maxwell中</p>
+<p>这个就是Flink CDC解析时间的问题</p>
 <h2 id="第5章-DWM层支付宽表（练习）"><a href="#第5章-DWM层支付宽表（练习）" class="headerlink" title="第5章 DWM层支付宽表（练习）"></a>第5章 DWM层支付宽表（练习）</h2><h2 id="第6章-总结"><a href="#第6章-总结" class="headerlink" title="第6章 总结"></a>第6章 总结</h2>
                 
             </div>

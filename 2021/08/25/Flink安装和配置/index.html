@@ -493,6 +493,23 @@
 </code></pre>
 <pre class=" language-properties"><code class="language-properties"><span class="token attr-name">workers</span> <span class="token attr-value">这个是对于taskmanager</span>
 记住在新版本中，主节点是单独的作为要给节点的
+
+可以在网上看这些配置，可以在这个网上就行管理这些内存，可以去查看这些的配置信息
+</code></pre>
+<h2 id="2、提交任务"><a href="#2、提交任务" class="headerlink" title="2、提交任务"></a>2、提交任务</h2><p>我们在实际生产过程当中都是采用jar上传的方式来进行上传的过程，很少是采用在页面上提交的方式，集群的默认并行度是在本地来进行测试的，并行度的灵活配置方式，env的全局环境配置</p>
+<p>并行度的设置都是可以在每个操作的算子中来进行配置的</p>
+<p>要习惯在实际的生产过程当中的测试环境和我们在编写代码的这个过程当中的一个环境</p>
+<p>了解配置的选项我们的实际工作当中的写代码是有好处的，提交jar的参数也是可以设置很多的命令行的提交</p>
+<p>这个的默认的配置是和算子以及我们在提交Job的时候是非常重要的</p>
+<h2 id="3、观察提交的任务链"><a href="#3、观察提交的任务链" class="headerlink" title="3、观察提交的任务链"></a>3、观察提交的任务链</h2><pre class=" language-properties"><code class="language-properties">在实际生产的过程当中看web端的链条可以简单的看出我们的代码的优化量有那些的
+</code></pre>
+<h2 id="4、保存点"><a href="#4、保存点" class="headerlink" title="4、保存点"></a>4、保存点</h2><pre class=" language-properties"><code class="language-properties">这些都是面试的重点同时的话也是生产的重点
+</code></pre>
+<h2 id="5、提交资料的申请"><a href="#5、提交资料的申请" class="headerlink" title="5、提交资料的申请"></a>5、提交资料的申请</h2><pre class=" language-properties"><code class="language-properties">如果资源不够的情况下是会报错的，所以我们要注意并行的这些的算子的操作是否是和我们的算子是一样的
+</code></pre>
+<h2 id="6、资源的分配和并行度"><a href="#6、资源的分配和并行度" class="headerlink" title="6、资源的分配和并行度"></a>6、资源的分配和并行度</h2><pre class=" language-properties"><code class="language-properties">如何才能让作业才能运行起来的，调大集群的资源，这个在生产中是不允许的额，可以把任务的并行度调低，四个任务，slot，每一个线程占用要slot，推荐给当前的CPU的核心数
+
+<span class="token attr-name">最大的并行度</span> <span class="token attr-value">就是和最大的那个</span>
 </code></pre>
 
                 
