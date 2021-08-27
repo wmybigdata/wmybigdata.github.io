@@ -504,6 +504,13 @@
 <li><input disabled="" type="checkbox"> 7.生成最终的执行计划，提交任务到Hadoop集群运行</li>
 </ul>
 <p>总结：解析，查询块，操作树，逻辑优化，任务树，物理优化，提交任务执行</p>
+<h3 id="1-3-HQL转换为MR核心流程"><a href="#1-3-HQL转换为MR核心流程" class="headerlink" title="1.3 HQL转换为MR核心流程"></a>1.3 HQL转换为MR核心流程</h3><p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210827144442869.png" alt="HQL 转换流程"></p>
+<h3 id="1-4-导入源码工程"><a href="#1-4-导入源码工程" class="headerlink" title="1.4 导入源码工程"></a>1.4 导入源码工程</h3><h3 id="1-5-准备工作"><a href="#1-5-准备工作" class="headerlink" title="1.5 准备工作"></a>1.5 准备工作</h3><p>众所周知，我们执行一个 HQL 语句通常有以下几种方式：</p>
+<p> 1）$HIVE_HOME/bin/hive 进入客户端，然后执行 HQL；</p>
+<p> 2）$HIVE_HOME/bin/hive -e “hql”；</p>
+<p> 3）$HIVE_HOME/bin/hive -f hive.sql；</p>
+<p> 4）先开启 hivesever2 服务端，然后通过 JDBC 方式连接远程提交 HQL。 可 以 知 道 我 们 执 行 HQL 主 要 依 赖 于 $HIVE_HOME/bin/hive 和 $HIVE_HOME/bin/ hivesever2 两种脚本来实现提交 HQL，而在这两个脚本中，最终启动的 JAVA 程序的主类为 “org.apache.hadoop.hive.cli.CliDriver”，所以其实 Hive 程序的入口就是“CliDriver”这个类。</p>
+<h2 id="第二章-源码阅读"><a href="#第二章-源码阅读" class="headerlink" title="第二章 源码阅读"></a>第二章 源码阅读</h2><h3 id="2-1-Hive源码阅读（入口程序）"><a href="#2-1-Hive源码阅读（入口程序）" class="headerlink" title="2.1 Hive源码阅读（入口程序）"></a>2.1 Hive源码阅读（入口程序）</h3><p>详细得事情大致得去了解一下就行</p>
 
                 
             </div>
