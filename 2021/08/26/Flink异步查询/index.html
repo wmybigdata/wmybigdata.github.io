@@ -590,279 +590,92 @@ DataStream<span class="token operator">&lt;</span>Tuple2<span class="token opera
 <h2 id="Flink-异步IO实战"><a href="#Flink-异步IO实战" class="headerlink" title="Flink 异步IO实战"></a>Flink 异步IO实战</h2><p>首先通过官网的一个图片了解一下Asynchronous I/O Operation</p>
 <p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210827141057088.png" alt="Flink 异步IO实战"></p>
 <p>Flink source收到一条数据就会进行处理，如果需要通过这条数据关联外部数据源，例如mysql，在发出查询请求后，同步IO的方式是会等待查询结果再处理下一条数据的查询，也就是每一条数据都要等待上一个查询结束。而异步IO是指数据来了以后发出查询请求，先不等查询结果，直接继续发送下一条的查询请求，对于查询结果是异步返回的，返回结果之后再进入下一个算子的计算。这两种方式性能差距请看下的样例。</p>
-<h3 id="1、生成6条数据，从0开始递增的6个数字。模拟异步查询之后，加上时间戳输出"><a href="#1、生成6条数据，从0开始递增的6个数字。模拟异步查询之后，加上时间戳输出" class="headerlink" title="1、生成6条数据，从0开始递增的6个数字。模拟异步查询之后，加上时间戳输出"></a>1、生成6条数据，从0开始递增的6个数字。模拟异步查询之后，加上时间戳输出</h3><pre class=" language-java"><code class="language-java"><span class="token keyword">package</span> com<span class="token punctuation">.</span>wmy<span class="token punctuation">.</span>flink<span class="token punctuation">.</span>warehouse<span class="token punctuation">.</span>app<span class="token punctuation">.</span>dwm<span class="token punctuation">;</span>
+<h3 id="1、生成6条数据，从0开始递增的6个数字。模拟异步查询之后，加上时间戳输出"><a href="#1、生成6条数据，从0开始递增的6个数字。模拟异步查询之后，加上时间戳输出" class="headerlink" title="1、生成6条数据，从0开始递增的6个数字。模拟异步查询之后，加上时间戳输出"></a>1、生成6条数据，从0开始递增的6个数字。模拟异步查询之后，加上时间戳输出</h3><pre class=" language-java"><code class="language-java"><span class="token keyword">package</span> com<span class="token punctuation">.</span>wmy<span class="token punctuation">.</span>flink<span class="token punctuation">.</span>jc<span class="token punctuation">.</span>operation<span class="token punctuation">;</span>
 
-<span class="token keyword">import</span> com<span class="token punctuation">.</span>alibaba<span class="token punctuation">.</span>fastjson<span class="token punctuation">.</span>JSON<span class="token punctuation">;</span>
-<span class="token keyword">import</span> com<span class="token punctuation">.</span>alibaba<span class="token punctuation">.</span>fastjson<span class="token punctuation">.</span>JSONObject<span class="token punctuation">;</span>
-<span class="token keyword">import</span> com<span class="token punctuation">.</span>wmy<span class="token punctuation">.</span>flink<span class="token punctuation">.</span>warehouse<span class="token punctuation">.</span>app<span class="token punctuation">.</span>func<span class="token punctuation">.</span>DimAsyncFunction<span class="token punctuation">;</span>
-<span class="token keyword">import</span> com<span class="token punctuation">.</span>wmy<span class="token punctuation">.</span>flink<span class="token punctuation">.</span>warehouse<span class="token punctuation">.</span>bean<span class="token punctuation">.</span>OrderDetail<span class="token punctuation">;</span>
-<span class="token keyword">import</span> com<span class="token punctuation">.</span>wmy<span class="token punctuation">.</span>flink<span class="token punctuation">.</span>warehouse<span class="token punctuation">.</span>bean<span class="token punctuation">.</span>OrderInfo<span class="token punctuation">;</span>
-<span class="token keyword">import</span> com<span class="token punctuation">.</span>wmy<span class="token punctuation">.</span>flink<span class="token punctuation">.</span>warehouse<span class="token punctuation">.</span>bean<span class="token punctuation">.</span>OrderWide<span class="token punctuation">;</span>
-<span class="token keyword">import</span> com<span class="token punctuation">.</span>wmy<span class="token punctuation">.</span>flink<span class="token punctuation">.</span>warehouse<span class="token punctuation">.</span>utils<span class="token punctuation">.</span>KafkaUtils<span class="token punctuation">;</span>
-<span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>flink<span class="token punctuation">.</span>api<span class="token punctuation">.</span>common<span class="token punctuation">.</span>eventtime<span class="token punctuation">.</span>SerializableTimestampAssigner<span class="token punctuation">;</span>
-<span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>flink<span class="token punctuation">.</span>api<span class="token punctuation">.</span>common<span class="token punctuation">.</span>eventtime<span class="token punctuation">.</span>WatermarkStrategy<span class="token punctuation">;</span>
 <span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>flink<span class="token punctuation">.</span>api<span class="token punctuation">.</span>common<span class="token punctuation">.</span>functions<span class="token punctuation">.</span>MapFunction<span class="token punctuation">;</span>
 <span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>flink<span class="token punctuation">.</span>streaming<span class="token punctuation">.</span>api<span class="token punctuation">.</span>datastream<span class="token punctuation">.</span>AsyncDataStream<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>flink<span class="token punctuation">.</span>streaming<span class="token punctuation">.</span>api<span class="token punctuation">.</span>datastream<span class="token punctuation">.</span>DataStream<span class="token punctuation">;</span>
 <span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>flink<span class="token punctuation">.</span>streaming<span class="token punctuation">.</span>api<span class="token punctuation">.</span>datastream<span class="token punctuation">.</span>DataStreamSource<span class="token punctuation">;</span>
-<span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>flink<span class="token punctuation">.</span>streaming<span class="token punctuation">.</span>api<span class="token punctuation">.</span>datastream<span class="token punctuation">.</span>SingleOutputStreamOperator<span class="token punctuation">;</span>
 <span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>flink<span class="token punctuation">.</span>streaming<span class="token punctuation">.</span>api<span class="token punctuation">.</span>environment<span class="token punctuation">.</span>StreamExecutionEnvironment<span class="token punctuation">;</span>
-<span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>flink<span class="token punctuation">.</span>streaming<span class="token punctuation">.</span>api<span class="token punctuation">.</span>functions<span class="token punctuation">.</span>co<span class="token punctuation">.</span>ProcessJoinFunction<span class="token punctuation">;</span>
-<span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>flink<span class="token punctuation">.</span>streaming<span class="token punctuation">.</span>api<span class="token punctuation">.</span>windowing<span class="token punctuation">.</span>time<span class="token punctuation">.</span>Time<span class="token punctuation">;</span>
-<span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>flink<span class="token punctuation">.</span>util<span class="token punctuation">.</span>Collector<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>flink<span class="token punctuation">.</span>streaming<span class="token punctuation">.</span>api<span class="token punctuation">.</span>functions<span class="token punctuation">.</span>async<span class="token punctuation">.</span>AsyncFunction<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>flink<span class="token punctuation">.</span>streaming<span class="token punctuation">.</span>api<span class="token punctuation">.</span>functions<span class="token punctuation">.</span>source<span class="token punctuation">.</span>SourceFunction<span class="token punctuation">;</span>
 
-<span class="token keyword">import</span> java<span class="token punctuation">.</span>text<span class="token punctuation">.</span>ParseException<span class="token punctuation">;</span>
-<span class="token keyword">import</span> java<span class="token punctuation">.</span>text<span class="token punctuation">.</span>SimpleDateFormat<span class="token punctuation">;</span>
-<span class="token keyword">import</span> java<span class="token punctuation">.</span>time<span class="token punctuation">.</span>Duration<span class="token punctuation">;</span>
 <span class="token keyword">import</span> java<span class="token punctuation">.</span>util<span class="token punctuation">.</span>concurrent<span class="token punctuation">.</span>TimeUnit<span class="token punctuation">;</span>
 
 <span class="token comment" spellcheck="true">/**
  * @project_name: wmyFlinkWarehouseItem
- * @package_name: com.wmy.flink.warehouse.app.dwm
+ * @package_name: com.wmy.flink.jc.operation
  * @Author: wmy
- * @Date: 2021/8/25
+ * @Date: 2021/8/27
  * @Major: 数据科学与大数据技术
  * @Post：大数据实时开发
  * @Email：wmy_2000@163.com
- * @Desription: 订单宽表
+ * @Desription: Flink 异步查询
  * @Version: wmy-version-01
  */</span>
-<span class="token comment" spellcheck="true">//数据  Web/App -> Nginx -> SpringBoot -> Mysql(Binlog) -> FlinkApp -> Kafka(ods) -> Flink -> Kafka(dwd)/HBase(DIM) -> Flink -> Kafka(dwm)</span>
-
-<span class="token comment" spellcheck="true">//进程     Mock -> Mysql(Binlog) -> FlinkCDC -> Kafka(ods_base_db) -> BaseDBApp -> Kafka(dwd_*) -> OrderWideApp(Redis) -> Kafka(dwm_order_wide)</span>
-<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">OrderWideAPP</span> <span class="token punctuation">{</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">AsyncIODemo</span> <span class="token punctuation">{</span>
     <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token keyword">throws</span> Exception <span class="token punctuation">{</span>
-
-        <span class="token comment" spellcheck="true">// 打印测试的一个标识</span>
+         <span class="token comment" spellcheck="true">// 打印版本的info</span>
         System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"wmy-version-01"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-        <span class="token comment" spellcheck="true">// TODO 1、获取执行环境</span>
+        <span class="token comment" spellcheck="true">// 创建测试环境</span>
         StreamExecutionEnvironment env <span class="token operator">=</span> StreamExecutionEnvironment<span class="token punctuation">.</span><span class="token function">getExecutionEnvironment</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
         env<span class="token punctuation">.</span><span class="token function">setParallelism</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-        <span class="token comment" spellcheck="true">/*// 开启CK
-        // 1、第一步都是得设置多少时间执行一次Checkpoint
-        env.enableCheckpointing(5_000L);
+        <span class="token keyword">final</span> <span class="token keyword">int</span> maxCount <span class="token operator">=</span> <span class="token number">6</span><span class="token punctuation">;</span>
+        <span class="token keyword">final</span> <span class="token keyword">int</span> taskNum <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+        <span class="token keyword">final</span> <span class="token keyword">long</span> timeout <span class="token operator">=</span> <span class="token number">40000</span><span class="token punctuation">;</span>
 
-        // 2、设置超时时间得限定
-        env.getCheckpointConfig().setCheckpointTimeout(5_000L);
+        <span class="token comment" spellcheck="true">// 读取数据源</span>
+        DataStreamSource<span class="token operator">&lt;</span>Integer<span class="token operator">></span> inputStream <span class="token operator">=</span> env<span class="token punctuation">.</span><span class="token function">addSource</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">SimpleSource</span><span class="token punctuation">(</span><span class="token number">6</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        AsyncFunction<span class="token operator">&lt;</span>Integer<span class="token punctuation">,</span> String<span class="token operator">></span> function <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">SampleAsyncFunction</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-        // 3、设置数据一致性语义
-        env.getCheckpointConfig().setCheckpointingMode(CheckpointingMode.EXACTLY_ONCE);
+        DataStream<span class="token operator">&lt;</span>String<span class="token operator">></span> result <span class="token operator">=</span> AsyncDataStream<span class="token punctuation">.</span><span class="token function">unorderedWait</span><span class="token punctuation">(</span>
+                inputStream<span class="token punctuation">,</span>
+                function<span class="token punctuation">,</span>
+                timeout<span class="token punctuation">,</span>
+                TimeUnit<span class="token punctuation">.</span>MILLISECONDS<span class="token punctuation">,</span>
+                <span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">setParallelism</span><span class="token punctuation">(</span>taskNum<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-        // 4、正常得Canal任务取消得时候保留最后一次Ck
-        env.getCheckpointConfig().enableExternalizedCheckpoints(CheckpointConfig.ExternalizedCheckpointCleanup.RETAIN_ON_CANCELLATION);
-
-        // 5、开启重启策略
-        env.setRestartStrategy(RestartStrategies.fixedDelayRestart(3, 5_000L));
-
-        // 6、设置状态后端
-        env.setStateBackend(new FsStateBackend("hdfs://flink01:9820/flinkWarehouse/ck/dwm"));
-
-        // 设置hadoop的执行权限
-        System.setProperty("HADOOP_USER_NAME", "root");*/</span>
-
-        <span class="token comment" spellcheck="true">// TODO 2、读取kafka dwd_order_info、dwd_order_detail 主题的数据</span>
-        String orderInfoSoureTopic <span class="token operator">=</span> <span class="token string">"dwd_order_info"</span><span class="token punctuation">;</span>
-        String orderDetailSourceTopic <span class="token operator">=</span> <span class="token string">"dwd_order_detail"</span><span class="token punctuation">;</span>
-        String orderWideSinkTopic <span class="token operator">=</span> <span class="token string">"dwm_order_wide"</span><span class="token punctuation">;</span>
-        String groupID <span class="token operator">=</span> <span class="token string">"OrderWideAPP"</span><span class="token punctuation">;</span>
-        DataStreamSource<span class="token operator">&lt;</span>String<span class="token operator">></span> orderInfoDS <span class="token operator">=</span> env<span class="token punctuation">.</span><span class="token function">addSource</span><span class="token punctuation">(</span>KafkaUtils<span class="token punctuation">.</span><span class="token function">getFlinkKafkaConsumer</span><span class="token punctuation">(</span>orderInfoSoureTopic<span class="token punctuation">,</span> groupID<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        DataStreamSource<span class="token operator">&lt;</span>String<span class="token operator">></span> detailInfoDS <span class="token operator">=</span> env<span class="token punctuation">.</span><span class="token function">addSource</span><span class="token punctuation">(</span>KafkaUtils<span class="token punctuation">.</span><span class="token function">getFlinkKafkaConsumer</span><span class="token punctuation">(</span>orderDetailSourceTopic<span class="token punctuation">,</span> groupID<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-        <span class="token comment" spellcheck="true">// TODO 3、将数据转换为javaBean并提取时间戳生成watermark</span>
-        SingleOutputStreamOperator<span class="token operator">&lt;</span>OrderInfo<span class="token operator">></span> orderInfoWithWatermark <span class="token operator">=</span> orderInfoDS<span class="token punctuation">.</span><span class="token function">map</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">MapFunction</span><span class="token operator">&lt;</span>String<span class="token punctuation">,</span> OrderInfo<span class="token operator">></span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        result<span class="token punctuation">.</span><span class="token function">map</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">MapFunction</span><span class="token operator">&lt;</span>String<span class="token punctuation">,</span> String<span class="token operator">></span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
             <span class="token annotation punctuation">@Override</span>
-            <span class="token keyword">public</span> OrderInfo <span class="token function">map</span><span class="token punctuation">(</span>String value<span class="token punctuation">)</span> <span class="token keyword">throws</span> Exception <span class="token punctuation">{</span>
-                OrderInfo orderInfo <span class="token operator">=</span> JSON<span class="token punctuation">.</span><span class="token function">parseObject</span><span class="token punctuation">(</span>value<span class="token punctuation">,</span> OrderInfo<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                <span class="token comment" spellcheck="true">// yyyy-MM-dd HH:mm:ss</span>
-                String create_time <span class="token operator">=</span> orderInfo<span class="token punctuation">.</span><span class="token function">getCreate_time</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                String<span class="token punctuation">[</span><span class="token punctuation">]</span> dateHourArr <span class="token operator">=</span> create_time<span class="token punctuation">.</span><span class="token function">split</span><span class="token punctuation">(</span><span class="token string">" "</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                orderInfo<span class="token punctuation">.</span><span class="token function">setCreate_date</span><span class="token punctuation">(</span>dateHourArr<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                orderInfo<span class="token punctuation">.</span><span class="token function">setCreate_hour</span><span class="token punctuation">(</span>dateHourArr<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token function">split</span><span class="token punctuation">(</span><span class="token string">":"</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-                SimpleDateFormat simpleDateFormat <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">SimpleDateFormat</span><span class="token punctuation">(</span><span class="token string">"yyyy-MM-dd HH:mm:ss"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                <span class="token keyword">long</span> time <span class="token operator">=</span> simpleDateFormat<span class="token punctuation">.</span><span class="token function">parse</span><span class="token punctuation">(</span>create_time<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getTime</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                orderInfo<span class="token punctuation">.</span><span class="token function">setCreate_ts</span><span class="token punctuation">(</span>time<span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-                <span class="token keyword">return</span> orderInfo<span class="token punctuation">;</span>
+            <span class="token keyword">public</span> String <span class="token function">map</span><span class="token punctuation">(</span>String value<span class="token punctuation">)</span> <span class="token keyword">throws</span> Exception <span class="token punctuation">{</span>
+                <span class="token keyword">return</span> value <span class="token operator">+</span> <span class="token string">","</span> <span class="token operator">+</span> System<span class="token punctuation">.</span><span class="token function">currentTimeMillis</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
             <span class="token punctuation">}</span>
-        <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">assignTimestampsAndWatermarks</span><span class="token punctuation">(</span>WatermarkStrategy<span class="token punctuation">.</span>&lt;OrderInfo<span class="token operator">></span><span class="token function">forBoundedOutOfOrderness</span><span class="token punctuation">(</span>Duration<span class="token punctuation">.</span><span class="token function">ofSeconds</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-                <span class="token punctuation">.</span><span class="token function">withTimestampAssigner</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">SerializableTimestampAssigner</span><span class="token operator">&lt;</span>OrderInfo<span class="token operator">></span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-                    <span class="token annotation punctuation">@Override</span>
-                    <span class="token keyword">public</span> <span class="token keyword">long</span> <span class="token function">extractTimestamp</span><span class="token punctuation">(</span>OrderInfo element<span class="token punctuation">,</span> <span class="token keyword">long</span> recordTimestamp<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-                        <span class="token keyword">return</span> element<span class="token punctuation">.</span><span class="token function">getCreate_ts</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                    <span class="token punctuation">}</span>
-                <span class="token punctuation">}</span><span class="token punctuation">)</span>
-        <span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">print</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-        SingleOutputStreamOperator<span class="token operator">&lt;</span>OrderDetail<span class="token operator">></span> orderDetailWithWatermark <span class="token operator">=</span> detailInfoDS<span class="token punctuation">.</span><span class="token function">map</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">MapFunction</span><span class="token operator">&lt;</span>String<span class="token punctuation">,</span> OrderDetail<span class="token operator">></span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-            <span class="token annotation punctuation">@Override</span>
-            <span class="token keyword">public</span> OrderDetail <span class="token function">map</span><span class="token punctuation">(</span>String value<span class="token punctuation">)</span> <span class="token keyword">throws</span> Exception <span class="token punctuation">{</span>
-                OrderDetail orderDetail <span class="token operator">=</span> JSON<span class="token punctuation">.</span><span class="token function">parseObject</span><span class="token punctuation">(</span>value<span class="token punctuation">,</span> OrderDetail<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                String create_time <span class="token operator">=</span> orderDetail<span class="token punctuation">.</span><span class="token function">getCreate_time</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                SimpleDateFormat simpleDateFormat <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">SimpleDateFormat</span><span class="token punctuation">(</span><span class="token string">"yyyy-MM-dd HH:mm:ss"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                <span class="token keyword">long</span> time <span class="token operator">=</span> simpleDateFormat<span class="token punctuation">.</span><span class="token function">parse</span><span class="token punctuation">(</span>create_time<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getTime</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                orderDetail<span class="token punctuation">.</span><span class="token function">setCreate_ts</span><span class="token punctuation">(</span>time<span class="token punctuation">)</span><span class="token punctuation">;</span>
-                <span class="token keyword">return</span> orderDetail<span class="token punctuation">;</span>
-            <span class="token punctuation">}</span>
-            <span class="token comment" spellcheck="true">// 记住这个是不能移出去，有一个线程安全的问题</span>
-        <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">assignTimestampsAndWatermarks</span><span class="token punctuation">(</span>WatermarkStrategy<span class="token punctuation">.</span>&lt;OrderDetail<span class="token operator">></span><span class="token function">forBoundedOutOfOrderness</span><span class="token punctuation">(</span>Duration<span class="token punctuation">.</span><span class="token function">ofSeconds</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-                <span class="token punctuation">.</span><span class="token function">withTimestampAssigner</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">SerializableTimestampAssigner</span><span class="token operator">&lt;</span>OrderDetail<span class="token operator">></span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-                    <span class="token annotation punctuation">@Override</span>
-                    <span class="token keyword">public</span> <span class="token keyword">long</span> <span class="token function">extractTimestamp</span><span class="token punctuation">(</span>OrderDetail element<span class="token punctuation">,</span> <span class="token keyword">long</span> recordTimestamp<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-                        <span class="token keyword">return</span> element<span class="token punctuation">.</span><span class="token function">getCreate_ts</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                    <span class="token punctuation">}</span>
-                <span class="token punctuation">}</span><span class="token punctuation">)</span>
-        <span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-        <span class="token comment" spellcheck="true">// TODO 4、将两个流双流JOIN</span>
-        SingleOutputStreamOperator<span class="token operator">&lt;</span>OrderWide<span class="token operator">></span> orderWideDS <span class="token operator">=</span> orderInfoWithWatermark
-                <span class="token punctuation">.</span><span class="token function">keyBy</span><span class="token punctuation">(</span>OrderInfo<span class="token operator">:</span><span class="token operator">:</span>getId<span class="token punctuation">)</span>
-                <span class="token punctuation">.</span><span class="token function">intervalJoin</span><span class="token punctuation">(</span>
-                        orderDetailWithWatermark<span class="token punctuation">.</span><span class="token function">keyBy</span><span class="token punctuation">(</span>OrderDetail<span class="token operator">:</span><span class="token operator">:</span>getOrder_id<span class="token punctuation">)</span>
-                <span class="token punctuation">)</span>
-                <span class="token punctuation">.</span><span class="token function">between</span><span class="token punctuation">(</span>Time<span class="token punctuation">.</span><span class="token function">seconds</span><span class="token punctuation">(</span><span class="token operator">-</span><span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">,</span> Time<span class="token punctuation">.</span><span class="token function">seconds</span><span class="token punctuation">(</span><span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-                <span class="token punctuation">.</span><span class="token function">process</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">ProcessJoinFunction</span><span class="token operator">&lt;</span>OrderInfo<span class="token punctuation">,</span> OrderDetail<span class="token punctuation">,</span> OrderWide<span class="token operator">></span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-                    <span class="token annotation punctuation">@Override</span>
-                    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">processElement</span><span class="token punctuation">(</span>OrderInfo left<span class="token punctuation">,</span> OrderDetail right<span class="token punctuation">,</span> ProcessJoinFunction<span class="token operator">&lt;</span>OrderInfo<span class="token punctuation">,</span> OrderDetail<span class="token punctuation">,</span> OrderWide<span class="token operator">></span><span class="token punctuation">.</span>Context ctx<span class="token punctuation">,</span> Collector<span class="token operator">&lt;</span>OrderWide<span class="token operator">></span> out<span class="token punctuation">)</span> <span class="token keyword">throws</span> Exception <span class="token punctuation">{</span>
-                        out<span class="token punctuation">.</span><span class="token function">collect</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">OrderWide</span><span class="token punctuation">(</span>left<span class="token punctuation">,</span> right<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                    <span class="token punctuation">}</span>
-                <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-        <span class="token comment" spellcheck="true">// TODO　5、关联用户维度、地区维度、SKU维度、SPU维度、品类维度、品牌维度</span>
-        <span class="token comment" spellcheck="true">//TODO 5.1 关联用户维度</span>
-        SingleOutputStreamOperator<span class="token operator">&lt;</span>OrderWide<span class="token operator">></span> orderWideWithUserDS <span class="token operator">=</span> AsyncDataStream<span class="token punctuation">.</span><span class="token function">unorderedWait</span><span class="token punctuation">(</span>orderWideDS<span class="token punctuation">,</span>
-                <span class="token keyword">new</span> <span class="token class-name">DimAsyncFunction</span><span class="token operator">&lt;</span>OrderWide<span class="token operator">></span><span class="token punctuation">(</span><span class="token string">"DIM_USER_INFO"</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-
-                    <span class="token annotation punctuation">@Override</span>
-                    <span class="token keyword">public</span> String <span class="token function">getId</span><span class="token punctuation">(</span>OrderWide orderWide<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-                        <span class="token keyword">return</span> orderWide<span class="token punctuation">.</span><span class="token function">getUser_id</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                    <span class="token punctuation">}</span>
-
-                    <span class="token annotation punctuation">@Override</span>
-                    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">join</span><span class="token punctuation">(</span>OrderWide orderWide<span class="token punctuation">,</span> JSONObject dimInfo<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-
-                        String birthday <span class="token operator">=</span> dimInfo<span class="token punctuation">.</span><span class="token function">getString</span><span class="token punctuation">(</span><span class="token string">"BIRTHDAY"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                        String gender <span class="token operator">=</span> dimInfo<span class="token punctuation">.</span><span class="token function">getString</span><span class="token punctuation">(</span><span class="token string">"GENDER"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-                        SimpleDateFormat sdf <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">SimpleDateFormat</span><span class="token punctuation">(</span><span class="token string">"yyyy-MM-dd"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-                        <span class="token comment" spellcheck="true">//获取当前时间</span>
-                        <span class="token keyword">long</span> ts <span class="token operator">=</span> System<span class="token punctuation">.</span><span class="token function">currentTimeMillis</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                        <span class="token keyword">long</span> time <span class="token operator">=</span> ts<span class="token punctuation">;</span>
-                        <span class="token keyword">try</span> <span class="token punctuation">{</span>
-                            time <span class="token operator">=</span> sdf<span class="token punctuation">.</span><span class="token function">parse</span><span class="token punctuation">(</span>birthday<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getTime</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                        <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">ParseException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-                            e<span class="token punctuation">.</span><span class="token function">printStackTrace</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                        <span class="token punctuation">}</span>
-
-                        <span class="token keyword">long</span> age <span class="token operator">=</span> <span class="token punctuation">(</span>ts <span class="token operator">-</span> time<span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token punctuation">(</span>1000L <span class="token operator">*</span> <span class="token number">60</span> <span class="token operator">*</span> <span class="token number">60</span> <span class="token operator">*</span> <span class="token number">24</span> <span class="token operator">*</span> <span class="token number">365</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-                        <span class="token comment" spellcheck="true">//将性别与年纪补充到OrderWide</span>
-                        orderWide<span class="token punctuation">.</span><span class="token function">setUser_gender</span><span class="token punctuation">(</span>gender<span class="token punctuation">)</span><span class="token punctuation">;</span>
-                        orderWide<span class="token punctuation">.</span><span class="token function">setUser_age</span><span class="token punctuation">(</span>Integer<span class="token punctuation">.</span><span class="token function">parseInt</span><span class="token punctuation">(</span>age <span class="token operator">+</span> <span class="token string">""</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                    <span class="token punctuation">}</span>
-                <span class="token punctuation">}</span><span class="token punctuation">,</span>
-                <span class="token number">100</span><span class="token punctuation">,</span>
-                TimeUnit<span class="token punctuation">.</span>SECONDS<span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token comment" spellcheck="true">//        orderWideWithUserDS.print("User>>>>>>>>>>>");</span>
-
-        <span class="token comment" spellcheck="true">//TODO 5.2 关联地区维度</span>
-        SingleOutputStreamOperator<span class="token operator">&lt;</span>OrderWide<span class="token operator">></span> orderWideWithProvinceDS <span class="token operator">=</span> AsyncDataStream<span class="token punctuation">.</span><span class="token function">unorderedWait</span><span class="token punctuation">(</span>orderWideWithUserDS<span class="token punctuation">,</span>
-                <span class="token keyword">new</span> <span class="token class-name">DimAsyncFunction</span><span class="token operator">&lt;</span>OrderWide<span class="token operator">></span><span class="token punctuation">(</span><span class="token string">"DIM_BASE_PROVINCE"</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-                    <span class="token annotation punctuation">@Override</span>
-                    <span class="token keyword">public</span> String <span class="token function">getId</span><span class="token punctuation">(</span>OrderWide orderWide<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-                        <span class="token keyword">return</span> orderWide<span class="token punctuation">.</span><span class="token function">getProvince_id</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                    <span class="token punctuation">}</span>
-
-                    <span class="token annotation punctuation">@Override</span>
-                    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">join</span><span class="token punctuation">(</span>OrderWide orderWide<span class="token punctuation">,</span> JSONObject dimInfo<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-
-                        String name <span class="token operator">=</span> dimInfo<span class="token punctuation">.</span><span class="token function">getString</span><span class="token punctuation">(</span><span class="token string">"NAME"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                        String area_code <span class="token operator">=</span> dimInfo<span class="token punctuation">.</span><span class="token function">getString</span><span class="token punctuation">(</span><span class="token string">"AREA_CODE"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                        String iso_code <span class="token operator">=</span> dimInfo<span class="token punctuation">.</span><span class="token function">getString</span><span class="token punctuation">(</span><span class="token string">"ISO_CODE"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                        String iso_3166_2 <span class="token operator">=</span> dimInfo<span class="token punctuation">.</span><span class="token function">getString</span><span class="token punctuation">(</span><span class="token string">"ISO_3166_2"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-                        orderWide<span class="token punctuation">.</span><span class="token function">setProvince_name</span><span class="token punctuation">(</span>name<span class="token punctuation">)</span><span class="token punctuation">;</span>
-                        orderWide<span class="token punctuation">.</span><span class="token function">setProvince_area_code</span><span class="token punctuation">(</span>area_code<span class="token punctuation">)</span><span class="token punctuation">;</span>
-                        orderWide<span class="token punctuation">.</span><span class="token function">setProvince_iso_code</span><span class="token punctuation">(</span>iso_code<span class="token punctuation">)</span><span class="token punctuation">;</span>
-                        orderWide<span class="token punctuation">.</span><span class="token function">setProvince_3166_2_code</span><span class="token punctuation">(</span>iso_3166_2<span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-                    <span class="token punctuation">}</span>
-                <span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token number">100</span><span class="token punctuation">,</span>
-                TimeUnit<span class="token punctuation">.</span>SECONDS<span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token comment" spellcheck="true">//        orderWideWithProvinceDS.print("Province>>>>>>>>>");</span>
-
-        <span class="token comment" spellcheck="true">//TODO 5.3 关联SKU维度</span>
-        SingleOutputStreamOperator<span class="token operator">&lt;</span>OrderWide<span class="token operator">></span> orderWideWithSkuDS <span class="token operator">=</span> AsyncDataStream<span class="token punctuation">.</span><span class="token function">unorderedWait</span><span class="token punctuation">(</span>
-                orderWideWithProvinceDS<span class="token punctuation">,</span>
-                <span class="token keyword">new</span> <span class="token class-name">DimAsyncFunction</span><span class="token operator">&lt;</span>OrderWide<span class="token operator">></span><span class="token punctuation">(</span><span class="token string">"DIM_SKU_INFO"</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-                    <span class="token annotation punctuation">@Override</span>
-                    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">join</span><span class="token punctuation">(</span>OrderWide orderWide<span class="token punctuation">,</span> JSONObject jsonObject<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-                        orderWide<span class="token punctuation">.</span><span class="token function">setSku_name</span><span class="token punctuation">(</span>jsonObject<span class="token punctuation">.</span><span class="token function">getString</span><span class="token punctuation">(</span><span class="token string">"SKU_NAME"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                        orderWide<span class="token punctuation">.</span><span class="token function">setCategory3_id</span><span class="token punctuation">(</span>jsonObject<span class="token punctuation">.</span><span class="token function">getLong</span><span class="token punctuation">(</span><span class="token string">"CATEGORY3_ID"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                        orderWide<span class="token punctuation">.</span><span class="token function">setSpu_id</span><span class="token punctuation">(</span>jsonObject<span class="token punctuation">.</span><span class="token function">getLong</span><span class="token punctuation">(</span><span class="token string">"SPU_ID"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                        orderWide<span class="token punctuation">.</span><span class="token function">setTm_id</span><span class="token punctuation">(</span>jsonObject<span class="token punctuation">.</span><span class="token function">getLong</span><span class="token punctuation">(</span><span class="token string">"TM_ID"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                    <span class="token punctuation">}</span>
-
-                    <span class="token annotation punctuation">@Override</span>
-                    <span class="token keyword">public</span> String <span class="token function">getId</span><span class="token punctuation">(</span>OrderWide orderWide<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-                        <span class="token keyword">return</span> String<span class="token punctuation">.</span><span class="token function">valueOf</span><span class="token punctuation">(</span>orderWide<span class="token punctuation">.</span><span class="token function">getSku_id</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                    <span class="token punctuation">}</span>
-                <span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token number">60</span><span class="token punctuation">,</span> TimeUnit<span class="token punctuation">.</span>SECONDS<span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-        <span class="token comment" spellcheck="true">//TODO 5.4 关联SPU维度</span>
-        SingleOutputStreamOperator<span class="token operator">&lt;</span>OrderWide<span class="token operator">></span> orderWideWithSpuDS <span class="token operator">=</span> AsyncDataStream<span class="token punctuation">.</span><span class="token function">unorderedWait</span><span class="token punctuation">(</span>
-                orderWideWithSkuDS<span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">DimAsyncFunction</span><span class="token operator">&lt;</span>OrderWide<span class="token operator">></span><span class="token punctuation">(</span><span class="token string">"DIM_SPU_INFO"</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-                    <span class="token annotation punctuation">@Override</span>
-                    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">join</span><span class="token punctuation">(</span>OrderWide orderWide<span class="token punctuation">,</span> JSONObject jsonObject<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-                        orderWide<span class="token punctuation">.</span><span class="token function">setSpu_name</span><span class="token punctuation">(</span>jsonObject<span class="token punctuation">.</span><span class="token function">getString</span><span class="token punctuation">(</span><span class="token string">"SPU_NAME"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                    <span class="token punctuation">}</span>
-
-                    <span class="token annotation punctuation">@Override</span>
-                    <span class="token keyword">public</span> String <span class="token function">getId</span><span class="token punctuation">(</span>OrderWide orderWide<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-                        <span class="token keyword">return</span> String<span class="token punctuation">.</span><span class="token function">valueOf</span><span class="token punctuation">(</span>orderWide<span class="token punctuation">.</span><span class="token function">getSpu_id</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                    <span class="token punctuation">}</span>
-                <span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token number">60</span><span class="token punctuation">,</span> TimeUnit<span class="token punctuation">.</span>SECONDS<span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-        <span class="token comment" spellcheck="true">//TODO 5.5 关联TradeMark维度</span>
-        SingleOutputStreamOperator<span class="token operator">&lt;</span>OrderWide<span class="token operator">></span> orderWideWithTmDS <span class="token operator">=</span> AsyncDataStream<span class="token punctuation">.</span><span class="token function">unorderedWait</span><span class="token punctuation">(</span>
-                orderWideWithSpuDS<span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">DimAsyncFunction</span><span class="token operator">&lt;</span>OrderWide<span class="token operator">></span><span class="token punctuation">(</span><span class="token string">"DIM_BASE_TRADEMARK"</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-                    <span class="token annotation punctuation">@Override</span>
-                    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">join</span><span class="token punctuation">(</span>OrderWide orderWide<span class="token punctuation">,</span> JSONObject jsonObject<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-                        orderWide<span class="token punctuation">.</span><span class="token function">setTm_name</span><span class="token punctuation">(</span>jsonObject<span class="token punctuation">.</span><span class="token function">getString</span><span class="token punctuation">(</span><span class="token string">"TM_NAME"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                    <span class="token punctuation">}</span>
-
-                    <span class="token annotation punctuation">@Override</span>
-                    <span class="token keyword">public</span> String <span class="token function">getId</span><span class="token punctuation">(</span>OrderWide orderWide<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-                        <span class="token keyword">return</span> String<span class="token punctuation">.</span><span class="token function">valueOf</span><span class="token punctuation">(</span>orderWide<span class="token punctuation">.</span><span class="token function">getTm_id</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                    <span class="token punctuation">}</span>
-                <span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token number">60</span><span class="token punctuation">,</span> TimeUnit<span class="token punctuation">.</span>SECONDS<span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-        <span class="token comment" spellcheck="true">//TODO 5.6 关联Category维度</span>
-        SingleOutputStreamOperator<span class="token operator">&lt;</span>OrderWide<span class="token operator">></span> orderWideWithCategory3DS <span class="token operator">=</span> AsyncDataStream<span class="token punctuation">.</span><span class="token function">unorderedWait</span><span class="token punctuation">(</span>
-                orderWideWithTmDS<span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">DimAsyncFunction</span><span class="token operator">&lt;</span>OrderWide<span class="token operator">></span><span class="token punctuation">(</span><span class="token string">"DIM_BASE_CATEGORY3"</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-                    <span class="token annotation punctuation">@Override</span>
-                    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">join</span><span class="token punctuation">(</span>OrderWide orderWide<span class="token punctuation">,</span> JSONObject jsonObject<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-                        orderWide<span class="token punctuation">.</span><span class="token function">setCategory3_name</span><span class="token punctuation">(</span>jsonObject<span class="token punctuation">.</span><span class="token function">getString</span><span class="token punctuation">(</span><span class="token string">"NAME"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                    <span class="token punctuation">}</span>
-
-                    <span class="token annotation punctuation">@Override</span>
-                    <span class="token keyword">public</span> String <span class="token function">getId</span><span class="token punctuation">(</span>OrderWide orderWide<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-                        <span class="token keyword">return</span> String<span class="token punctuation">.</span><span class="token function">valueOf</span><span class="token punctuation">(</span>orderWide<span class="token punctuation">.</span><span class="token function">getCategory3_id</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                    <span class="token punctuation">}</span>
-                <span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token number">60</span><span class="token punctuation">,</span> TimeUnit<span class="token punctuation">.</span>SECONDS<span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-        <span class="token comment" spellcheck="true">//打印测试</span>
-        orderWideWithCategory3DS<span class="token punctuation">.</span><span class="token function">map</span><span class="token punctuation">(</span>JSONObject<span class="token operator">:</span><span class="token operator">:</span>toJSONString<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">print</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-        <span class="token comment" spellcheck="true">//TODO 6.将数据写入Kafka</span>
-        orderWideWithCategory3DS
-                <span class="token punctuation">.</span><span class="token function">map</span><span class="token punctuation">(</span>JSONObject<span class="token operator">:</span><span class="token operator">:</span>toJSONString<span class="token punctuation">)</span>
-                <span class="token punctuation">.</span><span class="token function">addSink</span><span class="token punctuation">(</span>KafkaUtils<span class="token punctuation">.</span><span class="token function">getFlinkKafkaProducer</span><span class="token punctuation">(</span>orderWideSinkTopic<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-        <span class="token comment" spellcheck="true">// TODO 7、启动</span>
+        <span class="token comment" spellcheck="true">// 启动程序</span>
         env<span class="token punctuation">.</span><span class="token function">execute</span><span class="token punctuation">(</span><span class="token string">"wmy-version-01"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment" spellcheck="true">// 自定义数据源</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">class</span> <span class="token class-name">SimpleSource</span> <span class="token keyword">implements</span> <span class="token class-name">SourceFunction</span><span class="token operator">&lt;</span>Integer<span class="token operator">></span> <span class="token punctuation">{</span>
+
+        <span class="token keyword">private</span> <span class="token keyword">volatile</span> <span class="token keyword">boolean</span> isRunning <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+        <span class="token keyword">private</span> <span class="token keyword">int</span> counter <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+        <span class="token keyword">private</span> <span class="token keyword">int</span> start <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+
+        <span class="token keyword">public</span> <span class="token function">SimpleSource</span><span class="token punctuation">(</span><span class="token keyword">int</span> counter<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">this</span><span class="token punctuation">.</span>counter <span class="token operator">=</span> counter<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+
+        <span class="token annotation punctuation">@Override</span>
+        <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">run</span><span class="token punctuation">(</span>SourceContext<span class="token operator">&lt;</span>Integer<span class="token operator">></span> ctx<span class="token punctuation">)</span> <span class="token keyword">throws</span> Exception <span class="token punctuation">{</span>
+            <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>start <span class="token operator">&lt;</span> counter <span class="token operator">||</span> counter <span class="token operator">==</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> isRunning<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">synchronized</span> <span class="token punctuation">(</span>ctx<span class="token punctuation">.</span><span class="token function">getCheckpointLock</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"send data: "</span> <span class="token operator">+</span> start<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    ctx<span class="token punctuation">.</span><span class="token function">collect</span><span class="token punctuation">(</span>start<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    <span class="token operator">++</span>start<span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+                Thread<span class="token punctuation">.</span><span class="token function">sleep</span><span class="token punctuation">(</span>10L<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+
+        <span class="token annotation punctuation">@Override</span>
+        <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">cancel</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            isRunning <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
     <span class="token punctuation">}</span>
 <span class="token punctuation">}</span>
 </code></pre>
