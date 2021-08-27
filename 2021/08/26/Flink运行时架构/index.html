@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="Flink内存管理, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
+    <meta name="keywords" content="Flink运行时架构, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
     <meta name="description" content="本网站是个人兴趣爱好，总结分享经验，记录生活点滴的平台，希望在以后的学习旅途中，走出自己的风景。">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -16,7 +16,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>Flink内存管理 | 情深骚明大数据之旅</title>
+    <title>Flink运行时架构 | 情深骚明大数据之旅</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -314,12 +314,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/8.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/16.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">Flink内存管理</h1>
+                    <h1 class="description center-align post-title">Flink运行时架构</h1>
                 </div>
             </div>
         </div>
@@ -460,7 +460,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2021-08-25
+                    2021-08-26
                 </div>
                 
 
@@ -481,7 +481,22 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                
+                <h1 id="Flink运行时架构"><a href="#Flink运行时架构" class="headerlink" title="Flink运行时架构"></a>Flink运行时架构</h1><p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210826164621451.png" alt="运行架构"></p>
+<h2 id="TaskManager"><a href="#TaskManager" class="headerlink" title="TaskManager"></a>TaskManager</h2><p>TaskManager心跳信息和统计信息，批次之间也会进行交换数据</p>
+<p>一个任务执行完成之后，分发，有时候时slot和taskmanager，中涉及到一个传输数据的过程</p>
+<h2 id="ResourceManager"><a href="#ResourceManager" class="headerlink" title="ResourceManager"></a>ResourceManager</h2><p>Jobmanager向ResourceManager申请，有则分配，无则等待，进一步yarn申请，启动taskManager来进行分配执行</p>
+<h2 id="Dispatcher"><a href="#Dispatcher" class="headerlink" title="Dispatcher"></a>Dispatcher</h2><p>Job提交任务，提交一个接口，不是必须的，使用什么平台，有时候就没有整合，就是一个桥梁的作业</p>
+<h2 id="任务提交流程"><a href="#任务提交流程" class="headerlink" title="任务提交流程"></a>任务提交流程</h2><p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210826165847406.png" alt="任务提交流程"></p>
+<p>ResourceManager只在分配的时候有关系</p>
+<p>TaskManager时最重要的</p>
+<h2 id="Yarn任务提交流程"><a href="#Yarn任务提交流程" class="headerlink" title="Yarn任务提交流程"></a>Yarn任务提交流程</h2><p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210826171215444.png" alt="任务提交流程"></p>
+<h2 id="任务调度原理"><a href="#任务调度原理" class="headerlink" title="任务调度原理"></a>任务调度原理</h2><p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210826171236046.png" alt="任务调度"></p>
+<h3 id="思考"><a href="#思考" class="headerlink" title="思考"></a>思考</h3><ul>
+<li><input disabled="" type="checkbox"> 怎么样实现并行计算</li>
+<li><input disabled="" type="checkbox"> 并行的任务，需要占用多少个slot</li>
+<li><input disabled="" type="checkbox"> 一个流处理程序，到底包含多少个任务</li>
+</ul>
+
                 
             </div>
             <hr/>
@@ -507,7 +522,7 @@
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://github.com/wmybigdata/2021/08/25/Flink%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/">https://github.com/wmybigdata/2021/08/25/Flink%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/</a>
+                    <a href="https://github.com/wmybigdata/2021/08/26/Flink%E8%BF%90%E8%A1%8C%E6%97%B6%E6%9E%B6%E6%9E%84/">https://github.com/wmybigdata/2021/08/26/Flink%E8%BF%90%E8%A1%8C%E6%97%B6%E6%9E%B6%E6%9E%84/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -720,13 +735,13 @@
             <div class="article-badge left-badge text-color">
                 <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2021/08/26/FlinkCDC-SQL-debezium%E5%AE%9E%E6%88%98%E6%A1%88%E4%BE%8B/">
+                <a href="/2021/08/26/Redis6%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/18.jpg" class="responsive-img" alt="FlinkCDC-SQL-debezium实战案例">
+                        <img src="/medias/featureimages/22.jpg" class="responsive-img" alt="Redis6学习记录">
                         
-                        <span class="card-title">FlinkCDC-SQL-debezium实战案例</span>
+                        <span class="card-title">Redis6学习记录</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -741,23 +756,11 @@
                         </span>
                         <span class="publish-author">
                             
-                            <i class="fas fa-bookmark fa-fw icon-category"></i>
-                            
-                            <a href="/categories/Flink%E6%B5%81%E5%BC%8F%E5%BC%95%E6%93%8E/" class="post-category">
-                                    Flink流式引擎
-                                </a>
-                            
+                            <i class="fas fa-user fa-fw"></i>
+                            情深骚明
                             
                         </span>
                     </div>
-                </div>
-                
-                <div class="card-action article-tags">
-                    
-                    <a href="/tags/Flink%E6%B5%81%E5%BC%8F%E5%BC%95%E6%93%8E/">
-                        <span class="chip bg-color">Flink流式引擎</span>
-                    </a>
-                    
                 </div>
                 
             </div>
@@ -769,13 +772,13 @@
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2021/08/25/Flink%E5%AE%89%E8%A3%85%E5%92%8C%E9%85%8D%E7%BD%AE/">
+                <a href="/2021/08/26/Flink%E9%83%A8%E7%BD%B2%E6%A8%A1%E5%BC%8F/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/7.jpg" class="responsive-img" alt="Flink安装和配置">
+                        <img src="/medias/featureimages/8.jpg" class="responsive-img" alt="Flink部署模式">
                         
-                        <span class="card-title">Flink安装和配置</span>
+                        <span class="card-title">Flink部署模式</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -786,7 +789,7 @@
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2021-08-25
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-08-26
                             </span>
                         <span class="publish-author">
                             
