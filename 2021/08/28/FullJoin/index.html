@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="Flink部署模式, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
+    <meta name="keywords" content="FullJoin, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
     <meta name="description" content="本网站是个人兴趣爱好，总结分享经验，记录生活点滴的平台，希望在以后的学习旅途中，走出自己的风景。">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -16,7 +16,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>Flink部署模式 | 情深骚明大数据之旅</title>
+    <title>FullJoin | 情深骚明大数据之旅</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -314,12 +314,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/8.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/9.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">Flink部署模式</h1>
+                    <h1 class="description center-align post-title">FullJoin</h1>
                 </div>
             </div>
         </div>
@@ -435,8 +435,8 @@
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/Flink%E6%B5%81%E5%BC%8F%E5%BC%95%E6%93%8E/">
-                                <span class="chip bg-color">Flink流式引擎</span>
+                            <a href="/tags/hive/">
+                                <span class="chip bg-color">hive</span>
                             </a>
                         
                     </div>
@@ -447,8 +447,8 @@
                     <div class="post-cate">
                         <i class="fas fa-bookmark fa-fw icon-category"></i>
                         
-                            <a href="/categories/Flink%E6%B5%81%E5%BC%8F%E5%BC%95%E6%93%8E/" class="post-category">
-                                Flink流式引擎
+                            <a href="/categories/hive/" class="post-category">
+                                hive
                             </a>
                         
                     </div>
@@ -460,7 +460,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2021-08-26
+                    2021-08-28
                 </div>
                 
 
@@ -481,42 +481,7 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h1 id="Flink部署模式"><a href="#Flink部署模式" class="headerlink" title="Flink部署模式"></a>Flink部署模式</h1><p><a href="https://ci.apache.org/projects/flink/flink-docs-release-1.13/docs/deployment/resource-providers/yarn/" target="_blank" rel="noopener">https://ci.apache.org/projects/flink/flink-docs-release-1.13/docs/deployment/resource-providers/yarn/</a></p>
-<h2 id="Flink-on-Yarn"><a href="#Flink-on-Yarn" class="headerlink" title="Flink on Yarn"></a>Flink on Yarn</h2><p>以 Yarn 模式部署 Flink 任务时，要求 Flink 是有 Hadoop 支持的版本，Hadoop 环境需要保证版本在 2.2 以上，并且集群中安装有 HDFS 服务。</p>
-<p>Flink 提供了两种在 yarn 上运行的模式，分别为 Session-Cluster 和 Per-Job-Cluster 模式。</p>
-<h3 id="1、-Session-cluster-模式"><a href="#1、-Session-cluster-模式" class="headerlink" title="1、 Session-cluster 模式"></a>1、 Session-cluster 模式</h3><p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210826154328964.png" alt="Session-cluster模式"></p>
-<p>​    Session-Cluster 模式需要先启动集群，然后再提交作业，接着会向 yarn 申请一 块空间后，资源永远保持不变。如果资源满了，下一个作业就无法提交，只能等到 yarn 中的其中一个作业执行完成后，释放了资源，下个作业才会正常提交。所有作 业共享 Dispatcher 和 ResourceManager；共享资源；适合规模小执行时间短的作业。</p>
-<p>​    在 yarn 中初始化一个 flink 集群，开辟指定的资源，以后提交任务都向这里提 交。这个 flink 集群会常驻在 yarn 集群中，除非手工停止。</p>
-<h3 id="2、Session-Cluster"><a href="#2、Session-Cluster" class="headerlink" title="2、Session Cluster"></a>2、Session Cluster</h3><ul>
-<li><input disabled="" type="checkbox"> 启动hd.sh start</li>
-<li><input disabled="" type="checkbox"> 启动yarn-session</li>
-</ul>
-<pre class=" language-xml"><code class="language-xml">yarn-session.sh -n 2 -s 2 -jm 1024 -tm 1024 -nm wmy-flink-session -d
-</code></pre>
-<p>-n 现在不能直接指定taskmanager的数量，一般设置了都是没有效果的</p>
-<pre class=" language-xml"><code class="language-xml">其中：
--n(--container)：TaskManager 的数量。
--s(--slots)： 每个 TaskManager 的 slot 数量，默认一个 slot 一个 core，默认每个
-taskmanager 的 slot 的个数为 1，有时可以多一些 taskmanager，做冗余。
--jm：JobManager 的内存（单位 MB)。
--tm：每个 taskmanager 的内存（单位 MB)。
--nm：yarn 的 appName(现在 yarn 的 ui 上的名字)。
--d：后台执行。
-</code></pre>
-<h4 id="2-1-错误"><a href="#2-1-错误" class="headerlink" title="2.1 错误"></a>2.1 错误</h4><p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210826155759424.png" alt="启动yarn session失败"></p>
-<p>这个是Flink 1.11.1  使用yarn-session 出现的错误；原因是在Flink1.11 之后不再提供flink-shaded-hadoop-*” jars</p>
-<p>需要在yarn-session.sh 文件中添加 或者在环境变量中添加</p>
-<p>export HADOOP_CLASSPATH=<code>hadoop classpath</code></p>
-<p>分发给每一个flink节点</p>
-<h4 id="2-2-yarn界面上就可以看到"><a href="#2-2-yarn界面上就可以看到" class="headerlink" title="2.2 yarn界面上就可以看到"></a>2.2 yarn界面上就可以看到</h4><p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210826160342492.png" alt="yarn界面"></p>
-<pre class=" language-shell"><code class="language-shell">flink run -c com.atguigu.wc.StreamWordCount FlinkTutorial-1.0-SNAPSHOT.jar --host flink01 --port
-</code></pre>
-<h4 id="2-3-取消-yarn-session"><a href="#2-3-取消-yarn-session" class="headerlink" title="2.3  取消 yarn-session"></a>2.3  取消 yarn-session</h4><p>flink cancel appid</p>
-<h3 id="3、yarn-pre-job"><a href="#3、yarn-pre-job" class="headerlink" title="3、yarn-pre-job"></a>3、yarn-pre-job</h3><pre class=" language-xml"><code class="language-xml">flink run –m yarn-cluster -c com.atguigu.wc.StreamWordCount FlinkTutorial-1.0-SNAPSHOT-jar-with-dependencies.jar --host flink04 –port 7777
-</code></pre>
-<p>这个的话直接运行这个程序就可以了</p>
-<h4 id="3-1-错误"><a href="#3-1-错误" class="headerlink" title="3.1 错误"></a>3.1 错误</h4><p>Please make sure to export the HADOOP_CLASSPATH environment variable or have hadoop in your classpath.</p>
-
+                <h1 id="FullJoin"><a href="#FullJoin" class="headerlink" title="FullJoin"></a>FullJoin</h1>
                 
             </div>
             <hr/>
@@ -542,7 +507,7 @@ taskmanager 的 slot 的个数为 1，有时可以多一些 taskmanager，做冗
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://github.com/wmybigdata/2021/08/26/Flink%E9%83%A8%E7%BD%B2%E6%A8%A1%E5%BC%8F/">https://github.com/wmybigdata/2021/08/26/Flink%E9%83%A8%E7%BD%B2%E6%A8%A1%E5%BC%8F/</a>
+                    <a href="https://github.com/wmybigdata/2021/08/28/FullJoin/">https://github.com/wmybigdata/2021/08/28/FullJoin/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -580,8 +545,8 @@ taskmanager 的 slot 的个数为 1，有时可以多一些 taskmanager，做冗
                     
                         <div class="article-tag">
                             
-                                <a href="/tags/Flink%E6%B5%81%E5%BC%8F%E5%BC%95%E6%93%8E/">
-                                    <span class="chip bg-color">Flink流式引擎</span>
+                                <a href="/tags/hive/">
+                                    <span class="chip bg-color">hive</span>
                                 </a>
                             
                         </div>
@@ -751,17 +716,18 @@ taskmanager 的 slot 的个数为 1，有时可以多一些 taskmanager，做冗
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+                <i class="far fa-dot-circle"></i>&nbsp;本篇
+            </div>
             <div class="card">
-                <a href="/2021/08/26/Flink%E8%BF%90%E8%A1%8C%E6%97%B6%E6%9E%B6%E6%9E%84/">
+                <a href="/2021/08/28/FullJoin/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/16.jpg" class="responsive-img" alt="Flink运行时架构">
+                        <img src="/medias/featureimages/9.jpg" class="responsive-img" alt="FullJoin">
                         
-                        <span class="card-title">Flink运行时架构</span>
+                        <span class="card-title">FullJoin</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -771,26 +737,27 @@ taskmanager 的 slot 的个数为 1，有时可以多一些 taskmanager，做冗
                         
                     </div>
                     <div class="publish-info">
-                        <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2021-08-26
-                        </span>
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-08-28
+                            </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Flink%E6%B5%81%E5%BC%8F%E5%BC%95%E6%93%8E/" class="post-category">
-                                    Flink流式引擎
+                            <a href="/categories/hive/" class="post-category">
+                                    hive
                                 </a>
                             
                             
                         </span>
                     </div>
                 </div>
+
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/Flink%E6%B5%81%E5%BC%8F%E5%BC%95%E6%93%8E/">
-                        <span class="chip bg-color">Flink流式引擎</span>
+                    <a href="/tags/hive/">
+                        <span class="chip bg-color">hive</span>
                     </a>
                     
                 </div>
@@ -804,13 +771,13 @@ taskmanager 的 slot 的个数为 1，有时可以多一些 taskmanager，做冗
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2021/08/26/FlinkCDC%E8%AF%BB%E5%8F%96mysql%E4%B8%AD%E6%97%B6%E9%97%B4%E7%B1%BB%E5%9E%8B/">
+                <a href="/2021/08/27/hive3-1-2%E8%A7%A3%E5%86%B3%E6%8E%A7%E5%88%B6%E5%8F%B0%E6%97%A5%E5%BF%97/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/10.jpg" class="responsive-img" alt="FlinkCDC读取mysql中时间类型">
+                        <img src="/medias/featureimages/7.jpg" class="responsive-img" alt="hive3.1.2解决控制台日志">
                         
-                        <span class="card-title">FlinkCDC读取mysql中时间类型</span>
+                        <span class="card-title">hive3.1.2解决控制台日志</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -821,14 +788,14 @@ taskmanager 的 slot 的个数为 1，有时可以多一些 taskmanager，做冗
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2021-08-26
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-08-27
                             </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/%E5%A4%A7%E6%95%B0%E6%8D%AE%E9%87%87%E9%9B%86%E7%B3%BB%E7%BB%9F/" class="post-category">
-                                    大数据采集系统
+                            <a href="/categories/hive/" class="post-category">
+                                    hive
                                 </a>
                             
                             
@@ -838,8 +805,8 @@ taskmanager 的 slot 的个数为 1，有时可以多一些 taskmanager，做冗
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE%E9%87%87%E9%9B%86%E7%B3%BB%E7%BB%9F/">
-                        <span class="chip bg-color">大数据采集系统</span>
+                    <a href="/tags/hive/">
+                        <span class="chip bg-color">hive</span>
                     </a>
                     
                 </div>
