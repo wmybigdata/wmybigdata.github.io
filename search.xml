@@ -4,11 +4,36 @@
   
     
     <entry>
+      <title>Redis经典案例场景</title>
+      <link href="/2021/08/28/Redis%E7%BB%8F%E5%85%B8%E6%A1%88%E4%BE%8B%E5%9C%BA%E6%99%AF/"/>
+      <url>/2021/08/28/Redis%E7%BB%8F%E5%85%B8%E6%A1%88%E4%BE%8B%E5%9C%BA%E6%99%AF/</url>
+      
+        <content type="html"><![CDATA[<h1 id="Redis经典案例场景"><a href="#Redis经典案例场景" class="headerlink" title="Redis经典案例场景"></a>Redis经典案例场景</h1>]]></content>
+      
+      
+      <categories>
+          
+          <category> redis </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> redis </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>Geographic经纬度需求</title>
       <link href="/2021/08/28/Geographic%E7%BB%8F%E7%BA%AC%E5%BA%A6%E9%9C%80%E6%B1%82/"/>
       <url>/2021/08/28/Geographic%E7%BB%8F%E7%BA%AC%E5%BA%A6%E9%9C%80%E6%B1%82/</url>
       
-        <content type="html"><![CDATA[]]></content>
+        <content type="html"><![CDATA[<h1 id="Geographic经纬度需求"><a href="#Geographic经纬度需求" class="headerlink" title="Geographic经纬度需求"></a>Geographic经纬度需求</h1><h2 id="知识点描述"><a href="#知识点描述" class="headerlink" title="知识点描述"></a>知识点描述</h2><p>Redis 3.2 中增加了对GEO类型的支持。GEO、Geographic，地理信息的缩写，该类型就是元素的2维坐标，在地图上就是经纬度，Redis基于该类型，提供了经纬度设置，查询，范围查询，经纬度hash等常见操作。</p>]]></content>
       
       
       <categories>
@@ -33,7 +58,7 @@
       <link href="/2021/08/28/redis%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%99%A8%E7%AE%97%E6%B3%95/"/>
       <url>/2021/08/28/redis%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%99%A8%E7%AE%97%E6%B3%95/</url>
       
-        <content type="html"><![CDATA[]]></content>
+        <content type="html"><![CDATA[<h1 id="redis布隆过滤器算法"><a href="#redis布隆过滤器算法" class="headerlink" title="redis布隆过滤器算法"></a>redis布隆过滤器算法</h1><h2 id="案例"><a href="#案例" class="headerlink" title="案例"></a>案例</h2><p>在Flink编程过程当中用到的非常多</p>]]></content>
       
       
       <categories>
