@@ -4,6 +4,81 @@
   
     
     <entry>
+      <title>Geographic经纬度需求</title>
+      <link href="/2021/08/28/Geographic%E7%BB%8F%E7%BA%AC%E5%BA%A6%E9%9C%80%E6%B1%82/"/>
+      <url>/2021/08/28/Geographic%E7%BB%8F%E7%BA%AC%E5%BA%A6%E9%9C%80%E6%B1%82/</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+      
+      <categories>
+          
+          <category> redis </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> redis </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>redis布隆过滤器算法</title>
+      <link href="/2021/08/28/redis%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%99%A8%E7%AE%97%E6%B3%95/"/>
+      <url>/2021/08/28/redis%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%99%A8%E7%AE%97%E6%B3%95/</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+      
+      <categories>
+          
+          <category> redis </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> redis </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>RedisHyperLogLog基数统计算法</title>
+      <link href="/2021/08/28/RedisHyperLogLog%E5%9F%BA%E6%95%B0%E7%BB%9F%E8%AE%A1%E7%AE%97%E6%B3%95/"/>
+      <url>/2021/08/28/RedisHyperLogLog%E5%9F%BA%E6%95%B0%E7%BB%9F%E8%AE%A1%E7%AE%97%E6%B3%95/</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+      
+      <categories>
+          
+          <category> redis </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> redis </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>redis位图法bitmap统计活跃用户</title>
       <link href="/2021/08/28/redis%E4%BD%8D%E5%9B%BE%E6%B3%95bitmap%E7%BB%9F%E8%AE%A1%E6%B4%BB%E8%B7%83%E7%94%A8%E6%88%B7/"/>
       <url>/2021/08/28/redis%E4%BD%8D%E5%9B%BE%E6%B3%95bitmap%E7%BB%9F%E8%AE%A1%E6%B4%BB%E8%B7%83%E7%94%A8%E6%88%B7/</url>
@@ -237,6 +312,18 @@
         <content type="html"><![CDATA[]]></content>
       
       
+      <categories>
+          
+          <category> redis </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> redis </tag>
+            
+        </tags>
       
     </entry>
     
