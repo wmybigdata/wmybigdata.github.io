@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="java中annotation注解, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
+    <meta name="keywords" content="hive统计硅谷影音视频网站, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
     <meta name="description" content="本网站是个人兴趣爱好，总结分享经验，记录生活点滴的平台，希望在以后的学习旅途中，走出自己的风景。">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -16,7 +16,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>java中annotation注解 | 情深骚明大数据之旅</title>
+    <title>hive统计硅谷影音视频网站 | 情深骚明大数据之旅</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -314,12 +314,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/19.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/7.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">java中annotation注解</h1>
+                    <h1 class="description center-align post-title">hive统计硅谷影音视频网站</h1>
                 </div>
             </div>
         </div>
@@ -435,8 +435,8 @@
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/java/">
-                                <span class="chip bg-color">java</span>
+                            <a href="/tags/hive/">
+                                <span class="chip bg-color">hive</span>
                             </a>
                         
                     </div>
@@ -447,8 +447,8 @@
                     <div class="post-cate">
                         <i class="fas fa-bookmark fa-fw icon-category"></i>
                         
-                            <a href="/categories/java/" class="post-category">
-                                java
+                            <a href="/categories/hive/" class="post-category">
+                                hive
                             </a>
                         
                     </div>
@@ -481,7 +481,173 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h1 id="java中annotation注解"><a href="#java中annotation注解" class="headerlink" title="java中annotation注解"></a>java中annotation注解</h1>
+                <h1 id="hive统计硅谷影音视频网站"><a href="#hive统计硅谷影音视频网站" class="headerlink" title="hive统计硅谷影音视频网站"></a>hive统计硅谷影音视频网站</h1><p>[TOC]</p>
+<h2 id="1、需求描述"><a href="#1、需求描述" class="headerlink" title="1、需求描述"></a>1、需求描述</h2><p>统计硅谷影音视频网站的常规指标，各种 TopN 指标： </p>
+<ul>
+<li><input disabled="" type="checkbox"> 1、统计视频观看数 Top10 </li>
+<li><input disabled="" type="checkbox"> 2、统计视频类别热度 Top10 </li>
+<li><input disabled="" type="checkbox"> 3、统计出视频观看数最高的 20 个视频的所属类别以及类别包含 Top20 视频的个数 </li>
+<li><input disabled="" type="checkbox"> 4、统计视频观看数 Top50 所关联视频的所属类别排序 </li>
+<li><input disabled="" type="checkbox"> 5、统计每个类别中的视频热度 Top10,以 Music 为例 </li>
+<li><input disabled="" type="checkbox"> 6、统计每个类别视频观看数 Top10 </li>
+<li><input disabled="" type="checkbox"> 7、 统计上传视频最多的用户 Top10 以及他们上传的视频观看次数在前 20 的视频</li>
+</ul>
+<h2 id="2、数据结构"><a href="#2、数据结构" class="headerlink" title="2、数据结构"></a>2、数据结构</h2><h3 id="1）视频表"><a href="#1）视频表" class="headerlink" title="1）视频表"></a>1）视频表</h3><table>
+<thead>
+<tr>
+<th>字段</th>
+<th>备注</th>
+<th>详细描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>videoId</td>
+<td>视频唯一id（String）</td>
+<td>11位字符串</td>
+</tr>
+<tr>
+<td>uploader</td>
+<td>视频上传者（String）</td>
+<td>上传视频的用户名String</td>
+</tr>
+<tr>
+<td>age</td>
+<td>视频年龄（int）</td>
+<td>视频在平台上的整数天</td>
+</tr>
+<tr>
+<td>category</td>
+<td>视频类别（Array<string>）</string></td>
+<td>上传视频指定的视频分类</td>
+</tr>
+<tr>
+<td>length</td>
+<td>视频长度（Int）</td>
+<td>整形数字标识的视频长度</td>
+</tr>
+<tr>
+<td>views</td>
+<td>观看次数（Int）</td>
+<td>视频被浏览的次数</td>
+</tr>
+<tr>
+<td>rate</td>
+<td>视频评分（Double）</td>
+<td>满分5分</td>
+</tr>
+<tr>
+<td>Ratings</td>
+<td>流量（Int）</td>
+<td>视频的流量，整型数字</td>
+</tr>
+<tr>
+<td>conments</td>
+<td>评论数（Int）</td>
+<td>一个视频的整数评论数</td>
+</tr>
+<tr>
+<td>relatedId</td>
+<td>相关视频id（Array<string>）</string></td>
+<td>相关视频的id，最多20个</td>
+</tr>
+</tbody></table>
+<h3 id="2）用户表"><a href="#2）用户表" class="headerlink" title="2）用户表"></a>2）用户表</h3><table>
+<thead>
+<tr>
+<th>字段</th>
+<th>备注</th>
+<th>字段类型</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>uploader</td>
+<td>上传者用户名</td>
+<td>string</td>
+</tr>
+<tr>
+<td>videos</td>
+<td>上传视频数</td>
+<td>int</td>
+</tr>
+<tr>
+<td>friends</td>
+<td>朋友数量</td>
+<td>int</td>
+</tr>
+</tbody></table>
+<h2 id="3、准备工作"><a href="#3、准备工作" class="headerlink" title="3、准备工作"></a>3、准备工作</h2><h3 id="3-1-准备表"><a href="#3-1-准备表" class="headerlink" title="3.1 准备表"></a>3.1 准备表</h3><h4 id="1）需要准备的表"><a href="#1）需要准备的表" class="headerlink" title="1）需要准备的表"></a>1）需要准备的表</h4><p>创建原始数据表：gulivideo_ori，gulivideo_user_ori， 创建最终表：gulivideo_orc，gulivideo_user_orc</p>
+<h4 id="2）创建原始数据表"><a href="#2）创建原始数据表" class="headerlink" title="2）创建原始数据表"></a>2）创建原始数据表</h4><h5 id="（1）gulivideo-ori"><a href="#（1）gulivideo-ori" class="headerlink" title="（1）gulivideo_ori"></a>（1）gulivideo_ori</h5><pre class=" language-sql"><code class="language-sql"><span class="token keyword">create</span> <span class="token keyword">table</span> gulivideo_ori<span class="token punctuation">(</span>
+ videoId string<span class="token punctuation">,</span>
+ uploader string<span class="token punctuation">,</span>
+ age <span class="token keyword">int</span><span class="token punctuation">,</span>
+ category array<span class="token operator">&lt;</span>string<span class="token operator">></span><span class="token punctuation">,</span>
+ length <span class="token keyword">int</span><span class="token punctuation">,</span>
+ views <span class="token keyword">int</span><span class="token punctuation">,</span>
+ rate <span class="token keyword">float</span><span class="token punctuation">,</span>
+ ratings <span class="token keyword">int</span><span class="token punctuation">,</span>
+ comments <span class="token keyword">int</span><span class="token punctuation">,</span>
+ relatedId array<span class="token operator">&lt;</span>string<span class="token operator">></span><span class="token punctuation">)</span>
+<span class="token keyword">row</span> format delimited <span class="token keyword">fields</span> <span class="token keyword">terminated by</span> <span class="token string">"\t"</span>
+collection items <span class="token keyword">terminated by</span> <span class="token string">"&amp;"</span>
+stored <span class="token keyword">as</span> textfile<span class="token punctuation">;</span>
+</code></pre>
+<h5 id="（2）创建原始数据表-gulivideo-user-ori"><a href="#（2）创建原始数据表-gulivideo-user-ori" class="headerlink" title="（2）创建原始数据表: gulivideo_user_ori"></a>（2）创建原始数据表: gulivideo_user_ori</h5><pre class=" language-sql"><code class="language-sql"><span class="token keyword">create</span> <span class="token keyword">table</span> gulivideo_user_ori<span class="token punctuation">(</span>
+ uploader string<span class="token punctuation">,</span>
+ videos <span class="token keyword">int</span><span class="token punctuation">,</span>
+ friends <span class="token keyword">int</span><span class="token punctuation">)</span>
+<span class="token keyword">row</span> format delimited
+<span class="token keyword">fields</span> <span class="token keyword">terminated by</span> <span class="token string">"\t"</span>
+stored <span class="token keyword">as</span> textfile<span class="token punctuation">;</span>
+</code></pre>
+<h4 id="3）创建-orc-存储格式带-snappy-压缩的表"><a href="#3）创建-orc-存储格式带-snappy-压缩的表" class="headerlink" title="3）创建 orc 存储格式带 snappy 压缩的表"></a>3）创建 orc 存储格式带 snappy 压缩的表</h4><h5 id="（1）gulivideo-orc"><a href="#（1）gulivideo-orc" class="headerlink" title="（1）gulivideo_orc"></a>（1）gulivideo_orc</h5><pre class=" language-sql"><code class="language-sql"><span class="token keyword">create</span> <span class="token keyword">table</span> gulivideo_orc<span class="token punctuation">(</span>
+ videoId string<span class="token punctuation">,</span>
+ uploader string<span class="token punctuation">,</span>
+ age <span class="token keyword">int</span><span class="token punctuation">,</span>
+ category array<span class="token operator">&lt;</span>string<span class="token operator">></span><span class="token punctuation">,</span>
+ length <span class="token keyword">int</span><span class="token punctuation">,</span>
+ views <span class="token keyword">int</span><span class="token punctuation">,</span>
+ rate <span class="token keyword">float</span><span class="token punctuation">,</span>
+ ratings <span class="token keyword">int</span><span class="token punctuation">,</span>
+ comments <span class="token keyword">int</span><span class="token punctuation">,</span>
+ relatedId array<span class="token operator">&lt;</span>string<span class="token operator">></span><span class="token punctuation">)</span>
+stored <span class="token keyword">as</span> orc
+tblproperties<span class="token punctuation">(</span><span class="token string">"orc.compress"</span><span class="token operator">=</span><span class="token string">"SNAPPY"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h5 id="（2）gulivideo-user-orc"><a href="#（2）gulivideo-user-orc" class="headerlink" title="（2）gulivideo_user_orc"></a>（2）gulivideo_user_orc</h5><pre class=" language-sql"><code class="language-sql"><span class="token keyword">create</span> <span class="token keyword">table</span> gulivideo_user_orc<span class="token punctuation">(</span>
+ uploader string<span class="token punctuation">,</span>
+ videos <span class="token keyword">int</span><span class="token punctuation">,</span>
+ friends <span class="token keyword">int</span><span class="token punctuation">)</span>
+<span class="token keyword">row</span> format delimited
+<span class="token keyword">fields</span> <span class="token keyword">terminated by</span> <span class="token string">"\t"</span>
+stored <span class="token keyword">as</span> orc
+tblproperties<span class="token punctuation">(</span><span class="token string">"orc.compress"</span><span class="token operator">=</span><span class="token string">"SNAPPY"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h5 id="（3）向-ori-表插入数据"><a href="#（3）向-ori-表插入数据" class="headerlink" title="（3）向 ori 表插入数据"></a>（3）向 ori 表插入数据</h5><pre class=" language-sql"><code class="language-sql"><span class="token keyword">load</span> <span class="token keyword">data</span> <span class="token keyword">local</span> inpath <span class="token string">"/opt/flink/warehouse/gulivideo/video"</span> <span class="token keyword">into</span> <span class="token keyword">table</span> gulivideo_ori<span class="token punctuation">;</span>
+<span class="token keyword">load</span> <span class="token keyword">data</span> <span class="token keyword">local</span> inpath <span class="token string">"/opt/flink/warehouse/gulivideo/user"</span> <span class="token keyword">into</span> <span class="token keyword">table</span> gulivideo_user_ori<span class="token punctuation">;</span>
+</code></pre>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210829133218817.png" alt="数据来源"></p>
+<p><em><strong>视频数据</strong></em></p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210829132804111.png" alt="gulivideo_user_ori"></p>
+<p><em><strong>用户数据</strong></em></p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210829132906400.png" alt="gulivideo_ori"></p>
+<h5 id="（4）向-orc-表插入数据"><a href="#（4）向-orc-表插入数据" class="headerlink" title="（4）向 orc 表插入数据"></a>（4）向 orc 表插入数据</h5><pre class=" language-sql"><code class="language-sql"><span class="token keyword">insert</span> <span class="token keyword">into</span> <span class="token keyword">table</span> gulivideo_orc <span class="token keyword">select</span> <span class="token operator">*</span> <span class="token keyword">from</span> gulivideo_ori<span class="token punctuation">;</span>
+<span class="token keyword">insert</span> <span class="token keyword">into</span> <span class="token keyword">table</span> gulivideo_user_orc <span class="token keyword">select</span> <span class="token operator">*</span> <span class="token keyword">from</span> gulivideo_user_ori<span class="token punctuation">;</span>
+</code></pre>
+<h2 id="4、业务分析"><a href="#4、业务分析" class="headerlink" title="4、业务分析"></a>4、业务分析</h2><h3 id="4-1-统计视频观看数-Top10"><a href="#4-1-统计视频观看数-Top10" class="headerlink" title="4.1 统计视频观看数 Top10"></a>4.1 统计视频观看数 Top10</h3><pre class=" language-sql"><code class="language-sql">
+</code></pre>
+<h3 id="4-2-统计视频类别热度-Top10"><a href="#4-2-统计视频类别热度-Top10" class="headerlink" title="4.2 统计视频类别热度 Top10"></a>4.2 统计视频类别热度 Top10</h3><pre class=" language-sql"><code class="language-sql">
+</code></pre>
+<h3 id="4-3-统计出视频观看数最高的-20-个视频的所属类别以及类别包含-Top20-视频的个数"><a href="#4-3-统计出视频观看数最高的-20-个视频的所属类别以及类别包含-Top20-视频的个数" class="headerlink" title="4.3 统计出视频观看数最高的 20 个视频的所属类别以及类别包含 Top20 视频的个数"></a>4.3 统计出视频观看数最高的 20 个视频的所属类别以及类别包含 Top20 视频的个数</h3><pre class=" language-sql"><code class="language-sql">
+</code></pre>
+<h3 id="4-4-统计视频观看数-Top50-所关联视频的所属类别排序"><a href="#4-4-统计视频观看数-Top50-所关联视频的所属类别排序" class="headerlink" title="4.4 统计视频观看数 Top50 所关联视频的所属类别排序"></a>4.4 统计视频观看数 Top50 所关联视频的所属类别排序</h3><pre class=" language-sql"><code class="language-sql">
+</code></pre>
+<h3 id="4-5-统计每个类别中的视频热度-Top10，以-Music-为例"><a href="#4-5-统计每个类别中的视频热度-Top10，以-Music-为例" class="headerlink" title="4.5 统计每个类别中的视频热度 Top10，以 Music 为例"></a>4.5 统计每个类别中的视频热度 Top10，以 Music 为例</h3><pre class=" language-sql"><code class="language-sql">
+</code></pre>
+<h3 id="4-6-统计每个类别视频观看数-Top10"><a href="#4-6-统计每个类别视频观看数-Top10" class="headerlink" title="4.6 统计每个类别视频观看数 Top10"></a>4.6 统计每个类别视频观看数 Top10</h3><pre class=" language-sql"><code class="language-sql">
+</code></pre>
+<h3 id="4-7-统计上传视频最多的用户-Top10以及他们上传的视频-观看次数在前-20-的视频"><a href="#4-7-统计上传视频最多的用户-Top10以及他们上传的视频-观看次数在前-20-的视频" class="headerlink" title="4.7 统计上传视频最多的用户 Top10以及他们上传的视频 观看次数在前 20 的视频"></a>4.7 统计上传视频最多的用户 Top10以及他们上传的视频 观看次数在前 20 的视频</h3><pre class=" language-sql"><code class="language-sql">
+</code></pre>
+
                 
             </div>
             <hr/>
@@ -507,7 +673,7 @@
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://github.com/wmybigdata/2021/08/29/java%E4%B8%ADannotation%E6%B3%A8%E8%A7%A3/">https://github.com/wmybigdata/2021/08/29/java%E4%B8%ADannotation%E6%B3%A8%E8%A7%A3/</a>
+                    <a href="https://github.com/wmybigdata/2021/08/29/hive%E7%BB%9F%E8%AE%A1%E7%A1%85%E8%B0%B7%E5%BD%B1%E9%9F%B3%E8%A7%86%E9%A2%91%E7%BD%91%E7%AB%99/">https://github.com/wmybigdata/2021/08/29/hive%E7%BB%9F%E8%AE%A1%E7%A1%85%E8%B0%B7%E5%BD%B1%E9%9F%B3%E8%A7%86%E9%A2%91%E7%BD%91%E7%AB%99/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -545,8 +711,8 @@
                     
                         <div class="article-tag">
                             
-                                <a href="/tags/java/">
-                                    <span class="chip bg-color">java</span>
+                                <a href="/tags/hive/">
+                                    <span class="chip bg-color">hive</span>
                                 </a>
                             
                         </div>
@@ -716,9 +882,10 @@
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+                <i class="far fa-dot-circle"></i>&nbsp;本篇
+            </div>
             <div class="card">
                 <a href="/2021/08/29/hive%E7%BB%9F%E8%AE%A1%E7%A1%85%E8%B0%B7%E5%BD%B1%E9%9F%B3%E8%A7%86%E9%A2%91%E7%BD%91%E7%AB%99/">
                     <div class="card-image">
@@ -736,9 +903,9 @@
                         
                     </div>
                     <div class="publish-info">
-                        <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2021-08-29
-                        </span>
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-08-29
+                            </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
@@ -751,6 +918,7 @@
                         </span>
                     </div>
                 </div>
+
                 
                 <div class="card-action article-tags">
                     
@@ -769,13 +937,13 @@
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2021/08/29/lombok%E6%B3%A8%E8%A7%A3/">
+                <a href="/2021/08/29/java%E4%B8%ADannotation%E6%B3%A8%E8%A7%A3/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/1.jpg" class="responsive-img" alt="lombok注解">
+                        <img src="/medias/featureimages/19.jpg" class="responsive-img" alt="java中annotation注解">
                         
-                        <span class="card-title">lombok注解</span>
+                        <span class="card-title">java中annotation注解</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
