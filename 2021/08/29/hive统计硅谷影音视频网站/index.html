@@ -633,20 +633,202 @@ tblproperties<span class="token punctuation">(</span><span class="token string">
 <h5 id="（4）向-orc-表插入数据"><a href="#（4）向-orc-表插入数据" class="headerlink" title="（4）向 orc 表插入数据"></a>（4）向 orc 表插入数据</h5><pre class=" language-sql"><code class="language-sql"><span class="token keyword">insert</span> <span class="token keyword">into</span> <span class="token keyword">table</span> gulivideo_orc <span class="token keyword">select</span> <span class="token operator">*</span> <span class="token keyword">from</span> gulivideo_ori<span class="token punctuation">;</span>
 <span class="token keyword">insert</span> <span class="token keyword">into</span> <span class="token keyword">table</span> gulivideo_user_orc <span class="token keyword">select</span> <span class="token operator">*</span> <span class="token keyword">from</span> gulivideo_user_ori<span class="token punctuation">;</span>
 </code></pre>
-<h2 id="4、业务分析"><a href="#4、业务分析" class="headerlink" title="4、业务分析"></a>4、业务分析</h2><h3 id="4-1-统计视频观看数-Top10"><a href="#4-1-统计视频观看数-Top10" class="headerlink" title="4.1 统计视频观看数 Top10"></a>4.1 统计视频观看数 Top10</h3><pre class=" language-sql"><code class="language-sql">
+<h2 id="4、业务分析"><a href="#4、业务分析" class="headerlink" title="4、业务分析"></a>4、业务分析</h2><h3 id="4-1-统计视频观看数-Top10"><a href="#4-1-统计视频观看数-Top10" class="headerlink" title="4.1 统计视频观看数 Top10"></a>4.1 统计视频观看数 Top10</h3><p>思路：使用 order by 按照 views 字段做一个全局排序即可，同时我们设置只显示前 10 条。</p>
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">SELECT</span>
+ videoId<span class="token punctuation">,</span>
+ views
+<span class="token keyword">FROM</span>
+ gulivideo_orc
+<span class="token keyword">ORDER</span> <span class="token keyword">BY</span>
+ views <span class="token keyword">DESC</span>
+<span class="token keyword">LIMIT</span> <span class="token number">10</span><span class="token punctuation">;</span>
 </code></pre>
-<h3 id="4-2-统计视频类别热度-Top10"><a href="#4-2-统计视频类别热度-Top10" class="headerlink" title="4.2 统计视频类别热度 Top10"></a>4.2 统计视频类别热度 Top10</h3><pre class=" language-sql"><code class="language-sql">
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210829133543921.png" alt="案例结果"></p>
+<h3 id="4-2-统计视频类别热度-Top10"><a href="#4-2-统计视频类别热度-Top10" class="headerlink" title="4.2 统计视频类别热度 Top10"></a>4.2 统计视频类别热度 Top10</h3><p>思路： </p>
+<p>（1）即统计每个类别有多少个视频，显示出包含视频最多的前 10 个类别。 </p>
+<p>（2）我们需要按照类别 group by 聚合，然后 count 组内的 videoId 个数即可。 </p>
+<p>（3）因为当前表结构为：一个视频对应一个或多个类别。所以如果要 group by 类别， 需要先将类别进行列转行(展开)，然后再进行 count 即可。 </p>
+<p>（4）最后按照热度排序，显示前 10 条。</p>
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">SELECT</span>
+ t1<span class="token punctuation">.</span>category_name <span class="token punctuation">,</span>
+ <span class="token function">COUNT</span><span class="token punctuation">(</span>t1<span class="token punctuation">.</span>videoId<span class="token punctuation">)</span> hot
+<span class="token keyword">FROM</span>
+<span class="token punctuation">(</span>
+<span class="token keyword">SELECT</span>
+ videoId<span class="token punctuation">,</span>
+ category_name
+<span class="token keyword">FROM</span>
+ gulivideo_orc
+lateral <span class="token keyword">VIEW</span> explode<span class="token punctuation">(</span>category<span class="token punctuation">)</span> gulivideo_orc_tmp <span class="token keyword">AS</span> category_name
+<span class="token punctuation">)</span> t1
+<span class="token keyword">GROUP</span> <span class="token keyword">BY</span>
+ t1<span class="token punctuation">.</span>category_name
+<span class="token keyword">ORDER</span> <span class="token keyword">BY</span>
+ hot
+<span class="token keyword">DESC</span>
+<span class="token keyword">LIMIT</span> <span class="token number">10</span><span class="token punctuation">;</span>
 </code></pre>
-<h3 id="4-3-统计出视频观看数最高的-20-个视频的所属类别以及类别包含-Top20-视频的个数"><a href="#4-3-统计出视频观看数最高的-20-个视频的所属类别以及类别包含-Top20-视频的个数" class="headerlink" title="4.3 统计出视频观看数最高的 20 个视频的所属类别以及类别包含 Top20 视频的个数"></a>4.3 统计出视频观看数最高的 20 个视频的所属类别以及类别包含 Top20 视频的个数</h3><pre class=" language-sql"><code class="language-sql">
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210829134211821.png" alt="结果展示"></p>
+<h3 id="4-3-统计出视频观看数最高的-20-个视频的所属类别以及类别包含-Top20-视频的个数"><a href="#4-3-统计出视频观看数最高的-20-个视频的所属类别以及类别包含-Top20-视频的个数" class="headerlink" title="4.3 统计出视频观看数最高的 20 个视频的所属类别以及类别包含 Top20 视频的个数"></a>4.3 统计出视频观看数最高的 20 个视频的所属类别以及类别包含 Top20 视频的个数</h3><p>思路： </p>
+<p>（1）先找到观看数最高的 20 个视频所属条目的所有信息，降序排列 </p>
+<p>（2）把这 20 条信息中的 category 分裂出来(列转行) </p>
+<p>（3）最后查询视频分类名称和该分类下有多少个 Top20 的视频</p>
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">SELECT</span> 
+ t2<span class="token punctuation">.</span>category_name<span class="token punctuation">,</span>
+ <span class="token function">COUNT</span><span class="token punctuation">(</span>t2<span class="token punctuation">.</span>videoId<span class="token punctuation">)</span> video_sum
+<span class="token keyword">FROM</span>
+<span class="token punctuation">(</span>
+<span class="token keyword">SELECT</span>
+ t1<span class="token punctuation">.</span>videoId<span class="token punctuation">,</span>
+ category_name
+<span class="token keyword">FROM</span>
+<span class="token punctuation">(</span>
+<span class="token keyword">SELECT</span>
+ videoId<span class="token punctuation">,</span>
+ views <span class="token punctuation">,</span>
+ category
+<span class="token keyword">FROM</span>
+ gulivideo_orc
+<span class="token keyword">ORDER</span> <span class="token keyword">BY</span>
+ views
+<span class="token keyword">DESC</span>
+<span class="token keyword">LIMIT</span> <span class="token number">20</span>
+<span class="token punctuation">)</span> t1
+lateral <span class="token keyword">VIEW</span> explode<span class="token punctuation">(</span>t1<span class="token punctuation">.</span>category<span class="token punctuation">)</span> t1_tmp <span class="token keyword">AS</span> category_name
+<span class="token punctuation">)</span> t2
+<span class="token keyword">GROUP</span> <span class="token keyword">BY</span> t2<span class="token punctuation">.</span>category_name<span class="token punctuation">;</span>
 </code></pre>
-<h3 id="4-4-统计视频观看数-Top50-所关联视频的所属类别排序"><a href="#4-4-统计视频观看数-Top50-所关联视频的所属类别排序" class="headerlink" title="4.4 统计视频观看数 Top50 所关联视频的所属类别排序"></a>4.4 统计视频观看数 Top50 所关联视频的所属类别排序</h3><pre class=" language-sql"><code class="language-sql">
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210829134303809.png" alt="结果展示"></p>
+<h3 id="4-4-统计视频观看数-Top50-所关联视频的所属类别排序"><a href="#4-4-统计视频观看数-Top50-所关联视频的所属类别排序" class="headerlink" title="4.4 统计视频观看数 Top50 所关联视频的所属类别排序"></a>4.4 统计视频观看数 Top50 所关联视频的所属类别排序</h3><pre class=" language-sql"><code class="language-sql"><span class="token keyword">SELECT</span>
+ t6<span class="token punctuation">.</span>category_name<span class="token punctuation">,</span>
+ t6<span class="token punctuation">.</span>video_sum<span class="token punctuation">,</span>
+ rank<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">over</span><span class="token punctuation">(</span><span class="token keyword">ORDER</span> <span class="token keyword">BY</span> t6<span class="token punctuation">.</span>video_sum <span class="token keyword">DESC</span> <span class="token punctuation">)</span> rk
+<span class="token keyword">FROM</span>
+<span class="token punctuation">(</span>
+<span class="token keyword">SELECT</span>
+ t5<span class="token punctuation">.</span>category_name<span class="token punctuation">,</span>
+ <span class="token function">COUNT</span><span class="token punctuation">(</span>t5<span class="token punctuation">.</span>relatedid_id<span class="token punctuation">)</span> video_sum
+<span class="token keyword">FROM</span>
+<span class="token punctuation">(</span>
+<span class="token keyword">SELECT</span>
+ t4<span class="token punctuation">.</span>relatedid_id<span class="token punctuation">,</span>
+ category_name
+<span class="token keyword">FROM</span>
+<span class="token punctuation">(</span>
+<span class="token keyword">SELECT</span>
+ t2<span class="token punctuation">.</span>relatedid_id <span class="token punctuation">,</span>
+ t3<span class="token punctuation">.</span>category
+<span class="token keyword">FROM</span>
+<span class="token punctuation">(</span>
+<span class="token keyword">SELECT</span>
+ relatedid_id
+<span class="token keyword">FROM</span>
+<span class="token punctuation">(</span>
+<span class="token keyword">SELECT</span>
+ videoId<span class="token punctuation">,</span>
+ views<span class="token punctuation">,</span>
+ relatedid
+<span class="token keyword">FROM</span>
+ gulivideo_orc
+<span class="token keyword">ORDER</span> <span class="token keyword">BY</span>
+ views
+<span class="token keyword">DESC</span>
+<span class="token keyword">LIMIT</span> <span class="token number">50</span>
+<span class="token punctuation">)</span>t1
+lateral <span class="token keyword">VIEW</span> explode<span class="token punctuation">(</span>t1<span class="token punctuation">.</span>relatedid<span class="token punctuation">)</span> t1_tmp <span class="token keyword">AS</span> relatedid_id
+<span class="token punctuation">)</span>t2
+<span class="token keyword">JOIN</span>
+ gulivideo_orc t3
+<span class="token keyword">ON</span>
+t2<span class="token punctuation">.</span>relatedid_id <span class="token operator">=</span> t3<span class="token punctuation">.</span>videoId
+<span class="token punctuation">)</span> t4
+lateral <span class="token keyword">VIEW</span> explode<span class="token punctuation">(</span>t4<span class="token punctuation">.</span>category<span class="token punctuation">)</span> t4_tmp <span class="token keyword">AS</span> category_name
+<span class="token punctuation">)</span> t5
+<span class="token keyword">GROUP</span> <span class="token keyword">BY</span>
+ t5<span class="token punctuation">.</span>category_name
+<span class="token keyword">ORDER</span> <span class="token keyword">BY</span>
+ video_sum
+<span class="token keyword">DESC</span>
+<span class="token punctuation">)</span> t6<span class="token punctuation">;</span>
 </code></pre>
-<h3 id="4-5-统计每个类别中的视频热度-Top10，以-Music-为例"><a href="#4-5-统计每个类别中的视频热度-Top10，以-Music-为例" class="headerlink" title="4.5 统计每个类别中的视频热度 Top10，以 Music 为例"></a>4.5 统计每个类别中的视频热度 Top10，以 Music 为例</h3><pre class=" language-sql"><code class="language-sql">
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210829134352131.png" alt="结果展示"></p>
+<h3 id="4-5-统计每个类别中的视频热度-Top10，以-Music-为例"><a href="#4-5-统计每个类别中的视频热度-Top10，以-Music-为例" class="headerlink" title="4.5 统计每个类别中的视频热度 Top10，以 Music 为例"></a>4.5 统计每个类别中的视频热度 Top10，以 Music 为例</h3><p>思路： </p>
+<p>（1）要想统计 Music 类别中的视频热度 Top10，需要先找到 Music 类别，那么就需要将 category 展开，所以可以创建一张表用于存放 categoryId 展开的数据。 </p>
+<p>（2）向 category 展开的表中插入数据。 </p>
+<p>（3）统计对应类别（Music）中的视频热度。 </p>
+<p>统计 Music 类别的 Top10（也可以统计其他）</p>
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">SELECT</span>
+ t1<span class="token punctuation">.</span>videoId<span class="token punctuation">,</span>
+ t1<span class="token punctuation">.</span>views<span class="token punctuation">,</span>
+ t1<span class="token punctuation">.</span>category_name
+<span class="token keyword">FROM</span>
+<span class="token punctuation">(</span>
+<span class="token keyword">SELECT</span>
+ videoId<span class="token punctuation">,</span>
+ views<span class="token punctuation">,</span>
+ category_name
+<span class="token keyword">FROM</span> gulivideo_orc
+lateral <span class="token keyword">VIEW</span> explode<span class="token punctuation">(</span>category<span class="token punctuation">)</span> gulivideo_orc_tmp <span class="token keyword">AS</span> category_name
+<span class="token punctuation">)</span>t1
+<span class="token keyword">WHERE</span>
+ t1<span class="token punctuation">.</span>category_name <span class="token operator">=</span> <span class="token string">"Music"</span>
+<span class="token keyword">ORDER</span> <span class="token keyword">BY</span>
+ t1<span class="token punctuation">.</span>views
+<span class="token keyword">DESC</span>
+<span class="token keyword">LIMIT</span> <span class="token number">10</span><span class="token punctuation">;</span>
 </code></pre>
-<h3 id="4-6-统计每个类别视频观看数-Top10"><a href="#4-6-统计每个类别视频观看数-Top10" class="headerlink" title="4.6 统计每个类别视频观看数 Top10"></a>4.6 统计每个类别视频观看数 Top10</h3><pre class=" language-sql"><code class="language-sql">
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210829134507742.png" alt="结果展示"></p>
+<h3 id="4-6-统计每个类别视频观看数-Top10"><a href="#4-6-统计每个类别视频观看数-Top10" class="headerlink" title="4.6 统计每个类别视频观看数 Top10"></a>4.6 统计每个类别视频观看数 Top10</h3><pre class=" language-sql"><code class="language-sql"><span class="token keyword">SELECT</span>
+ t2<span class="token punctuation">.</span>videoId<span class="token punctuation">,</span>
+ t2<span class="token punctuation">.</span>views<span class="token punctuation">,</span>
+ t2<span class="token punctuation">.</span>category_name<span class="token punctuation">,</span>
+ t2<span class="token punctuation">.</span>rk
+<span class="token keyword">FROM</span>
+<span class="token punctuation">(</span>
+<span class="token keyword">SELECT</span>
+ t1<span class="token punctuation">.</span>videoId<span class="token punctuation">,</span>
+ t1<span class="token punctuation">.</span>views<span class="token punctuation">,</span>
+ t1<span class="token punctuation">.</span>category_name<span class="token punctuation">,</span>
+ rank<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">over</span><span class="token punctuation">(</span><span class="token keyword">PARTITION</span> <span class="token keyword">BY</span> t1<span class="token punctuation">.</span>category_name <span class="token keyword">ORDER</span> <span class="token keyword">BY</span> t1<span class="token punctuation">.</span>views <span class="token keyword">DESC</span> <span class="token punctuation">)</span> rk
+<span class="token keyword">FROM</span>
+<span class="token punctuation">(</span>
+<span class="token keyword">SELECT</span>
+ videoId<span class="token punctuation">,</span>
+ views<span class="token punctuation">,</span>
+ category_name
+<span class="token keyword">FROM</span> gulivideo_orc
+lateral <span class="token keyword">VIEW</span> explode<span class="token punctuation">(</span>category<span class="token punctuation">)</span> gulivideo_orc_tmp <span class="token keyword">AS</span> category_name
+<span class="token punctuation">)</span>t1
+<span class="token punctuation">)</span>t2
+<span class="token keyword">WHERE</span> t2<span class="token punctuation">.</span>rk <span class="token operator">&lt;=</span><span class="token number">10</span> <span class="token keyword">limit</span> <span class="token number">10</span><span class="token punctuation">;</span>
 </code></pre>
-<h3 id="4-7-统计上传视频最多的用户-Top10以及他们上传的视频-观看次数在前-20-的视频"><a href="#4-7-统计上传视频最多的用户-Top10以及他们上传的视频-观看次数在前-20-的视频" class="headerlink" title="4.7 统计上传视频最多的用户 Top10以及他们上传的视频 观看次数在前 20 的视频"></a>4.7 统计上传视频最多的用户 Top10以及他们上传的视频 观看次数在前 20 的视频</h3><pre class=" language-sql"><code class="language-sql">
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210829134601089.png" alt="结果展示"></p>
+<h3 id="4-7-统计上传视频最多的用户-Top10以及他们上传的视频-观看次数在前-20-的视频"><a href="#4-7-统计上传视频最多的用户-Top10以及他们上传的视频-观看次数在前-20-的视频" class="headerlink" title="4.7 统计上传视频最多的用户 Top10以及他们上传的视频 观看次数在前 20 的视频"></a>4.7 统计上传视频最多的用户 Top10以及他们上传的视频 观看次数在前 20 的视频</h3><p>思路：</p>
+<p> （1）求出上传视频最多的 10 个用户 </p>
+<p>（2）关联 gulivideo_orc 表，求出这 10 个用户上传的所有的视频，按照观看数取前 20</p>
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">SELECT</span>
+ t2<span class="token punctuation">.</span>videoId<span class="token punctuation">,</span>
+ t2<span class="token punctuation">.</span>views<span class="token punctuation">,</span>
+ t2<span class="token punctuation">.</span>uploader
+<span class="token keyword">FROM</span>
+<span class="token punctuation">(</span>
+<span class="token keyword">SELECT</span>
+ uploader<span class="token punctuation">,</span>
+ videos
+<span class="token keyword">FROM</span> gulivideo_user_orc
+<span class="token keyword">ORDER</span> <span class="token keyword">BY</span>
+ videos
+<span class="token keyword">DESC</span>
+<span class="token keyword">LIMIT</span> <span class="token number">10</span>
+<span class="token punctuation">)</span> t1
+<span class="token keyword">JOIN</span> gulivideo_orc t2
+<span class="token keyword">ON</span> t1<span class="token punctuation">.</span>uploader <span class="token operator">=</span> t2<span class="token punctuation">.</span>uploader
+<span class="token keyword">ORDER</span> <span class="token keyword">BY</span>
+ t2<span class="token punctuation">.</span>views
+<span class="token keyword">DESC</span>
+<span class="token keyword">LIMIT</span> <span class="token number">20</span><span class="token punctuation">;</span>
 </code></pre>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210829134650961.png" alt="结果展示"></p>
 
                 
             </div>
