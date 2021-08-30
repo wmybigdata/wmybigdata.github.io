@@ -490,7 +490,7 @@
 <p>公共汇总粒度事实层（DWS）：以分析的主题对象作为建模驱动，基于上层的应用和产品的指标需求，构建公共粒度的汇总指标事实表，以宽表化手段物理化模型。构建命名规范、口径一致的统计指标，为上层提供公共指标，建立汇总宽表、明细事实表。</p>
 <p>公共汇总粒度事实层的表通常也被称为汇总逻辑表，用于存放派生指标数据。</p>
 <h2 id="四-ADS层"><a href="#四-ADS层" class="headerlink" title="四 ADS层"></a>四 ADS层</h2><p>数据应用层ADS（Application Data Service）：面向业务需求定制开发，存放数据产品个性化的统计指标数据。</p>
-<h2 id="五-逻辑分层架构"><a href="#五-逻辑分层架构" class="headerlink" title="五 逻辑分层架构"></a>五 逻辑分层架构</h2><p><img src="https://cdn.nlark.com/yuque/0/2021/png/8407327/1626350203232-7ff97992-930a-4064-8a68-eac0cffbaa94.png" alt="img"></p>
+<h2 id="五-逻辑分层架构"><a href="#五-逻辑分层架构" class="headerlink" title="五 逻辑分层架构"></a>五 逻辑分层架构</h2><p><img src="https://cdn.nlark.com/yuque/0/2021/png/8407327/1626350203232-7ff97992-930a-4064-8a68-eac0cffbaa94.png" alt="img1"></p>
 <h2 id="六-分层的好处"><a href="#六-分层的好处" class="headerlink" title="六 分层的好处"></a>六 分层的好处</h2><ul>
 <li><p>清晰数据结构：每一个数据分层都有它的作用域，这样我们在使用表的时候能更方便地定位和理解。</p>
 </li>
@@ -501,7 +501,7 @@
 <li><p>把复杂问题简单化：将一个复杂的任务分解成多个步骤来完成，每一层只处理单一的步骤，比较简单和容易理解。而且便于维护数据的准确性，当数据出现问题之后，可以不用修复所有的数据，只需要从有问题的步骤开始修复。</p>
 </li>
 </ul>
-<h2 id="七-数据流向"><a href="#七-数据流向" class="headerlink" title="七 数据流向"></a>七 数据流向</h2><p><img src="https://cdn.nlark.com/yuque/0/2021/png/8407327/1626350246414-50040f21-c68a-4711-b40a-75a46f5c8677.png" alt="img"></p>
+<h2 id="七-数据流向"><a href="#七-数据流向" class="headerlink" title="七 数据流向"></a>七 数据流向</h2><p><img src="https://cdn.nlark.com/yuque/0/2021/png/8407327/1626350246414-50040f21-c68a-4711-b40a-75a46f5c8677.png" alt="img2"></p>
 <ul>
 <li><p>正常流向：ODS-&gt;DWD-&gt;DW-&gt;DWS-&gt;ADS，当出现ODS-&gt;DWD-&gt;DWS-&gt;ADS这种关系时，说明主题域未覆盖全。应将DWD数据落到DW中，对于使用频度非常低的表允许DWD-&gt;DWS。</p>
 </li>
