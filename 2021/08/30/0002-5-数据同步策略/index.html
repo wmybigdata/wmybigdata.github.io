@@ -481,17 +481,17 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h1 id="0002-5-数据同步策略"><a href="#0002-5-数据同步策略" class="headerlink" title="0002-5-数据同步策略"></a>0002-5-数据同步策略</h1><h1 id=""><a href="#" class="headerlink" title=""></a><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/1626355927869-98d9803a-36a8-4c5f-a420-b76725063d2a.png" alt="img"></h1><h1 id="一-mysql数据准备"><a href="#一-mysql数据准备" class="headerlink" title="一 mysql数据准备"></a>一 mysql数据准备</h1><p>第一天 9月10号数据</p>
-<pre><code>1,待支付,2020-09-10 12:20:11,2020-09-10 12:20:11
-2,待支付,2020-09-10 14:20:11,2020-09-10 14:20:11
-3,待支付,2020-09-10 16:20:11,2020-09-10 16:20:11
+                <h1 id="0002-5-数据同步策略"><a href="#0002-5-数据同步策略" class="headerlink" title="0002-5-数据同步策略"></a>0002-5-数据同步策略</h1><h1 id=""><a href="#" class="headerlink" title=""></a><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210830175504552.png" alt="image-20210830175504552"></h1><h1 id="一-mysql数据准备"><a href="#一-mysql数据准备" class="headerlink" title="一 mysql数据准备"></a>一 mysql数据准备</h1><p>第一天 9月10号数据</p>
+<pre class=" language-sql"><code class="language-sql"><span class="token number">1</span><span class="token punctuation">,</span>待支付<span class="token punctuation">,</span><span class="token number">2020</span><span class="token operator">-</span><span class="token number">09</span><span class="token operator">-</span><span class="token number">10</span> <span class="token number">12</span>:<span class="token number">20</span>:<span class="token number">11</span><span class="token punctuation">,</span><span class="token number">2020</span><span class="token operator">-</span><span class="token number">09</span><span class="token operator">-</span><span class="token number">10</span> <span class="token number">12</span>:<span class="token number">20</span>:<span class="token number">11</span>
+<span class="token number">2</span><span class="token punctuation">,</span>待支付<span class="token punctuation">,</span><span class="token number">2020</span><span class="token operator">-</span><span class="token number">09</span><span class="token operator">-</span><span class="token number">10</span> <span class="token number">14</span>:<span class="token number">20</span>:<span class="token number">11</span><span class="token punctuation">,</span><span class="token number">2020</span><span class="token operator">-</span><span class="token number">09</span><span class="token operator">-</span><span class="token number">10</span> <span class="token number">14</span>:<span class="token number">20</span>:<span class="token number">11</span>
+<span class="token number">3</span><span class="token punctuation">,</span>待支付<span class="token punctuation">,</span><span class="token number">2020</span><span class="token operator">-</span><span class="token number">09</span><span class="token operator">-</span><span class="token number">10</span> <span class="token number">16</span>:<span class="token number">20</span>:<span class="token number">11</span><span class="token punctuation">,</span><span class="token number">2020</span><span class="token operator">-</span><span class="token number">09</span><span class="token operator">-</span><span class="token number">10</span> <span class="token number">16</span>:<span class="token number">20</span>:<span class="token number">11</span>
 </code></pre>
 <p>第二天 9月11号数据</p>
-<pre><code>1,待支付,2020-09-10 12:20:11,2020-09-10 12:20:11
-2,已支付,2020-09-10 14:20:11,2020-09-11 14:21:11
-3,已支付,2020-09-10 16:20:11,2020-09-11 16:21:11
-4,待支付,2020-09-11 12:20:11,2020-09-11 12:20:11
-5,待支付,2020-09-11 14:20:11,2020-09-11 14:20:11
+<pre class=" language-sql"><code class="language-sql"><span class="token number">1</span><span class="token punctuation">,</span>待支付<span class="token punctuation">,</span><span class="token number">2020</span><span class="token operator">-</span><span class="token number">09</span><span class="token operator">-</span><span class="token number">10</span> <span class="token number">12</span>:<span class="token number">20</span>:<span class="token number">11</span><span class="token punctuation">,</span><span class="token number">2020</span><span class="token operator">-</span><span class="token number">09</span><span class="token operator">-</span><span class="token number">10</span> <span class="token number">12</span>:<span class="token number">20</span>:<span class="token number">11</span>
+<span class="token number">2</span><span class="token punctuation">,</span>已支付<span class="token punctuation">,</span><span class="token number">2020</span><span class="token operator">-</span><span class="token number">09</span><span class="token operator">-</span><span class="token number">10</span> <span class="token number">14</span>:<span class="token number">20</span>:<span class="token number">11</span><span class="token punctuation">,</span><span class="token number">2020</span><span class="token operator">-</span><span class="token number">09</span><span class="token operator">-</span><span class="token number">11</span> <span class="token number">14</span>:<span class="token number">21</span>:<span class="token number">11</span>
+<span class="token number">3</span><span class="token punctuation">,</span>已支付<span class="token punctuation">,</span><span class="token number">2020</span><span class="token operator">-</span><span class="token number">09</span><span class="token operator">-</span><span class="token number">10</span> <span class="token number">16</span>:<span class="token number">20</span>:<span class="token number">11</span><span class="token punctuation">,</span><span class="token number">2020</span><span class="token operator">-</span><span class="token number">09</span><span class="token operator">-</span><span class="token number">11</span> <span class="token number">16</span>:<span class="token number">21</span>:<span class="token number">11</span>
+<span class="token number">4</span><span class="token punctuation">,</span>待支付<span class="token punctuation">,</span><span class="token number">2020</span><span class="token operator">-</span><span class="token number">09</span><span class="token operator">-</span><span class="token number">11</span> <span class="token number">12</span>:<span class="token number">20</span>:<span class="token number">11</span><span class="token punctuation">,</span><span class="token number">2020</span><span class="token operator">-</span><span class="token number">09</span><span class="token operator">-</span><span class="token number">11</span> <span class="token number">12</span>:<span class="token number">20</span>:<span class="token number">11</span>
+<span class="token number">5</span><span class="token punctuation">,</span>待支付<span class="token punctuation">,</span><span class="token number">2020</span><span class="token operator">-</span><span class="token number">09</span><span class="token operator">-</span><span class="token number">11</span> <span class="token number">14</span>:<span class="token number">20</span>:<span class="token number">11</span><span class="token punctuation">,</span><span class="token number">2020</span><span class="token operator">-</span><span class="token number">09</span><span class="token operator">-</span><span class="token number">11</span> <span class="token number">14</span>:<span class="token number">20</span>:<span class="token number">11</span>
 </code></pre>
 <p>对比mysql第一天和第二天的数据发现，第二天新增了订单id为4和5这两条数据，并且订单id为2和3的状态更新为了已支付</p>
 <h1 id="二-全量表"><a href="#二-全量表" class="headerlink" title="二 全量表"></a>二 全量表</h1><p>每天的所有的最新状态的数据。</p>
@@ -507,7 +507,7 @@
 <span class="token keyword">row</span> format delimited <span class="token keyword">fields</span> <span class="token keyword">terminated by</span> <span class="token string">','</span>
 <span class="token punctuation">;</span>
 </code></pre>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/1626355927869-98d9803a-36a8-4c5f-a420-b76725063d2a.png" alt="img"></p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210830175536168.png" alt="image-20210830175536168"></p>
 <pre class=" language-sql"><code class="language-sql"><span class="token keyword">create</span> <span class="token keyword">table</span> wedw_dwd<span class="token punctuation">.</span>order_info_df<span class="token punctuation">(</span>
  order_id     string    <span class="token keyword">COMMENT</span> <span class="token string">'订单id'</span>
 <span class="token punctuation">,</span>order_status string    <span class="token keyword">COMMENT</span> <span class="token string">'订单状态'</span>
@@ -527,7 +527,7 @@ order_id
 <span class="token keyword">from</span> wedw_ods<span class="token punctuation">.</span>order_info_20200910
 <span class="token punctuation">;</span>
 </code></pre>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/1626355927869-98d9803a-36a8-4c5f-a420-b76725063d2a.png" alt="img"></p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210830175549857.png" alt="image-20210830175549857"></p>
 <p>9月11号全量抽取到ods层</p>
 <pre class=" language-sql"><code class="language-sql"><span class="token keyword">create</span> <span class="token keyword">table</span> wedw_ods<span class="token punctuation">.</span>order_info_20200911<span class="token punctuation">(</span>
  order_id     string    <span class="token keyword">COMMENT</span> <span class="token string">'订单id'</span>
@@ -538,7 +538,7 @@ order_id
 <span class="token keyword">row</span> format delimited <span class="token keyword">fields</span> <span class="token keyword">terminated by</span> <span class="token string">','</span>
 <span class="token punctuation">;</span>
 </code></pre>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/1626355927869-98d9803a-36a8-4c5f-a420-b76725063d2a.png" alt="img"></p>
+<p><img src="C:/Users/wmy/AppData/Roaming/Typora/typora-user-images/image-20210830175604658.png" alt="image-20210830175604658"></p>
 <pre class=" language-sql"><code class="language-sql"><span class="token comment" spellcheck="true"># 把wedw_ods.order_info_20200911数据全量插到dwd层2020-09-11分区</span>
 <span class="token keyword">insert</span> overwrite <span class="token keyword">table</span> wedw_dwd<span class="token punctuation">.</span>order_info_df <span class="token keyword">partition</span><span class="token punctuation">(</span>date_id <span class="token operator">=</span> <span class="token string">'2020-09-11'</span><span class="token punctuation">)</span>
 <span class="token keyword">select</span>
@@ -549,14 +549,14 @@ order_id
 <span class="token keyword">from</span> wedw_ods<span class="token punctuation">.</span>order_info_20200911
 <span class="token punctuation">;</span>
 </code></pre>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/1626355927869-98d9803a-36a8-4c5f-a420-b76725063d2a.png" alt="img"></p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210830175627171.png" alt="image-20210830175627171"></p>
 <p>全量抽取，每个分区保留历史全量快照。</p>
 <h1 id="三-增量表"><a href="#三-增量表" class="headerlink" title="三 增量表"></a>三 增量表</h1><p>增量表：新增数据，增量数据是上次导出之后的新数据。</p>
 <p>1、记录每次增加的量，而不是总量；</p>
 <p>2、增量表，只报变化量，无变化不用报</p>
 <p>3、业务库表中需有主键及创建时间，修改时间</p>
 <p>9月10号全量抽取到ods层(全量初始化)</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/1626355927869-98d9803a-36a8-4c5f-a420-b76725063d2a.png" alt="img"></p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210830175659972.png" alt="image-20210830175659972"></p>
 <pre class=" language-sql"><code class="language-sql"><span class="token comment" spellcheck="true"># 把wedw_ods.order_info_20200910数据全量插到dwd层2020-09-10分区</span>
 <span class="token keyword">insert</span> overwrite <span class="token keyword">table</span> wedw_dwd<span class="token punctuation">.</span>order_info_di <span class="token keyword">partition</span><span class="token punctuation">(</span>date_id <span class="token operator">=</span> <span class="token string">'2020-09-10'</span><span class="token punctuation">)</span>
 <span class="token keyword">select</span>
@@ -567,9 +567,9 @@ order_id
 <span class="token keyword">from</span> wedw_ods<span class="token punctuation">.</span>order_info_20200910
 <span class="token punctuation">;</span>
 </code></pre>
-<p><img src="https://cdn.nlark.com/yuque/0/2021/png/8407327/1626355956101-4e1a7717-d1ed-46d8-ab6d-e9a87a5e646f.png" alt="img"></p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210830175712697.png" alt="image-20210830175712697"></p>
 <p>9月11号抽取更新的数据及当天新增的数据，即订单id为2,3,4,5的数据</p>
-<p><img src="https://cdn.nlark.com/yuque/0/2021/png/8407327/1626355977314-b95f5817-450a-4f74-b9d0-f865909d8e69.png" alt="img"></p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210830175723229.png" alt="image-20210830175723229"></p>
 <p>wedw_dwd.order_info_di表9月10号的分区数据与wedw_ods.order_info_20200911增量抽取的数据合并，有2种方案</p>
 <p>a.两个表通过主键关联，dwd表存在并且ods表不存在的数据</p>
 <p>union all 一下wedw_ods.order_info_20200911表所有的数据，即全量数据插入到dwd表的9月11号的分区</p>
@@ -596,7 +596,7 @@ wedw_ods<span class="token punctuation">.</span>order_info_20200911 t2
 wedw_ods<span class="token punctuation">.</span>order_info_20200911
 <span class="token punctuation">;</span>
 </code></pre>
-<p><img src="https://cdn.nlark.com/yuque/0/2021/png/8407327/1626356021537-45e8d1f0-7869-437a-9341-12ef40d43ff3.png" alt="img"></p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210830175738461.png" alt="image-20210830175738461"></p>
 <p>b.两个表数据union all一下，再根据order_id去重(根据order分组，更新时间降序，取第一条)</p>
 <pre class=" language-sql"><code class="language-sql"><span class="token keyword">insert</span> overwrite <span class="token keyword">table</span> wedw_dwd<span class="token punctuation">.</span>order_info_di <span class="token keyword">partition</span><span class="token punctuation">(</span>date_id <span class="token operator">=</span> <span class="token string">'2020-09-11'</span><span class="token punctuation">)</span>
 <span class="token keyword">select</span>
@@ -637,7 +637,7 @@ wedw_ods<span class="token punctuation">.</span>order_info_20200911
 <span class="token keyword">where</span> t2<span class="token punctuation">.</span>rn <span class="token operator">=</span> <span class="token number">1</span>
 <span class="token punctuation">;</span>
 </code></pre>
-<p><img src="https://cdn.nlark.com/yuque/0/2021/png/8407327/1626356063209-bc806fbf-aa7f-4576-93c8-65d3b52c9403.png" alt="img"></p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210830175756494.png" alt="image-20210830175756494"></p>
 <p>特殊增量表：da表，每天的分区就是当天的数据，其数据特点就是数据产生后就不会发生变化，如日志表。</p>
 <h1 id="四-拉链表"><a href="#四-拉链表" class="headerlink" title="四 拉链表"></a>四 拉链表</h1><p>维护历史状态，以及最新状态数据</p>
 <p>适用情况：</p>
@@ -661,7 +661,7 @@ wedw_ods<span class="token punctuation">.</span>order_info_20200911
 <span class="token keyword">row</span> format delimited <span class="token keyword">fields</span> <span class="token keyword">terminated by</span> <span class="token string">','</span>
 <span class="token punctuation">;</span>
 </code></pre>
-<p><img src="https://cdn.nlark.com/yuque/0/2021/png/8407327/1626356112237-603bd145-3c80-4502-bcf5-45e54cddf8be.png" alt="img"></p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210830175813111.png" alt="image-20210830175813111"></p>
 <p>建立dwd层拉链表</p>
 <p>增加两个字段：<br>start_dt(表示该条记录的生命周期开始时间——周期快照时的状态)<br>end_dt(该条记录的生命周期结束时间)</p>
 <p>end_dt= ‘9999-12-31’ 表示该条记录目前处于有效状态</p>
@@ -690,9 +690,9 @@ partitioned <span class="token keyword">by</span> <span class="token punctuation
 wedw_ods<span class="token punctuation">.</span>order_info_20200910
 <span class="token punctuation">;</span>
 </code></pre>
-<p><img src="https://cdn.nlark.com/yuque/0/2021/png/8407327/1626356157351-6ca39bfd-589a-4e32-9331-4dad45220f8e.png" alt="img"></p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210830175837695.png" alt="image-20210830175837695"></p>
 <p>9月11号抽取更新的数据及当天新增的数据到ods层，即订单id为2,3,4,5的数据</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/1626355774395-33091aff-f966-48c2-a154-939624f0f4c4.png" alt="img"></p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210830175847495.png" alt="image-20210830175847495"></p>
 <pre class=" language-sql"><code class="language-sql"><span class="token keyword">insert</span> overwrite <span class="token keyword">table</span> wedw_dwd<span class="token punctuation">.</span>order_info_dz <span class="token keyword">partition</span><span class="token punctuation">(</span>date_id <span class="token operator">=</span> <span class="token string">'2020-09-11'</span><span class="token punctuation">)</span>
 <span class="token keyword">select</span>
  t1<span class="token punctuation">.</span>order_id    
@@ -728,7 +728,7 @@ date_id <span class="token operator">=</span> <span class="token string">'2020-0
 <span class="token operator">and</span> end_dt <span class="token operator">=</span><span class="token string">'9999-12-31'</span>
 <span class="token punctuation">;</span>
 </code></pre>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/1626355774395-33091aff-f966-48c2-a154-939624f0f4c4.png" alt="img"></p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210830175901363.png" alt="image-20210830175901363"></p>
 <p>查询9月10号历史快照:</p>
 <pre class=" language-sql"><code class="language-sql"><span class="token keyword">select</span> 
 <span class="token operator">*</span> 
@@ -740,7 +740,7 @@ date_id <span class="token operator">=</span> <span class="token string">'2020-0
 <span class="token operator">and</span> end_dt <span class="token operator">>=</span><span class="token string">'2020-09-10'</span>
 <span class="token punctuation">;</span>
 </code></pre>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/1626355774395-33091aff-f966-48c2-a154-939624f0f4c4.png" alt="img"></p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210830175915527.png" alt="image-20210830175915527"></p>
 <p>查询9月11号历史快照:</p>
 <pre class=" language-sql"><code class="language-sql"><span class="token keyword">select</span> 
 <span class="token operator">*</span> 
@@ -752,7 +752,7 @@ date_id <span class="token operator">=</span> <span class="token string">'2020-0
 <span class="token operator">and</span> end_dt <span class="token operator">>=</span><span class="token string">'2020-09-11'</span>
 <span class="token punctuation">;</span>
 </code></pre>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/1626355774395-33091aff-f966-48c2-a154-939624f0f4c4.png" alt="img"></p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210830175932702.png" alt="image-20210830175932702"></p>
 <h1 id="五-总结"><a href="#五-总结" class="headerlink" title="五 总结"></a>五 总结</h1><p>在工作中，其实上述3种表都是很有可能会用到的，那么我们应该怎么选择呢？</p>
 <ul>
 <li><p>如果数据量不是很大(不超过20W)且预估后续增长的非常慢，可以考虑全量表抽取，这是最简便的方法</p>

@@ -485,22 +485,23 @@
 <p>在一些情况下，保留历史数据没有什么分析价值，而在另一些情况下,保留历史数据是非常重要的</p>
 <h1 id="二-解决方案"><a href="#二-解决方案" class="headerlink" title="二 解决方案"></a>二 解决方案</h1><h2 id="2-1-重写维度值"><a href="#2-1-重写维度值" class="headerlink" title="2.1 重写维度值"></a>2.1 重写维度值</h2><p>在维度表中，仅需以当前值重写先前存在的值，不需要触碰事实表</p>
 <p>缺点：如果业务需要准确的跟踪历史变化，这种方案是没法实现的，并且在以后想改变是非常困难的</p>
-<p><img src="https://cdn.nlark.com/yuque/0/2021/png/8407327/1626356823183-fc6d8120-cc76-47ac-9ebc-69068a89ff3a.png" alt="img"></p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210830180059221.png" alt="image-20210830180059221"></p>
 <p>修改后：</p>
-<p><img src="https://cdn.nlark.com/yuque/0/2021/png/8407327/1626356832098-d33c2bdc-4f22-461f-91c1-02bc1b17d402.png" alt="img"></p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210830180111798.png" alt="image-20210830180111798"></p>
 <h2 id="2-2-插入新的维度行"><a href="#2-2-插入新的维度行" class="headerlink" title="2.2 插入新的维度行"></a>2.2 插入新的维度行</h2><p>插入新的维度行。采用此种方式，保留历史数据，</p>
 <p>维度值变化前的事实和过去的维度值关联，维度值变化后的事实和当前的维度值关联</p>
 <p>缺点：虽然此方案能够区分历史情况，但是该方式不能将变化前后记录的事实归一为变化前的维度或者归一为变化后的维度</p>
-<p><img src="https://cdn.nlark.com/yuque/0/2021/png/8407327/1626356853384-f7d42536-9e2e-4d71-88ba-d5a6e666de04.png" alt="img"></p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210830180140766.png" alt="image-20210830180140766"></p>
 <h2 id="2-3-添加维度列"><a href="#2-3-添加维度列" class="headerlink" title="2.3 添加维度列"></a>2.3 添加维度列</h2><p>有些是只保留最新的维度值和最近的维度值，也有的是维度值一有变化就新增一个属性字段。都不是很好的解决方案</p>
-<p>变化前：<img src="https://cdn.nlark.com/yuque/0/2021/png/8407327/1626356878860-5591a0eb-834d-4b07-9971-f2001b01e13a.png" alt="img"></p>
+<p>变化前：</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210830180153135.png" alt="image-20210830180153135"></p>
 <p>变化后：</p>
-<p><img src="https://cdn.nlark.com/yuque/0/2021/png/8407327/1626356896286-7726d255-c8a0-40a2-a2db-b2b7e7e8b2b4.png" alt="img"></p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210830180202319.png" alt="image-20210830180202319"></p>
 <h2 id="2-4-拉链表处理"><a href="#2-4-拉链表处理" class="headerlink" title="2.4 拉链表处理"></a>2.4 拉链表处理</h2><p>这是精确跟踪缓慢变化维度属性的主要技术，因为新维度行能够自动划分事实表的历史，所以这是一项非常好的技术</p>
 <p>变化前：</p>
-<p><img src="https://cdn.nlark.com/yuque/0/2021/png/8407327/1626356923709-bd98e7b6-bff1-4455-8fe6-86fa87d55c52.png" alt="img"></p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210830180215495.png" alt="image-20210830180215495"></p>
 <p>变化后：</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/1626356931386-1793dc6f-1aae-4d6c-a0cf-0958f02d56bc.png" alt="img"></p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210830180226056.png" alt="image-20210830180226056"></p>
 
                 
             </div>
