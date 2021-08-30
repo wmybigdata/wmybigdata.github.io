@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="hbase数据写流程, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
+    <meta name="keywords" content="Rowkey如何设计, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
     <meta name="description" content="本网站是个人兴趣爱好，总结分享经验，记录生活点滴的平台，希望在以后的学习旅途中，走出自己的风景。">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -16,7 +16,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>hbase数据写流程 | 情深骚明大数据之旅</title>
+    <title>Rowkey如何设计 | 情深骚明大数据之旅</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -314,12 +314,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/12.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/21.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">hbase数据写流程</h1>
+                    <h1 class="description center-align post-title">Rowkey如何设计</h1>
                 </div>
             </div>
         </div>
@@ -433,25 +433,12 @@
             <div class="row tag-cate">
                 <div class="col s7">
                     
-                    <div class="article-tag">
-                        
-                            <a href="/tags/hbase/">
-                                <span class="chip bg-color">hbase</span>
-                            </a>
-                        
-                    </div>
+                          <div class="article-tag">
+                            <span class="chip bg-color">无标签</span>
+                          </div>
                     
                 </div>
                 <div class="col s5 right-align">
-                    
-                    <div class="post-cate">
-                        <i class="fas fa-bookmark fa-fw icon-category"></i>
-                        
-                            <a href="/categories/hbase/" class="post-category">
-                                hbase
-                            </a>
-                        
-                    </div>
                     
                 </div>
             </div>
@@ -481,76 +468,7 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h1 id="hbase数据写流程"><a href="#hbase数据写流程" class="headerlink" title="hbase数据写流程"></a>hbase数据写流程</h1><h2 id="说明"><a href="#说明" class="headerlink" title="说明"></a>说明</h2><pre class=" language-properties"><code class="language-properties"><span class="token attr-name">众所周知，HBase默认适用于写多读少的应用，正是依赖于它相当出色的写入性能：一个100台RS的集群可以轻松地支撑每天10T</span> <span class="token attr-value">的写入量。</span>
-当然，为了支持更高吞吐量的写入，HBase还在不断地进行优化和修正，这篇文章结合0.98版本的源码全面地分析HBase的写入流程，
-<span class="token attr-name">全文分为三个部分</span><span class="token punctuation">:</span>
-    第一部分介绍客户端的写入流程
-    第二部分介绍服务器端的写入流程，
-    最后再重点分析WAL的工作原理（注：从服务器端的角度理解，HBase写入分为两个阶段，
-    第一阶段数据会被写入memstore，并且会执行WAL的写入；
-    第二阶段会将memstore的中的数据集中flush到磁盘，本文主要集中分析第一阶段的相关细节）。
-</code></pre>
-<h2 id="客户端流程解析"><a href="#客户端流程解析" class="headerlink" title="客户端流程解析"></a>客户端流程解析</h2><p>（1）用户提交put请求后，HBase客户端会将put请求添加到本地buffer中，符合一定条件就会通过AsyncProcess异步批量提交。HBase默认设置autoflush=true，表示put请求直接会提交给服务器进行处理；用户可以设置autoflush=false，这样的话put请求会首先放到本地buffer，等到本地buffer大小超过一定阈值（默认为2M，可以通过配置文件配置）之后才会提交。很显然，后者采用group commit机制提交请求，可以极大地提升写入性能，但是因为没有保护机制，如果客户端崩溃的话会导致提交的请求丢失。</p>
-<p>（2）在提交之前，HBase会在元数据表.meta.中根据rowkey找到它们归属的region server，这个定位的过程是通过HConnection 的locateRegion方法获得的。如果是批量请求的话还会把这些rowkey按照HRegionLocation分组，每个分组可以对应一次RPC请求。</p>
-<p> 3 ）HBase 会为每个HRegionLocation 构造一个远程RPC 请求MultiServerCallable<row> ， 然后通过rpcCallerFactory.<multiresponse> newCaller()执行调用，忽略掉失败重新提交和错误处理，客户端的提交操作到此结束。****服务器端流程解析****服务器端RegionServer接收到客户端的写入请求后，首先会反序列化为Put对象，然后执行各种检查操作，比如检查region是否是只读、memstore大小是否超过blockingMemstoreSize等。检查完成之后，就会执行如下核心操作：</multiresponse></row></p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210830112300412.png" alt="客户端解析流程"></p>
-<p>（1） 获取行锁、Region更新共享锁： HBase中使用行锁保证对同一行数据的更新都是互斥操作，用以保证更新的原子性，要么更新成功，要么失败。</p>
-<p>（2） 开始写事务：获取write number，用于实现MVCC，实现数据的非锁定读，在保证读写一致性的前提下提高读取性能。</p>
-<p>（3） 写缓存memstore：HBase中每个列族都会对应一个store，用来存储该列族数据。每个store都会有个写缓存memstore，用于缓存写入数据。HBase并不会直接将数据落盘，而是先写入缓存，等缓存满足一定大小之后再一起落盘。</p>
-<p>（4） Append HLog：HBase使用WAL机制保证数据可靠性，即首先写日志再写缓存，即使发生宕机，也可以通过恢复HLog还原出原始数据。该步骤就是将数据构造为WALEdit对象，然后顺序写入HLog中，此时不需要执行sync操作。0.98版本采用了新的写线程模式实现HLog日志的写入，可以使得整个数据更新性能得到极大提升，具体原理见下一个章节。</p>
-<p>（5）释放行锁以及共享锁</p>
-<p>（6）Sync HLog真正sync到HDFS，在释放行锁之后执行sync操作是为了尽量减少持锁时间，提升写性能。如果Sync失败，执行回滚操作将memstore中已经写入的数据移除。</p>
-<p> （7） 结束写事务：此时该线程的更新操作才会对其他读请求可见，更新才实际生效。具体分析见上一篇文章《HBase - 并发控制深度解析》</p>
-<p>（8） flush memstore：当写缓存满64M之后，会启动flush线程将数据刷新到硬盘。刷新操作涉及到HFile相关结构，后面会详细对此进行介绍。</p>
-<h2 id="WAL机制解析"><a href="#WAL机制解析" class="headerlink" title="WAL机制解析"></a>WAL机制解析</h2><p> WAL(Write-Ahead Logging)是一种高效的日志算法，几乎是所有非内存数据库提升写性能的不二法门，基本原理是在数据写入之前首先顺序写入日志，然后再写入缓存，等到缓存写满之后统一落盘。之所以能够提升写性能，是因为WAL将一次随机写转化为了一次顺序写加一次内存写。提升写性能的同时，WAL可以保证数据的可靠性，即在任何情况下数据不丢失。假如一次写入完成之后发生了宕机，即使所有缓存中的数据丢失，也可以通过恢复日志还原出丢失的数据。</p>
-<h3 id="WAL-持-久-化-等-级"><a href="#WAL-持-久-化-等-级" class="headerlink" title="WAL 持 久 化 等 级"></a>WAL 持 久 化 等 级</h3><p>HBase中可以通过设置WAL的持久化等级决定是否开启WAL机制、以及HLog的落盘方式。WAL的持久化等级分为如下四个等级：</p>
-<ol>
-<li><p>SKIP_WAL：只写缓存，不写HLog日志。这种方式因为只写内存，因此可以极大的提升写入性能，但是数据有丢失的风险。在实际应用过程中并不建议设置此等级，除非确认不要求数据的可靠性。</p>
-</li>
-<li><p>ASYNC_WAL：异步将数据写入HLog日志中。</p>
-</li>
-<li><p>SYNC_WAL：同步将数据写入日志文件中，需要注意的是数据只是被写入文件系统中，并没有真正落盘。</p>
-</li>
-<li><p>FSYNC_WAL：同步将数据写入日志文件并强制落盘。最严格的日志写入等级，可以保证数据不会丢失，但是性能相对比较差。</p>
-</li>
-<li><p>USER_DEFAULT：默认如果用户没有指定持久化等级，HBase使用SYNC_WAL等级持久化数据。</p>
-</li>
-</ol>
-<p>用户可以通过客户端设置WAL持久化等级，代码：put.setDurability(Durability. SYNC_WAL ); </p>
-<h3 id="HLog数据结构"><a href="#HLog数据结构" class="headerlink" title="HLog数据结构"></a>HLog数据结构</h3><p>HBase中，WAL的实现类为HLog，每个Region Server拥有一个HLog日志，所有region的写入都是写到同一个HLog。下图表示同一个Region Server中的3个 region 共享一个HLog。当数据写入时，是将数据对&lt;HLogKey,WALEdit&gt;按照顺序追加到HLog 中，以获取最好的写入性能。</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210830113150156.png" alt="HLog数据结构"></p>
-<p>上图中HLogKey主要存储了log sequence number，更新时间 write time，region name，表名table name以及cluster ids。其中log sequncece number作为HFile中一个重要的元数据，和HLog的生命周期息息相关，后续章节会详细介绍；region name和table name分别表征该段日志属于哪个region以及哪张表；cluster ids用于将日志复制到集群中其他机器上。</p>
-<p>WALEdit用来表示一个事务中的更新集合，在之前的版本，如果一个事务中对一行row R中三列c1，c2，c3分别做了修改，那么hlog中会有3个对应的日志片段如下所示：</p>
-<p><logseq3-for-edit3>:<keyvalue-for-edit-c3></keyvalue-for-edit-c3></logseq3-for-edit3></p>
-<p> 然而，这种日志结构无法保证行级事务的原子性，假如刚好更新到c2之后发生宕机，那么就会产生只有部分日志写入成功的现象。为此，hbase将所有对同一行的更新操作都表示为一个记录，如下：</p>
-<p> &lt;logseq#-for-entire-txn&gt;:<waledit-for-entire-txn></waledit-for-entire-txn></p>
-<p>其中WALEdit会被序列化为格式&lt;-1, # of edits, <keyvalue>, <keyvalue>, <keyvalue>&gt;，比如&lt;-1, 3, <keyvalue-for-edit- c1="">, <keyvalue-for-edit-c2>, <keyvalue-for-edit-c3>&gt;，其中-1作为标示符表征这种新的日志结构。</keyvalue-for-edit-c3></keyvalue-for-edit-c2></keyvalue-for-edit-></keyvalue></keyvalue></keyvalue></p>
-<h3 id="WAL写入模型"><a href="#WAL写入模型" class="headerlink" title="WAL写入模型"></a>WAL写入模型</h3><p>了解了HLog 的结构之后， 我们就开始研究HLog 的写入模型。 HLog 的写入可以分为三个阶段， 首先将数据对&lt;HLogKey,WALEdit&gt;写入本地缓存，然后再将本地缓存写入文件系统，最后执行sync操作同步到磁盘。在以前老的写入模型中， 上述三步都由工作线程独自完成，如下图所示：</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210830113927667.png" alt="WAL写入模型"></p>
-<p>上图中，本地缓存写入文件系统那个步骤工作线程需要持有updateLock执行，不同工作线程之间必然会恶性竞争；不仅如此，在Sync HDFS这步中，工作线程之间需要抢占flushLock，因为Sync操作是一个耗时操作，抢占这个锁会导致写入性能大幅降低。</p>
-<p>所幸的是，来自中国（准确的来说，是来自小米，鼓掌）的3位工程师意识到了这个问题，进而提出了一种新的写入模型并被官方 采纳。根据官方测试，新写入模型的吞吐量比之前提升3倍多，单台RS写入吞吐量介于12150～31520，5台RS组成的集群写入吞吐量介于22000～70000（见HBASE-8755）。下图是小米官方给出来的对比测试结果：</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210830114032215.png" alt="测试结果"></p>
-<p>在新写入模型中，本地缓存写入文件系统以及Sync HDFS都交给了新的独立线程完成，并引入一个Notify线程通知工作线程是否已经Sync成功，采用这种机制消除上述锁竞争，具体如下图所示：</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210830114052041.png" alt="消除竞争锁"></p>
-<ol>
-<li><p>上文中提到工作线程在写入WALEdit 之后并没有进行Sync ， 而是等到释放行锁阻塞在syncedTillHere 变量上， 等待AsyncNotifier线程唤醒。</p>
-</li>
-<li><p>工作线程将WALEdit写入本地Buffer之后，会生成一个自增变量txid，携带此txid唤醒AsyncWriter线程</p>
-</li>
-<li><p>AsyncWriter 线程会取出本地Buffer 中的所有WALEdit ， 写入HDFS 。注意该线程会比较传入的txid 和已经写入的最大txid（writtenTxid），如果传入的txid小于writteTxid，表示该txid对应的WALEdit已经写入，直接跳过</p>
-</li>
-<li><p>AsyncWriter线程将所有WALEdit写入HDFS之后携带maxTxid唤醒AsyncFlusher线程 </p>
-</li>
-<li><p>AsyncFlusher线程将所有写入文件系统的WALEdit统一Sync刷新到磁盘</p>
-</li>
-<li><p>数据全部落盘之后调用setFlushedTxid方法唤醒AyncNotifier线程</p>
-</li>
-<li><p>AyncNotifier线程会唤醒所有阻塞在变量syncedTillHere的工作线程，工作线程被唤醒之后表示WAL写入完成，后面再执行MVCC结束写事务，推进全局读取点，本次更新才会对用户可见</p>
-</li>
-</ol>
-<p>通过上述过程的梳理可以知道，新写入模型采取了多线程模式独立完成写文件系统、sync磁盘操作，避免了之前多工作线程恶性抢占锁的问题。同时，工作线程在将WALEdit写入本地Buffer之后并没有马上阻塞，而是释放行锁之后阻塞等待WALEdit落盘，这样可以尽可能地避免行锁竞争，提高写入性能。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>文章刚开始就提到HBase写入分为两个阶段，本文主要集中分析第一阶段的相关细节，首先介绍了HBase的写入memstore的流程，之后重点分析了WAL的写入模型以及相关优化。</p>
-
+                
                 
             </div>
             <hr/>
@@ -576,7 +494,7 @@
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://github.com/wmybigdata/2021/08/30/hbase%E6%95%B0%E6%8D%AE%E5%86%99%E6%B5%81%E7%A8%8B/">https://github.com/wmybigdata/2021/08/30/hbase%E6%95%B0%E6%8D%AE%E5%86%99%E6%B5%81%E7%A8%8B/</a>
+                    <a href="https://github.com/wmybigdata/2021/08/30/Rowkey%E5%A6%82%E4%BD%95%E8%AE%BE%E8%AE%A1/">https://github.com/wmybigdata/2021/08/30/Rowkey%E5%A6%82%E4%BD%95%E8%AE%BE%E8%AE%A1/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -613,11 +531,7 @@
                 <div class="post-meta__tag-list" style="display: inline-block;">
                     
                         <div class="article-tag">
-                            
-                                <a href="/tags/hbase/">
-                                    <span class="chip bg-color">hbase</span>
-                                </a>
-                            
+                            <span class="chip bg-color">无标签</span>
                         </div>
                     
                 </div>
@@ -789,13 +703,13 @@
             <div class="article-badge left-badge text-color">
                 <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2021/08/30/hbase%E6%95%B0%E6%8D%AE%E8%AF%BB%E6%B5%81%E7%A8%8B/">
+                <a href="/2021/08/30/Phoenix%E4%BA%8C%E7%BA%A7%E7%B4%A2%E5%BC%95-%E8%AE%B2%E5%8E%9F%E7%90%86/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/18.jpg" class="responsive-img" alt="hbase数据读流程">
+                        <img src="/medias/featureimages/23.jpg" class="responsive-img" alt="Phoenix二级索引-讲原理">
                         
-                        <span class="card-title">hbase数据读流程</span>
+                        <span class="card-title">Phoenix二级索引-讲原理</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -810,23 +724,11 @@
                         </span>
                         <span class="publish-author">
                             
-                            <i class="fas fa-bookmark fa-fw icon-category"></i>
-                            
-                            <a href="/categories/hbase/" class="post-category">
-                                    hbase
-                                </a>
-                            
+                            <i class="fas fa-user fa-fw"></i>
+                            情深骚明
                             
                         </span>
                     </div>
-                </div>
-                
-                <div class="card-action article-tags">
-                    
-                    <a href="/tags/hbase/">
-                        <span class="chip bg-color">hbase</span>
-                    </a>
-                    
                 </div>
                 
             </div>
@@ -838,13 +740,13 @@
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2021/08/30/SparkStream%E7%9A%84%E5%8F%8C%E6%B5%81join/">
+                <a href="/2021/08/30/RowKey%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/22.jpg" class="responsive-img" alt="SparkStream的双流join">
+                        <img src="/medias/featureimages/10.jpg" class="responsive-img" alt="RowKey设计原则">
                         
-                        <span class="card-title">SparkStream的双流join</span>
+                        <span class="card-title">RowKey设计原则</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
