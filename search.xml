@@ -4,6 +4,182 @@
   
     
     <entry>
+      <title>hbase合并-切分-删除标记</title>
+      <link href="/2021/08/30/hbase%E5%90%88%E5%B9%B6-%E5%88%87%E5%88%86-%E5%88%A0%E9%99%A4%E6%A0%87%E8%AE%B0/"/>
+      <url>/2021/08/30/hbase%E5%90%88%E5%B9%B6-%E5%88%87%E5%88%86-%E5%88%A0%E9%99%A4%E6%A0%87%E8%AE%B0/</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+      
+      <categories>
+          
+          <category> hbase </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> hbase </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>hbase刷写</title>
+      <link href="/2021/08/30/hbase%E5%88%B7%E5%86%99/"/>
+      <url>/2021/08/30/hbase%E5%88%B7%E5%86%99/</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+      
+      <categories>
+          
+          <category> hbase </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> hbase </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>hbase读写测试</title>
+      <link href="/2021/08/30/hbase%E8%AF%BB%E5%86%99%E6%B5%8B%E8%AF%95/"/>
+      <url>/2021/08/30/hbase%E8%AF%BB%E5%86%99%E6%B5%8B%E8%AF%95/</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+      
+      <categories>
+          
+          <category> hbase </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> hbase </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>hbase数据读流程</title>
+      <link href="/2021/08/30/hbase%E6%95%B0%E6%8D%AE%E8%AF%BB%E6%B5%81%E7%A8%8B/"/>
+      <url>/2021/08/30/hbase%E6%95%B0%E6%8D%AE%E8%AF%BB%E6%B5%81%E7%A8%8B/</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+      
+      <categories>
+          
+          <category> hbase </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> hbase </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>hbase数据写流程</title>
+      <link href="/2021/08/30/hbase%E6%95%B0%E6%8D%AE%E5%86%99%E6%B5%81%E7%A8%8B/"/>
+      <url>/2021/08/30/hbase%E6%95%B0%E6%8D%AE%E5%86%99%E6%B5%81%E7%A8%8B/</url>
+      
+        <content type="html"><![CDATA[<h1 id="hbase数据写流程"><a href="#hbase数据写流程" class="headerlink" title="hbase数据写流程"></a>hbase数据写流程</h1>]]></content>
+      
+      
+      <categories>
+          
+          <category> hbase </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> hbase </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>SparkStream的双流join</title>
+      <link href="/2021/08/30/SparkStream%E7%9A%84%E5%8F%8C%E6%B5%81join/"/>
+      <url>/2021/08/30/SparkStream%E7%9A%84%E5%8F%8C%E6%B5%81join/</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Flink实时数仓ODS-DWD-DWM-DWS项目总结</title>
+      <link href="/2021/08/30/Flink%E5%AE%9E%E6%97%B6%E6%95%B0%E4%BB%93ODS-DWD-DWM-DWS%E9%A1%B9%E7%9B%AE%E6%80%BB%E7%BB%93/"/>
+      <url>/2021/08/30/Flink%E5%AE%9E%E6%97%B6%E6%95%B0%E4%BB%93ODS-DWD-DWM-DWS%E9%A1%B9%E7%9B%AE%E6%80%BB%E7%BB%93/</url>
+      
+        <content type="html"><![CDATA[<h1 id="Flink实时数仓ODS-DWD-DWM-DWS项目总结"><a href="#Flink实时数仓ODS-DWD-DWM-DWS项目总结" class="headerlink" title="Flink实时数仓ODS-DWD-DWM-DWS项目总结"></a>Flink实时数仓ODS-DWD-DWM-DWS项目总结</h1><h2 id="项目亮点"><a href="#项目亮点" class="headerlink" title="项目亮点"></a>项目亮点</h2><pre class=" language-properties"><code class="language-properties"><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span> DWD 层<span class="token attr-name">1、Flink</span> <span class="token attr-value">CDC ，flink1.11之后 ---> ODS</span>2、行为数据，解耦和时效性,springboot到kafka,flume到kafka3、dwd行为数据，使用侧输出流，新老用户校验<span class="token attr-name">4、dwd业务数据：广播流进行分流(hbase,kafka)，flink</span> <span class="token attr-value">cdc读取配置信息</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span> DWM 层1、四张表：UV(状态编程),Uj(CEP),OderWide,PaymentWide（双流join）DWS不同主题会用到不同的数据，不是直接来自于DWD，提取出来，减少程序和数据的复用率，建模的思想，根本的思想得说明白订单和订单明细join，六张维度，地区，用户，SPU，SKU，品牌，品类（3个分类）离线数仓中做降维和维度退化，这个得话我们也可以这样来进行做维护sku表，实时数仓当中，在来一个sku表进行更新操作就好了，对于商品表来说，这个是缓慢渐变维，做维度退化，之间得点那种效果会更好一点勒，类似于3范式和维度建模不一致，我们追求效率，hbase中有维度表，数据量不是很大<span class="token attr-name">双流join</span> <span class="token attr-value">intervalJoin就可以了，考虑到延迟得话就行</span>SparkStreaming中得，因为可能公司Spark和Flink都得进行使用，FlinK只是作为要给人才来进行储备的，可能干的就是Spark反射和命名规范Redis来进行缓存，第三方进行交互，性能瓶颈，IO开销，官网当中提出了使用异步IO来提高它的效率10个线程，核心数够的话，可以进行同时的查询，压缩，串行，读过的数据，9，2，每条数据，中间的延迟很高，异步IO，有重叠时间，数据量很大做到了一个极大的优化，但是生产过程当中的数据量是非常的大背压，导致消费者不接受数据，kafka积压的过程，kafka不消费的话，数据不会丢掉，挤压带来的直接的影响就是延迟性会越来越高，异步IO的效率很高一定要分享出来，这个是面试过程当中非常重要的，实时数仓和离线数仓都是重点，把离线拿出来好好的进行复习</code></pre><pre class=" language-properties"><code class="language-properties"><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span><span class="token punctuation">=</span> DWS 层4张clickhouse表访客商品地区关键字用到的东西都是零零散散来进行拆开讲的，所以这个也是非常重要的一点难得东西进行拆开就显得稍微简单点亮点：访客主题：union，五个指标，pv,uv,uj,sv,duration_time三个流，page_log（uv,uj,sv），使用fulljoin，使用connect关联来进行做商品有7个流，connect只能使用两个流来进行做，使用了union(DataStreamAPI)<span class="token attr-name">Flink</span> <span class="token attr-value">SQL使用fullJoin来进行改写这个需求</span><span class="token attr-name">地区表和关键词都是使用Flink</span> <span class="token attr-value">SQL来进行做得，不过这些都是使用得是单表来进行做得，这个是很简单得</span>如果是事件事件，使用timestamp(3)来进行做得</code></pre>]]></content>
+      
+      
+      <categories>
+          
+          <category> 企业级数据仓库 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 企业级数据仓库 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Flink-IKSegmenter-学习使用</title>
+      <link href="/2021/08/30/Flink-IKSegmenter-%E5%AD%A6%E4%B9%A0%E4%BD%BF%E7%94%A8/"/>
+      <url>/2021/08/30/Flink-IKSegmenter-%E5%AD%A6%E4%B9%A0%E4%BD%BF%E7%94%A8/</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>hive统计硅谷影音视频网站</title>
       <link href="/2021/08/29/hive%E7%BB%9F%E8%AE%A1%E7%A1%85%E8%B0%B7%E5%BD%B1%E9%9F%B3%E8%A7%86%E9%A2%91%E7%BD%91%E7%AB%99/"/>
       <url>/2021/08/29/hive%E7%BB%9F%E8%AE%A1%E7%A1%85%E8%B0%B7%E5%BD%B1%E9%9F%B3%E8%A7%86%E9%A2%91%E7%BD%91%E7%AB%99/</url>
