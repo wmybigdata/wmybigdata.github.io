@@ -4,6 +4,31 @@
   
     
     <entry>
+      <title>hbase架构</title>
+      <link href="/2021/08/30/hbase%E6%9E%B6%E6%9E%84/"/>
+      <url>/2021/08/30/hbase%E6%9E%B6%E6%9E%84/</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+      
+      <categories>
+          
+          <category> hbase </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> hbase </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>hbase合并-切分-删除标记</title>
       <link href="/2021/08/30/hbase%E5%90%88%E5%B9%B6-%E5%88%87%E5%88%86-%E5%88%A0%E9%99%A4%E6%A0%87%E8%AE%B0/"/>
       <url>/2021/08/30/hbase%E5%90%88%E5%B9%B6-%E5%88%87%E5%88%86-%E5%88%A0%E9%99%A4%E6%A0%87%E8%AE%B0/</url>
