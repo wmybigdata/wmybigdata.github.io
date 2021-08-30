@@ -580,9 +580,9 @@
 <li>满足第一范式</li>
 <li>没有部分依赖</li>
 </ul>
-<p><img src="https://cdn.nlark.com/yuque/0/2021/png/8407327/1626349556620-d15972d0-77ae-4021-9d90-ed0e4947bf7f.png" alt="img"></p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210830172155797.png" alt="image-20210830172155797"></p>
 <p>上图可以看出，如果一个用户下了很多订单，则用户名，收获地址和手机号有重复出现的情况造成数据冗余，很明显不太符合第二范式，可以改成：</p>
-<p><img src="https://cdn.nlark.com/yuque/0/2021/png/8407327/1626349566788-d336d540-f3b4-42ac-9d09-b02c4230aa09.png" alt="img"></p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210830172218680.png" alt="image-20210830172218680"></p>
 <h3 id="5-1-4-第三范式"><a href="#5-1-4-第三范式" class="headerlink" title="5.1.4 第三范式"></a>5.1.4 第三范式</h3><p>第三范式要同时满足下面两个条件：</p>
 <ul>
 <li>满足第二范式</li>
@@ -595,7 +595,7 @@
 <h3 id="5-1-5-小结"><a href="#5-1-5-小结" class="headerlink" title="5.1.5 小结"></a>5.1.5 小结</h3><p>在关系数据模型设计中，一般需要满足第三范式的要求。如果一个表有良好的主外键设计，就应该是满足3NF的表。</p>
 <p>规范化带来的好处是通过减少数据冗余提高更新数据的效率，同时保证数据完整性。然而，我们在实际应用中也要防止过度规范化的问题。规范化程度越高，划分的表就越多，在查询数据时越有可能使用表连接操作。</p>
 <p>而如果连接的表过多，会影响查询的性能。关键的问题是要依据业务需求，仔细权衡数据查询和数据更新的关系，制定最适合的规范化程度。还有一点需要注意的是，不要为了遵循严格的规范化规则而修改业务需求。</p>
-<p><img src="https://cdn.nlark.com/yuque/0/2021/png/8407327/1626349608393-ec54233d-1018-4c81-88fa-f127e446a204.png" alt="img"></p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/1626349608393-ec54233d-1018-4c81-88fa-f127e446a204.png" alt="img"></p>
 <h2 id="5-2-维度建模"><a href="#5-2-维度建模" class="headerlink" title="5.2 维度建模"></a>5.2 维度建模</h2><p>维度建模是一种将大量数据结构化的逻辑设计手段，包含维度和指标，它不像ER模型目的是消除冗余数据，维度建模是面向分析，最终目的是提高查询性能，所以会增加数据冗余，并且违反三范式。</p>
 <p>维度建模也是重点关注让用户快速完成需求分析且对于复杂查询及时响应，维度建模一般可以分为三种：</p>
 <ul>
@@ -625,15 +625,15 @@
 </ul>
 <h5 id="下钻"><a href="#下钻" class="headerlink" title="下钻"></a><strong>下钻</strong></h5><p>下钻是商业用户分析数据的最基本的方法。下钻仅需要在查询上增加一个行头指针，新行的头指针是一个维度属性，附加了sql语言的group by表达式，属性可以来自任何与查询使用的事实表关联的维度，下钻不需要预先存在层次的定义，或者是下钻路径。</p>
 <h5 id="退化维度"><a href="#退化维度" class="headerlink" title="退化维度"></a><strong>退化维度</strong></h5><p>有时，维度除了主键外没有其他内容，例如，当某一发票包含多个数据项时，数据项事实行继承了发票的所有描述性维度外键，发票除了外键无其他项，但发票数量仍然是在此数据项级别的合法维度键。这种退化维度被放入事实表中，清楚的表明没有关联的维度表，退化维度常见于交易和累计快照事实表中。</p>
-<h3 id="5-2-3-事实表与维表的关系"><a href="#5-2-3-事实表与维表的关系" class="headerlink" title="5.2.3 事实表与维表的关系"></a>5.2.3 事实表与维表的关系</h3><p><img src="https://cdn.nlark.com/yuque/0/2021/png/8407327/1626349774783-c403d7e2-49e3-41f0-9322-8d7ec27c1125.png" alt="img"></p>
+<h3 id="5-2-3-事实表与维表的关系"><a href="#5-2-3-事实表与维表的关系" class="headerlink" title="5.2.3 事实表与维表的关系"></a>5.2.3 事实表与维表的关系</h3><p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/1626349774783-c403d7e2-49e3-41f0-9322-8d7ec27c1125.png" alt="img"></p>
 <h3 id="5-2-4-星型模型"><a href="#5-2-4-星型模型" class="headerlink" title="5.2.4 星型模型"></a>5.2.4 星型模型</h3><p>星形模型中有一张事实表，以及零个或多个维度表，事实表与维度表通过主键外键相关联，维度表之间没有关联，当所有维表都直接连接到“ 事实表”上时，整个图解就像星星一样，故将该模型称为星型模型。星形模型是最简单，也是最常用的模型。由于星形模型只有一张大表，因此它相比于其他模型更适合于大数据处理。其他模型可以通过一定的转换，变为星形模型。</p>
 <p>星型架构是一种非正规化的结构，多维数据集的每一个维度都直接与事实表相连接，不存在渐变维度，所以数据有一定的冗余，如在地域维度表中，存在国家 A 省 B 的城市 C 以及国家 A 省 B 的城市 D 两条记录，那么国家 A 和省 B 的信息分别存储了两次，即存在冗余。</p>
 <p><img src="https://cdn.nlark.com/yuque/0/2021/png/8407327/1626349830605-df44d76c-7afe-4722-bdf3-e1ccf9afec9a.png" alt="img"></p>
 <h3 id="5-2-5-雪花模型"><a href="#5-2-5-雪花模型" class="headerlink" title="5.2.5 雪花模型"></a>5.2.5 雪花模型</h3><p>当有一个或多个维表没有直接连接到事实表上，而是通过其他维表连接到事实表上时，其图解就像多个雪花连接在一起，故称雪花模型。雪花模型是对星型模型的扩展。它对星型模型的维表进一步层次化，原有的各维表可能被扩展为小的维度表，形成一些局部的 “ 层次 “ 区域，这些被分解的表都连接到主维度表而不是事实表。如图，将地域维表又分解为国家，省份，城市等维表。它的优点是 : 通过最大限度地减少数据存储量以及联合较小的维表来改善查询性能。雪花型结构去除了数据冗余。</p>
-<p><img src="https://cdn.nlark.com/yuque/0/2021/png/8407327/1626349842544-abf3f507-0c8e-47d0-b007-04426207c6e6.png" alt="img"></p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/1626349842544-abf3f507-0c8e-47d0-b007-04426207c6e6.png" alt="img"></p>
 <h3 id="5-2-6-星座模型"><a href="#5-2-6-星座模型" class="headerlink" title="5.2.6 星座模型"></a>5.2.6 星座模型</h3><p>星座模型是由星型模型延伸而来，星型模型是基于一张事实表而星座模式是基于多张事实表，并且共享维度表信息，这种模型往往应用于数据关系比星型模型和雪花模型更复杂的场合。星座模型需要多个事实表共享维度表，因而可以视为星形模型的集合，故亦被称为星系模型</p>
 <p><img src="https://cdn.nlark.com/yuque/0/2021/png/8407327/1626349885954-fb5e9e4a-4b69-49a3-8216-c33acee01d22.png" alt="img"></p>
-<h3 id="5-2-7-对比"><a href="#5-2-7-对比" class="headerlink" title="5.2.7 对比"></a>5.2.7 对比</h3><p><img src="https://cdn.nlark.com/yuque/0/2021/png/8407327/1626349903114-ee0ca66a-12e2-4d3c-a503-7a850b254bd4.png" alt="img"></p>
+<h3 id="5-2-7-对比"><a href="#5-2-7-对比" class="headerlink" title="5.2.7 对比"></a>5.2.7 对比</h3><p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/1626349903114-ee0ca66a-12e2-4d3c-a503-7a850b254bd4.png" alt="img"></p>
 <ul>
 <li><p>星型模型因为数据的冗余所以很多统计查询不需要做外部的连接，因此一般情况下效率比雪花型模型要高。</p>
 </li>
@@ -688,7 +688,7 @@
 </li>
 </ul>
 <p>Data Vault 模型比 ER 模型更容易设计和产出，它的 ETL 加工可实现配置化。</p>
-<p><img src="https://cdn.nlark.com/yuque/0/2021/png/8407327/1626350057160-d3092f97-e327-4081-8ccd-51cd974d2655.png" alt="img"></p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/1626350057160-d3092f97-e327-4081-8ccd-51cd974d2655.png" alt="img"></p>
 <h2 id="5-4-Anchor模型"><a href="#5-4-Anchor模型" class="headerlink" title="5.4 Anchor模型"></a>5.4 Anchor模型</h2><p>进一步规范化处理，其核心思想是所有的扩展只添加而不是修改，因此将模型规范到6NF，基本编程了K-V结构化模型。</p>
 <p>那么总的来说，分为三个阶段：</p>
 <p>1、将数据以源表结构相同的方式同步到Oracle，数据工程师基于ODS数据进行统计。</p>

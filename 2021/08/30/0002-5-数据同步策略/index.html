@@ -498,56 +498,56 @@
 <p>1、全量表，有无变化，都要报</p>
 <p>2、每次上报的数据都是所有的数据（变化的 + 没有变化的）</p>
 <p>9月10号全量抽取到ods层</p>
-<pre><code>create table wedw_ods.order_info_20200910(
- order_id     string    COMMENT '订单id'
-,order_status string    COMMENT '订单状态'
-,create_time  timestamp COMMENT '创建时间'
-,update_time  timestamp COMMENT '更新时间'
-) COMMENT '订单表'
-row format delimited fields terminated by ','
-;
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">create</span> <span class="token keyword">table</span> wedw_ods<span class="token punctuation">.</span>order_info_20200910<span class="token punctuation">(</span>
+ order_id     string    <span class="token keyword">COMMENT</span> <span class="token string">'订单id'</span>
+<span class="token punctuation">,</span>order_status string    <span class="token keyword">COMMENT</span> <span class="token string">'订单状态'</span>
+<span class="token punctuation">,</span>create_time  <span class="token keyword">timestamp</span> <span class="token keyword">COMMENT</span> <span class="token string">'创建时间'</span>
+<span class="token punctuation">,</span>update_time  <span class="token keyword">timestamp</span> <span class="token keyword">COMMENT</span> <span class="token string">'更新时间'</span>
+<span class="token punctuation">)</span> <span class="token keyword">COMMENT</span> <span class="token string">'订单表'</span>
+<span class="token keyword">row</span> format delimited <span class="token keyword">fields</span> <span class="token keyword">terminated by</span> <span class="token string">','</span>
+<span class="token punctuation">;</span>
 </code></pre>
 <p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/1626355927869-98d9803a-36a8-4c5f-a420-b76725063d2a.png" alt="img"></p>
-<pre><code>create table wedw_dwd.order_info_df(
- order_id     string    COMMENT '订单id'
-,order_status string    COMMENT '订单状态'
-,create_time  timestamp COMMENT '创建时间'
-,update_time  timestamp COMMENT '更新时间'
-) COMMENT '订单表'
-partitioned by (date_id string)
-row format delimited fields terminated by ','
-;
-# 把wedw_ods.order_info_20200910数据全量插到dwd层2020-09-10分区
-insert overwrite table wedw_dwd.order_info_df partition(date_id = '2020-09-10')
-select
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">create</span> <span class="token keyword">table</span> wedw_dwd<span class="token punctuation">.</span>order_info_df<span class="token punctuation">(</span>
+ order_id     string    <span class="token keyword">COMMENT</span> <span class="token string">'订单id'</span>
+<span class="token punctuation">,</span>order_status string    <span class="token keyword">COMMENT</span> <span class="token string">'订单状态'</span>
+<span class="token punctuation">,</span>create_time  <span class="token keyword">timestamp</span> <span class="token keyword">COMMENT</span> <span class="token string">'创建时间'</span>
+<span class="token punctuation">,</span>update_time  <span class="token keyword">timestamp</span> <span class="token keyword">COMMENT</span> <span class="token string">'更新时间'</span>
+<span class="token punctuation">)</span> <span class="token keyword">COMMENT</span> <span class="token string">'订单表'</span>
+partitioned <span class="token keyword">by</span> <span class="token punctuation">(</span>date_id string<span class="token punctuation">)</span>
+<span class="token keyword">row</span> format delimited <span class="token keyword">fields</span> <span class="token keyword">terminated by</span> <span class="token string">','</span>
+<span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true"># 把wedw_ods.order_info_20200910数据全量插到dwd层2020-09-10分区</span>
+<span class="token keyword">insert</span> overwrite <span class="token keyword">table</span> wedw_dwd<span class="token punctuation">.</span>order_info_df <span class="token keyword">partition</span><span class="token punctuation">(</span>date_id <span class="token operator">=</span> <span class="token string">'2020-09-10'</span><span class="token punctuation">)</span>
+<span class="token keyword">select</span>
 order_id
-,order_status
-,create_time
-,update_time
-from wedw_ods.order_info_20200910
-;
+<span class="token punctuation">,</span>order_status
+<span class="token punctuation">,</span>create_time
+<span class="token punctuation">,</span>update_time
+<span class="token keyword">from</span> wedw_ods<span class="token punctuation">.</span>order_info_20200910
+<span class="token punctuation">;</span>
 </code></pre>
 <p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/1626355927869-98d9803a-36a8-4c5f-a420-b76725063d2a.png" alt="img"></p>
 <p>9月11号全量抽取到ods层</p>
-<pre><code>create table wedw_ods.order_info_20200911(
- order_id     string    COMMENT '订单id'
-,order_status string    COMMENT '订单状态'
-,create_time  timestamp COMMENT '创建时间'
-,update_time  timestamp COMMENT '更新时间'
-) COMMENT '订单表'
-row format delimited fields terminated by ','
-;
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">create</span> <span class="token keyword">table</span> wedw_ods<span class="token punctuation">.</span>order_info_20200911<span class="token punctuation">(</span>
+ order_id     string    <span class="token keyword">COMMENT</span> <span class="token string">'订单id'</span>
+<span class="token punctuation">,</span>order_status string    <span class="token keyword">COMMENT</span> <span class="token string">'订单状态'</span>
+<span class="token punctuation">,</span>create_time  <span class="token keyword">timestamp</span> <span class="token keyword">COMMENT</span> <span class="token string">'创建时间'</span>
+<span class="token punctuation">,</span>update_time  <span class="token keyword">timestamp</span> <span class="token keyword">COMMENT</span> <span class="token string">'更新时间'</span>
+<span class="token punctuation">)</span> <span class="token keyword">COMMENT</span> <span class="token string">'订单表'</span>
+<span class="token keyword">row</span> format delimited <span class="token keyword">fields</span> <span class="token keyword">terminated by</span> <span class="token string">','</span>
+<span class="token punctuation">;</span>
 </code></pre>
 <p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/1626355927869-98d9803a-36a8-4c5f-a420-b76725063d2a.png" alt="img"></p>
-<pre><code># 把wedw_ods.order_info_20200911数据全量插到dwd层2020-09-11分区
-insert overwrite table wedw_dwd.order_info_df partition(date_id = '2020-09-11')
-select
+<pre class=" language-sql"><code class="language-sql"><span class="token comment" spellcheck="true"># 把wedw_ods.order_info_20200911数据全量插到dwd层2020-09-11分区</span>
+<span class="token keyword">insert</span> overwrite <span class="token keyword">table</span> wedw_dwd<span class="token punctuation">.</span>order_info_df <span class="token keyword">partition</span><span class="token punctuation">(</span>date_id <span class="token operator">=</span> <span class="token string">'2020-09-11'</span><span class="token punctuation">)</span>
+<span class="token keyword">select</span>
 order_id
-,order_status
-,create_time
-,update_time
-from wedw_ods.order_info_20200911
-;
+<span class="token punctuation">,</span>order_status
+<span class="token punctuation">,</span>create_time
+<span class="token punctuation">,</span>update_time
+<span class="token keyword">from</span> wedw_ods<span class="token punctuation">.</span>order_info_20200911
+<span class="token punctuation">;</span>
 </code></pre>
 <p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/1626355927869-98d9803a-36a8-4c5f-a420-b76725063d2a.png" alt="img"></p>
 <p>全量抽取，每个分区保留历史全量快照。</p>
@@ -557,15 +557,15 @@ from wedw_ods.order_info_20200911
 <p>3、业务库表中需有主键及创建时间，修改时间</p>
 <p>9月10号全量抽取到ods层(全量初始化)</p>
 <p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/1626355927869-98d9803a-36a8-4c5f-a420-b76725063d2a.png" alt="img"></p>
-<pre><code># 把wedw_ods.order_info_20200910数据全量插到dwd层2020-09-10分区
-insert overwrite table wedw_dwd.order_info_di partition(date_id = '2020-09-10')
-select
+<pre class=" language-sql"><code class="language-sql"><span class="token comment" spellcheck="true"># 把wedw_ods.order_info_20200910数据全量插到dwd层2020-09-10分区</span>
+<span class="token keyword">insert</span> overwrite <span class="token keyword">table</span> wedw_dwd<span class="token punctuation">.</span>order_info_di <span class="token keyword">partition</span><span class="token punctuation">(</span>date_id <span class="token operator">=</span> <span class="token string">'2020-09-10'</span><span class="token punctuation">)</span>
+<span class="token keyword">select</span>
 order_id
-,order_status
-,create_time
-,update_time
-from wedw_ods.order_info_20200910
-;
+<span class="token punctuation">,</span>order_status
+<span class="token punctuation">,</span>create_time
+<span class="token punctuation">,</span>update_times
+<span class="token keyword">from</span> wedw_ods<span class="token punctuation">.</span>order_info_20200910
+<span class="token punctuation">;</span>
 </code></pre>
 <p><img src="https://cdn.nlark.com/yuque/0/2021/png/8407327/1626355956101-4e1a7717-d1ed-46d8-ab6d-e9a87a5e646f.png" alt="img"></p>
 <p>9月11号抽取更新的数据及当天新增的数据，即订单id为2,3,4,5的数据</p>
@@ -573,69 +573,69 @@ from wedw_ods.order_info_20200910
 <p>wedw_dwd.order_info_di表9月10号的分区数据与wedw_ods.order_info_20200911增量抽取的数据合并，有2种方案</p>
 <p>a.两个表通过主键关联，dwd表存在并且ods表不存在的数据</p>
 <p>union all 一下wedw_ods.order_info_20200911表所有的数据，即全量数据插入到dwd表的9月11号的分区</p>
-<pre><code>insert overwrite table wedw_dwd.order_info_di partition(date_id = '2020-09-11')
-select
- t1.order_id
-,t1.order_status
-,t1.create_time
-,t1.update_time
-from
-wedw_dwd.order_info_di t1
-left join
-wedw_ods.order_info_20200911 t2
-on t1.order_id = t2.order_id
-where t1.date_id = '2020-09-10'
-and t2.order_id is null
-union all
-select 
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">insert</span> overwrite <span class="token keyword">table</span> wedw_dwd<span class="token punctuation">.</span>order_info_di <span class="token keyword">partition</span><span class="token punctuation">(</span>date_id <span class="token operator">=</span> <span class="token string">'2020-09-11'</span><span class="token punctuation">)</span>
+<span class="token keyword">select</span>
+ t1<span class="token punctuation">.</span>order_id
+<span class="token punctuation">,</span>t1<span class="token punctuation">.</span>order_status
+<span class="token punctuation">,</span>t1<span class="token punctuation">.</span>create_time
+<span class="token punctuation">,</span>t1<span class="token punctuation">.</span>update_time
+<span class="token keyword">from</span>
+wedw_dwd<span class="token punctuation">.</span>order_info_di t1
+<span class="token keyword">left</span> <span class="token keyword">join</span>
+wedw_ods<span class="token punctuation">.</span>order_info_20200911 t2
+<span class="token keyword">on</span> t1<span class="token punctuation">.</span>order_id <span class="token operator">=</span> t2<span class="token punctuation">.</span>order_id
+<span class="token keyword">where</span> t1<span class="token punctuation">.</span>date_id <span class="token operator">=</span> <span class="token string">'2020-09-10'</span>
+<span class="token operator">and</span> t2<span class="token punctuation">.</span>order_id <span class="token operator">is</span> <span class="token boolean">null</span>
+<span class="token keyword">union</span> <span class="token keyword">all</span>
+<span class="token keyword">select</span> 
  order_id
-,order_status
-,create_time
-,update_time
-from 
-wedw_ods.order_info_20200911
-;
+<span class="token punctuation">,</span>order_status
+<span class="token punctuation">,</span>create_time
+<span class="token punctuation">,</span>update_time
+<span class="token keyword">from</span> 
+wedw_ods<span class="token punctuation">.</span>order_info_20200911
+<span class="token punctuation">;</span>
 </code></pre>
 <p><img src="https://cdn.nlark.com/yuque/0/2021/png/8407327/1626356021537-45e8d1f0-7869-437a-9341-12ef40d43ff3.png" alt="img"></p>
 <p>b.两个表数据union all一下，再根据order_id去重(根据order分组，更新时间降序，取第一条)</p>
-<pre><code>insert overwrite table wedw_dwd.order_info_di partition(date_id = '2020-09-11')
-select
- t2.order_id
-,t2.order_status
-,t2.create_time
-,t2.update_time 
-from
-(
-    select
-     t1.order_id
-    ,t1.order_status
-    ,t1.create_time
-    ,t1.update_time
-    ,row_number() over(partition by order_id order by update_time desc) as rn
-    from
-    (
-        select
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">insert</span> overwrite <span class="token keyword">table</span> wedw_dwd<span class="token punctuation">.</span>order_info_di <span class="token keyword">partition</span><span class="token punctuation">(</span>date_id <span class="token operator">=</span> <span class="token string">'2020-09-11'</span><span class="token punctuation">)</span>
+<span class="token keyword">select</span>
+ t2<span class="token punctuation">.</span>order_id
+<span class="token punctuation">,</span>t2<span class="token punctuation">.</span>order_status
+<span class="token punctuation">,</span>t2<span class="token punctuation">.</span>create_time
+<span class="token punctuation">,</span>t2<span class="token punctuation">.</span>update_time 
+<span class="token keyword">from</span>
+<span class="token punctuation">(</span>
+    <span class="token keyword">select</span>
+     t1<span class="token punctuation">.</span>order_id
+    <span class="token punctuation">,</span>t1<span class="token punctuation">.</span>order_status
+    <span class="token punctuation">,</span>t1<span class="token punctuation">.</span>create_time
+    <span class="token punctuation">,</span>t1<span class="token punctuation">.</span>update_time
+    <span class="token punctuation">,</span>row_number<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">over</span><span class="token punctuation">(</span><span class="token keyword">partition</span> <span class="token keyword">by</span> order_id <span class="token keyword">order</span> <span class="token keyword">by</span> update_time <span class="token keyword">desc</span><span class="token punctuation">)</span> <span class="token keyword">as</span> rn
+    <span class="token keyword">from</span>
+    <span class="token punctuation">(</span>
+        <span class="token keyword">select</span>
          order_id
-        ,order_status
-        ,create_time
-        ,update_time
-        from
-        wedw_dwd.order_info_di 
-        where date_id = '2020-09-10'
+        <span class="token punctuation">,</span>order_status
+        <span class="token punctuation">,</span>create_time
+        <span class="token punctuation">,</span>update_time
+        <span class="token keyword">from</span>
+        wedw_dwd<span class="token punctuation">.</span>order_info_di 
+        <span class="token keyword">where</span> date_id <span class="token operator">=</span> <span class="token string">'2020-09-10'</span>
  
-        union all
+        <span class="token keyword">union</span> <span class="token keyword">all</span>
  
-        select 
+        <span class="token keyword">select</span> 
          order_id
-        ,order_status
-        ,create_time
-        ,update_time
-        from 
-        wedw_ods.order_info_20200911
-    ) t1
-) t2
-where t2.rn = 1
-;
+        <span class="token punctuation">,</span>order_status
+        <span class="token punctuation">,</span>create_time
+        <span class="token punctuation">,</span>update_time
+        <span class="token keyword">from</span> 
+        wedw_ods<span class="token punctuation">.</span>order_info_20200911
+    <span class="token punctuation">)</span> t1
+<span class="token punctuation">)</span> t2
+<span class="token keyword">where</span> t2<span class="token punctuation">.</span>rn <span class="token operator">=</span> <span class="token number">1</span>
+<span class="token punctuation">;</span>
 </code></pre>
 <p><img src="https://cdn.nlark.com/yuque/0/2021/png/8407327/1626356063209-bc806fbf-aa7f-4576-93c8-65d3b52c9403.png" alt="img"></p>
 <p>特殊增量表：da表，每天的分区就是当天的数据，其数据特点就是数据产生后就不会发生变化，如日志表。</p>
@@ -652,105 +652,105 @@ where t2.rn = 1
 <p>1、满足反应数据的历史状态</p>
 <p>2、最大程度节省存储</p>
 <p>9月10号全量抽取到ods层</p>
-<pre><code>create table wedw_ods.order_info_20200910(
- order_id     string    COMMENT '订单id'
-,order_status string    COMMENT '订单状态'
-,create_time  timestamp COMMENT '创建时间'
-,update_time  timestamp COMMENT '更新时间'
-) COMMENT '订单表'
-row format delimited fields terminated by ','
-;
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">create</span> <span class="token keyword">table</span> wedw_ods<span class="token punctuation">.</span>order_info_20200910<span class="token punctuation">(</span>
+ order_id     string    <span class="token keyword">COMMENT</span> <span class="token string">'订单id'</span>
+<span class="token punctuation">,</span>order_status string    <span class="token keyword">COMMENT</span> <span class="token string">'订单状态'</span>
+<span class="token punctuation">,</span>create_time  <span class="token keyword">timestamp</span> <span class="token keyword">COMMENT</span> <span class="token string">'创建时间'</span>
+<span class="token punctuation">,</span>update_time  <span class="token keyword">timestamp</span> <span class="token keyword">COMMENT</span> <span class="token string">'更新时间'</span>
+<span class="token punctuation">)</span> <span class="token keyword">COMMENT</span> <span class="token string">'订单表'</span>
+<span class="token keyword">row</span> format delimited <span class="token keyword">fields</span> <span class="token keyword">terminated by</span> <span class="token string">','</span>
+<span class="token punctuation">;</span>
 </code></pre>
 <p><img src="https://cdn.nlark.com/yuque/0/2021/png/8407327/1626356112237-603bd145-3c80-4502-bcf5-45e54cddf8be.png" alt="img"></p>
 <p>建立dwd层拉链表</p>
 <p>增加两个字段：<br>start_dt(表示该条记录的生命周期开始时间——周期快照时的状态)<br>end_dt(该条记录的生命周期结束时间)</p>
 <p>end_dt= ‘9999-12-31’ 表示该条记录目前处于有效状态</p>
-<pre><code>create table wedw_dwd.order_info_dz(
- order_id     string    COMMENT '订单id'
-,order_status string    COMMENT '订单状态'
-,create_time  timestamp COMMENT '创建时间'
-,update_time  timestamp COMMENT '更新时间'
-,start_dt     date      COMMENT '开始生效日期'
-,end_dt       date      COMMENT '结束生效日期'
-) COMMENT '订单表'
-partitioned by (date_id string)
-row format delimited fields terminated by ','
-;
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">create</span> <span class="token keyword">table</span> wedw_dwd<span class="token punctuation">.</span>order_info_dz<span class="token punctuation">(</span>
+ order_id     string    <span class="token keyword">COMMENT</span> <span class="token string">'订单id'</span>
+<span class="token punctuation">,</span>order_status string    <span class="token keyword">COMMENT</span> <span class="token string">'订单状态'</span>
+<span class="token punctuation">,</span>create_time  <span class="token keyword">timestamp</span> <span class="token keyword">COMMENT</span> <span class="token string">'创建时间'</span>
+<span class="token punctuation">,</span>update_time  <span class="token keyword">timestamp</span> <span class="token keyword">COMMENT</span> <span class="token string">'更新时间'</span>
+<span class="token punctuation">,</span>start_dt     <span class="token keyword">date</span>      <span class="token keyword">COMMENT</span> <span class="token string">'开始生效日期'</span>
+<span class="token punctuation">,</span>end_dt       <span class="token keyword">date</span>      <span class="token keyword">COMMENT</span> <span class="token string">'结束生效日期'</span>
+<span class="token punctuation">)</span> <span class="token keyword">COMMENT</span> <span class="token string">'订单表'</span>
+partitioned <span class="token keyword">by</span> <span class="token punctuation">(</span>date_id string<span class="token punctuation">)</span>
+<span class="token keyword">row</span> format delimited <span class="token keyword">fields</span> <span class="token keyword">terminated by</span> <span class="token string">','</span>
+<span class="token punctuation">;</span>
 </code></pre>
 <p>注：第一次加工的时候需要初始化所有数据，start_time设置为数据日期2020-09-10 ，end_time设置为9999-12-31</p>
-<pre><code>insert overwrite table wedw_dwd.order_info_dz partition(date_id = '2020-09-10')
-select
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">insert</span> overwrite <span class="token keyword">table</span> wedw_dwd<span class="token punctuation">.</span>order_info_dz <span class="token keyword">partition</span><span class="token punctuation">(</span>date_id <span class="token operator">=</span> <span class="token string">'2020-09-10'</span><span class="token punctuation">)</span>
+<span class="token keyword">select</span>
  order_id    
-,order_status
-,create_time 
-,update_time 
-,to_date(update_time) as start_dt   
-,'9999-12-31' as end_dt  
-from
-wedw_ods.order_info_20200910
-;
+<span class="token punctuation">,</span>order_status
+<span class="token punctuation">,</span>create_time 
+<span class="token punctuation">,</span>update_time 
+<span class="token punctuation">,</span>to_date<span class="token punctuation">(</span>update_time<span class="token punctuation">)</span> <span class="token keyword">as</span> start_dt   
+<span class="token punctuation">,</span><span class="token string">'9999-12-31'</span> <span class="token keyword">as</span> end_dt  
+<span class="token keyword">from</span>
+wedw_ods<span class="token punctuation">.</span>order_info_20200910
+<span class="token punctuation">;</span>
 </code></pre>
 <p><img src="https://cdn.nlark.com/yuque/0/2021/png/8407327/1626356157351-6ca39bfd-589a-4e32-9331-4dad45220f8e.png" alt="img"></p>
 <p>9月11号抽取更新的数据及当天新增的数据到ods层，即订单id为2,3,4,5的数据</p>
 <p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/1626355774395-33091aff-f966-48c2-a154-939624f0f4c4.png" alt="img"></p>
-<pre><code>insert overwrite table wedw_dwd.order_info_dz partition(date_id = '2020-09-11')
-select
- t1.order_id    
-,t1.order_status
-,t1.create_time 
-,t1.update_time
-,t1.start_dt
-,case when t1.end_dt = '9999-12-31' and t2.order_id is not null then t1.date_id else t1.end_dt end as end_dt
-from
-wedw_dwd.order_info_dz t1
-left join wedw_ods.order_info_20200911 t2
-on t1.order_id = t2.order_id
-where t1.date_id = '2020-09-10'
-union all
-SELECT
- t1.order_id    
-,t1.order_status
-,t1.create_time 
-,t1.update_time
-,to_date(update_time) as start_dt
-,'9999-12-31' as end_dt
-FROM wedw_ods.order_info_20200911 t1
-;
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">insert</span> overwrite <span class="token keyword">table</span> wedw_dwd<span class="token punctuation">.</span>order_info_dz <span class="token keyword">partition</span><span class="token punctuation">(</span>date_id <span class="token operator">=</span> <span class="token string">'2020-09-11'</span><span class="token punctuation">)</span>
+<span class="token keyword">select</span>
+ t1<span class="token punctuation">.</span>order_id    
+<span class="token punctuation">,</span>t1<span class="token punctuation">.</span>order_status
+<span class="token punctuation">,</span>t1<span class="token punctuation">.</span>create_time 
+<span class="token punctuation">,</span>t1<span class="token punctuation">.</span>update_time
+<span class="token punctuation">,</span>t1<span class="token punctuation">.</span>start_dt
+<span class="token punctuation">,</span><span class="token keyword">case</span> <span class="token keyword">when</span> t1<span class="token punctuation">.</span>end_dt <span class="token operator">=</span> <span class="token string">'9999-12-31'</span> <span class="token operator">and</span> t2<span class="token punctuation">.</span>order_id <span class="token operator">is</span> <span class="token operator">not</span> <span class="token boolean">null</span> <span class="token keyword">then</span> t1<span class="token punctuation">.</span>date_id <span class="token keyword">else</span> t1<span class="token punctuation">.</span>end_dt <span class="token keyword">end</span> <span class="token keyword">as</span> end_dt
+<span class="token keyword">from</span>
+wedw_dwd<span class="token punctuation">.</span>order_info_dz t1
+<span class="token keyword">left</span> <span class="token keyword">join</span> wedw_ods<span class="token punctuation">.</span>order_info_20200911 t2
+<span class="token keyword">on</span> t1<span class="token punctuation">.</span>order_id <span class="token operator">=</span> t2<span class="token punctuation">.</span>order_id
+<span class="token keyword">where</span> t1<span class="token punctuation">.</span>date_id <span class="token operator">=</span> <span class="token string">'2020-09-10'</span>
+<span class="token keyword">union</span> <span class="token keyword">all</span>
+<span class="token keyword">SELECT</span>
+ t1<span class="token punctuation">.</span>order_id    
+<span class="token punctuation">,</span>t1<span class="token punctuation">.</span>order_status
+<span class="token punctuation">,</span>t1<span class="token punctuation">.</span>create_time 
+<span class="token punctuation">,</span>t1<span class="token punctuation">.</span>update_time
+<span class="token punctuation">,</span>to_date<span class="token punctuation">(</span>update_time<span class="token punctuation">)</span> <span class="token keyword">as</span> start_dt
+<span class="token punctuation">,</span><span class="token string">'9999-12-31'</span> <span class="token keyword">as</span> end_dt
+<span class="token keyword">FROM</span> wedw_ods<span class="token punctuation">.</span>order_info_20200911 t1
+<span class="token punctuation">;</span>
 </code></pre>
 <p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/1626355774395-33091aff-f966-48c2-a154-939624f0f4c4.png" alt="img"></p>
 <p>查询当前的所有有效记录：</p>
-<pre><code>select 
-* 
-from 
-wedw_dwd.order_info_dz 
-where 
-date_id = '2020-09-11'
-and end_dt ='9999-12-31'
-;
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">select</span> 
+<span class="token operator">*</span> 
+<span class="token keyword">from</span> 
+wedw_dwd<span class="token punctuation">.</span>order_info_dz 
+<span class="token keyword">where</span> 
+date_id <span class="token operator">=</span> <span class="token string">'2020-09-11'</span>
+<span class="token operator">and</span> end_dt <span class="token operator">=</span><span class="token string">'9999-12-31'</span>
+<span class="token punctuation">;</span>
 </code></pre>
 <p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/1626355774395-33091aff-f966-48c2-a154-939624f0f4c4.png" alt="img"></p>
 <p>查询9月10号历史快照:</p>
-<pre><code>select 
-* 
-from 
-wedw_dwd.order_info_dz 
-where 
-date_id = '2020-09-10' 
-and start_dt &lt;= '2020-09-10' 
-and end_dt &gt;='2020-09-10'
-;
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">select</span> 
+<span class="token operator">*</span> 
+<span class="token keyword">from</span> 
+wedw_dwd<span class="token punctuation">.</span>order_info_dz 
+<span class="token keyword">where</span> 
+date_id <span class="token operator">=</span> <span class="token string">'2020-09-10'</span> 
+<span class="token operator">and</span> start_dt <span class="token operator">&lt;=</span> <span class="token string">'2020-09-10'</span> 
+<span class="token operator">and</span> end_dt <span class="token operator">>=</span><span class="token string">'2020-09-10'</span>
+<span class="token punctuation">;</span>
 </code></pre>
 <p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/1626355774395-33091aff-f966-48c2-a154-939624f0f4c4.png" alt="img"></p>
 <p>查询9月11号历史快照:</p>
-<pre><code>select 
-* 
-from 
-wedw_dwd.order_info_dz 
-where 
-date_id = '2020-09-11' 
-and start_dt &lt;= '2020-09-11' 
-and end_dt &gt;='2020-09-11'
-;
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">select</span> 
+<span class="token operator">*</span> 
+<span class="token keyword">from</span> 
+wedw_dwd<span class="token punctuation">.</span>order_info_dz 
+<span class="token keyword">where</span> 
+date_id <span class="token operator">=</span> <span class="token string">'2020-09-11'</span> 
+<span class="token operator">and</span> start_dt <span class="token operator">&lt;=</span> <span class="token string">'2020-09-11'</span> 
+<span class="token operator">and</span> end_dt <span class="token operator">>=</span><span class="token string">'2020-09-11'</span>
+<span class="token punctuation">;</span>
 </code></pre>
 <p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/1626355774395-33091aff-f966-48c2-a154-939624f0f4c4.png" alt="img"></p>
 <h1 id="五-总结"><a href="#五-总结" class="headerlink" title="五 总结"></a>五 总结</h1><p>在工作中，其实上述3种表都是很有可能会用到的，那么我们应该怎么选择呢？</p>
