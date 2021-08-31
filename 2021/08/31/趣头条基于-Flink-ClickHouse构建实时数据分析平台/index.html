@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="Flink的生命周期怎么会用到这些, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
+    <meta name="keywords" content="趣头条基于-Flink-ClickHouse构建实时数据分析平台, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
     <meta name="description" content="本网站是个人兴趣爱好，总结分享经验，记录生活点滴的平台，希望在以后的学习旅途中，走出自己的风景。">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -16,7 +16,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>Flink的生命周期怎么会用到这些 | 情深骚明大数据之旅</title>
+    <title>趣头条基于-Flink-ClickHouse构建实时数据分析平台 | 情深骚明大数据之旅</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -314,12 +314,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/7.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/23.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">Flink的生命周期怎么会用到这些</h1>
+                    <h1 class="description center-align post-title">趣头条基于-Flink-ClickHouse构建实时数据分析平台</h1>
                 </div>
             </div>
         </div>
@@ -433,25 +433,12 @@
             <div class="row tag-cate">
                 <div class="col s7">
                     
-                    <div class="article-tag">
-                        
-                            <a href="/tags/Flink%E6%B5%81%E5%BC%8F%E5%BC%95%E6%93%8E/">
-                                <span class="chip bg-color">Flink流式引擎</span>
-                            </a>
-                        
-                    </div>
+                          <div class="article-tag">
+                            <span class="chip bg-color">无标签</span>
+                          </div>
                     
                 </div>
                 <div class="col s5 right-align">
-                    
-                    <div class="post-cate">
-                        <i class="fas fa-bookmark fa-fw icon-category"></i>
-                        
-                            <a href="/categories/Flink%E6%B5%81%E5%BC%8F%E5%BC%95%E6%93%8E/" class="post-category">
-                                Flink流式引擎
-                            </a>
-                        
-                    </div>
                     
                 </div>
             </div>
@@ -481,212 +468,80 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h1 id="Flink的生命周期怎么会用到这些"><a href="#Flink的生命周期怎么会用到这些" class="headerlink" title="Flink的生命周期怎么会用到这些"></a>Flink的生命周期怎么会用到这些</h1><p> Flink API提供了开发的接口，此外，为了实现业务逻辑，还必须为开发者提供自定义业务逻辑的能力。。Flink中设计了用户自定义函数体系(User Defined Function,UDF),开发人员实现业务逻辑就是开发UDF。</p>
-<p>一、环境对象</p>
-<p>​    StreamExecutionEnvironment是Flink应用开发时的概念，表示流计算作业的执行环境，是作业开发的入口、数据源接口、生成和转换DataStream的接口、数据Sink的接口、作业配置接口、作业启动执行的入口。</p>
-<p>​    Environment是运行时作业级别的概念，从StreamExecutionEnvironment中的配置信息衍生而来。进入到Flink作业执行的时刻，作业需要的是相关的配置信息，如作业的名称、并行度、作业编号JobID、监控的Metric、容错的配置信息、IO等，用StreamExecutionRuntime对象就不适合了，很多API是不需要的，所以在Flink中抽象出了Environment作为运行时刻的上下文信息。</p>
-<p>​    RuntimeContext是运行时Task实例级别的概念。Environment本身仍然是比较粗粒度作业级别的配置，对于每一个Task而言，其本身有更细节的配置信息,所以Flink又抽象了RuntimeContext,每一个Task实例有自己的RuntimeContext。</p>
-<h2 id="1-1-执行环境"><a href="#1-1-执行环境" class="headerlink" title="1.1 执行环境"></a>1.1 执行环境</h2><p>StreamExecutionEnvironment是Flink流计算应用的执行环境，是Flink作业开发和启动执行的入口，开发者对StreamExecutionEnvironment的实现是无感知的。</p>
+                <p>title: 趣头条基于-Flink-ClickHouse构建实时数据分析平台<br>top: true<br>cover: true<br>author: 情深骚明<br>summary: 学习心得记录<br>date: 2021-08-31 14:14:33<br>categories: Flink流式引擎<br>tags: Flink流式引擎</p>
+<h1 id="趣头条基于-Flink-ClickHouse构建实时数据分析平台"><a href="#趣头条基于-Flink-ClickHouse构建实时数据分析平台" class="headerlink" title="趣头条基于-Flink-ClickHouse构建实时数据分析平台"></a>趣头条基于-Flink-ClickHouse构建实时数据分析平台</h1><h2 id="绪论"><a href="#绪论" class="headerlink" title="绪论"></a>绪论</h2><p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210831141514688.png" alt="业务场景分析"></p>
+<p><strong>摘要：</strong>本文由趣头条数据平台负责人王金海分享，主要介绍趣头条 Flink-to-Hive 小时级场景和 Flink-to-ClickHouse 秒级场景，内容分为以下四部分：</p>
+<ol>
+<li>业务场景与现状分析</li>
+<li>Flink-to-Hive 小时级场景</li>
+<li>Flink-to-ClickHouse 秒级场景</li>
+<li>未来发展与思考</li>
+</ol>
+<h2 id="业务场景与现状分析"><a href="#业务场景与现状分析" class="headerlink" title="业务场景与现状分析"></a>业务场景与现状分析</h2><p>趣头条查询的页面分为离线查询页面和实时查询页面。趣头条今年所实现的改造是在实时查询中接入了 ClickHouse 计算引擎。根据不同的业务场景，实时数据报表中会展现数据指标曲线图和详细的数据指标表。目前数据指标的采集和计算为每五分钟一个时间窗口，当然也存在三分钟或一分钟的特殊情况。数据指标数据全部从 Kafka 实时数据中导出，并导入 ClickHouse 进行计算。</p>
+<h2 id="Flink-to-Hive-小时级场景"><a href="#Flink-to-Hive-小时级场景" class="headerlink" title="Flink-to-Hive 小时级场景"></a>Flink-to-Hive 小时级场景</h2><h3 id="小时级实现架构图"><a href="#小时级实现架构图" class="headerlink" title="小时级实现架构图"></a>小时级实现架构图</h3><p>如下图所示，Database 中的 Binlog 导出到 Kafka，同时 Log Server 数据也会上报到 Kafka。所有数据实时落地到 Kafka 之后，通过 Flink 抽取到 HDFS。下图中 HDFS 到 Hive 之间为虚线，即 Flink 并非直接落地到 Hive，Flink 落地到 HDFS 后，再落地到 Hive 的时间可能是小时级、半小时级甚至分钟级，需要知道数据的 Event time 已经到何时，再触发 alter table，add partition，add location 等，写入其分区。</p>
+<p>这时需要有一个程序监控当前 Flink 任务的数据时间已经消费到什么时候，如9点的数据，落地时需要查看 Kafka 中消费的数据是否已经到达9点，然后在 Hive 中触发分区写入。</p>
+<p><img src="C:/Users/wmy/AppData/Roaming/Typora/typora-user-images/image-20210831141843680.png" alt="小时架构图"></p>
+<h3 id="实现原理"><a href="#实现原理" class="headerlink" title="实现原理"></a>实现原理</h3><p>趣头条主要使用了 Flink 高阶版本的一个特性——StreamingFileSink。StreamingFileSink 主要有几点功能。</p>
 <ul>
-<li>LocalStreamEnvironment</li>
+<li>第一， forBulkFormat 支持 avro、parquet 格式，即列式存储格式。</li>
+<li>第二， withBucketAssigner 自定义按数据时间分桶，此处会定义一个EventtimeBucket，既按数据时间进行数据落地到离线中。</li>
+<li>第三， OnCheckPointRollingPolicy，根据 CheckPoint 时间进行数据落地，在一定的 CheckPoint 时间内数据落地并回稳。按照 CheckPoint 落地还有其它策略，如按照数据大小。</li>
+<li>第四， StreamingFileSink 是 Exactly-Once 语义实现。</li>
 </ul>
-<p>​    本地执行环境，在单个JVM中使用多线程模拟Flink集群。</p>
-<p>​    其基本的工作流程如下：</p>
-<p>​    \1) 执行Flink作业的Main函数生成Streamgraph,转化为JobGraph。</p>
-<p>​    \2) 设置任务运行的配置信息。</p>
-<p>​    \3) 根据配置信息启动对应的LocalFlinkMiniCluster。</p>
-<p>​    \4) 根据配置信息和miniCluster生成对应的MiniClusterClient。</p>
-<p>​    \5) 通过MiniClusterClient提交JobGraph 到MiniCluster。</p>
+<p>Flink 中有两个 Exactly-Once 语义实现，第一个是 Kafka，第二个是 StreamingFileSink。下图为 OnCheckPointRollingPolicy 设计的每10分钟落地一次到HDFS文件中的 demo。</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210831142021326.png" alt="实现原理"></p>
+<h4 id="■-如何实现-Exactly-Once"><a href="#■-如何实现-Exactly-Once" class="headerlink" title="■ 如何实现 Exactly-Once"></a>■ 如何实现 Exactly-Once</h4><p>下图左侧为一个简单的二 PC 模型。Coordinator 发送一个 prepare，执行者开始触发 ack 动作，Coordinator 收到 ack 所有消息后，所有 ack 开始触发 commit，所有执行者进行落地，将其转化到 Flink 的模型中，Source 收到 checkpoint barrier 流时，开始触发一个 snapshot。</p>
+<p>每个算子的 CheckPoint、snapshot 都完成之后，CheckPoint 会给 Job Manager 发送 notifyCheckpointComplete。下图中二阶段模型和 Flink 模型左侧三条线部分是一致的。因此用 Flink 可以实现二阶段提交协议。</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210831142148040.png" alt="Exactly-Once"></p>
+<h4 id="■-如何使用-Flink-实现二阶段提交协议"><a href="#■-如何使用-Flink-实现二阶段提交协议" class="headerlink" title="■ 如何使用 Flink 实现二阶段提交协议"></a>■ 如何使用 Flink 实现二阶段提交协议</h4><p>首先，StreamingFileSink 实现两个接口，CheckpointedFunction 和CheckpointListener。CheckpointedFunction 实现 initializeState 和 snapshotState 函数。CheckpointListener 是 notifyCheckpointComplete 的方法实现，因此这两个接口可以实现二阶段提交语义。</p>
+<h5 id="initializeState"><a href="#initializeState" class="headerlink" title="initializeState"></a>initializeState</h5><p>initializeState 在任务启动时会触发三个动作。第一个是 commitPendingFile。实时数据落地到 Hdfs 上有三个状态。第一个状态是 in-progress ，正在进行状态。第二个状态是 pending 状态，第三个状态是 finished 状态。</p>
+<p>initializeState 在任务启动时还会触发 restoreInProgressFile，算子实时写入。如果 CheckPoint 还未成功时程序出现问题，再次启动时 initializeState 会 commit PendingFile，然后采用 Hadoop 2.7+ 版本的 truncate 方式重置或截断 in-progress 文件。</p>
+<h5 id="invoke"><a href="#invoke" class="headerlink" title="invoke"></a>invoke</h5><p>实时写入数据。</p>
+<h5 id="snapshotState"><a href="#snapshotState" class="headerlink" title="snapshotState"></a>snapshotState</h5><p>触发 CheckPoint 时会将 in-progress 文件转化为 pending state，同时记录数据长度（truncate 方式需要截断长度）。snapshotState 并非真正将数据写入 HDFS，而是写入 ListState。Flink 在 Barrier 对齐状态时内部实现 Exactly-Once 语义，但是实现外部端到端的 Exactly-Once 语义比较困难。Flink 内部实现 Exactly-Once 通过 ListState，将数据全部存入 ListState，等待所有算子 CheckPoint 完成，再将 ListState 中的数据刷到 HDFS 中。</p>
+<h5 id="notifyCheckpointComplete"><a href="#notifyCheckpointComplete" class="headerlink" title="notifyCheckpointComplete"></a>notifyCheckpointComplete</h5><p>notifyCheckpointComplete 会触发 pending 到 finished state 的数据写入。实现方法是 rename，Streaming 不断向 HDFS 写入临时文件，所有动作结束后通过 rename 动作写成正式文件。</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210831142411909.png" alt="image-20210831142411909"></p>
+<h3 id="跨集群多-nameservices"><a href="#跨集群多-nameservices" class="headerlink" title="跨集群多 nameservices"></a>跨集群多 nameservices</h3><p>趣头条的实时集群和离线集群是独立的，离线集群有多套，实时集群目前有一套。通过实时集群写入离线集群，会产生 HDFS nameservices 问题。在实时集群中将所有离线集群的 nameservices 用 namenode HA 的方式全部打入实时集群并不合适。那么如何在任务中通过实时集群提交到各个离线集群？</p>
+<p>如下图所示，在 Flink 任务的 resource 下面，在 HDFS 的 xml 中间加入 。在 PropertyHong Kong 中添加 nameservices，如 stream 是实时集群的 namenode HA 配置，data 是即将写入的离线集群的 namenode HA 配置。那么两个集群中间的 HDFS set 不需要相互修改，直接可以在客户端实现。</p>
+<p><img src="C:/Users/wmy/AppData/Roaming/Typora/typora-user-images/image-20210831142453719.png" alt="跨集群"></p>
+<h3 id="多用户写入权限"><a href="#多用户写入权限" class="headerlink" title="多用户写入权限"></a>多用户写入权限</h3><p>实时要写入离线 HDFS，可能会涉及用户权限问题。实时提交的用户已经定义好该用户在所有程序中都是同一个用户，但离线中是多用户的，因此会造成实时和离线用户不对等。趣头条在 API 中添加了 withBucketUser 写 HDFS。配置好 nameservices后，接下来只需要知道该 HDFS 路径通过哪个用户来写，比如配置一个 stream 用户写入。</p>
+<p>API 层级的好处是一个 Flink 程序可以指定多个不同的 HDFS 和不同的用户。多用户写入的实现是在 Hadoop file system 中加一个 ugi.do as ，代理用户。以上为趣头条使用 Flink 方式进行实时数据同步到 Hive 的一些工作。其中可能会出现小文件问题，小文件是后台程序进行定期 merge，如果 CheckPoint 间隔时间较短，如3分钟一次，会出现大量小文件问题。</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210831142637667.png" alt="image-20210831142637667"></p>
+<h2 id="Flink-to-ClickHouse-秒级场景"><a href="#Flink-to-ClickHouse-秒级场景" class="headerlink" title="Flink-to-ClickHouse 秒级场景"></a>Flink-to-ClickHouse 秒级场景</h2><h3 id="秒级实现架构图"><a href="#秒级实现架构图" class="headerlink" title="秒级实现架构图"></a>秒级实现架构图</h3><p>趣头条目前有很多实时指标，平均每五分钟或三分钟计算一次，如果每一个实时指标用一个 Flink 任务，或者一个 Flink SQL 来写，比如消费一个 Kafka Topic，需要计算其日活、新增、流程等等当用户提出一个新需求时，需要改当前的 Flink 任务或者启动一个新的 Flink 任务消费 Topic。</p>
+<p>因此会出现 Flink 任务不断修改或者不断起新的 Flink 任务的问题。趣头条尝试在 Flink 后接入 ClickHouse，实现整体的 OLAP。下图为秒级实现架构图。从 Kafka 到 Flink，到 Hive，到 ClickHouse 集群，对接外部 Horizon（实时报表），QE（实时 adhoc 查询），千寻（数据分析），用户画像（实时圈人）。</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210831142742269.png" alt="秒级架构图"></p>
+<h3 id="Why-Flink-ClickHouse"><a href="#Why-Flink-ClickHouse" class="headerlink" title="Why Flink+ClickHouse"></a>Why Flink+ClickHouse</h3><ul>
+<li><strong>指标实现 sql 化描述</strong>：分析师提出的指标基本都以 SQL 进行描述。</li>
+<li><strong>指标的上下线互不影响</strong>：一个 Flink 任务消费 Topic，如果还需要其它指标，可以保证指标的上下线互不影响。</li>
+<li><strong>数据可回溯，方便异常排查</strong>：当日活下降，需要回溯排查是哪些指标口径的逻辑问题，比如是报的数据差异或是数据流 Kafka 掉了，或者是因为用户没有上报某个指标导致日活下降，而 Flink 则无法进行回溯。</li>
+<li><strong>计算快，一个周期内完成所有指标计算</strong>：需要在五分钟内将成百上千的所有维度的指标全部计算完成。</li>
+<li><strong>支持实时流，分布式部署，运维简单</strong>：支持 Kafka 数据实时流。</li>
+</ul>
+<p>目前趣头条 Flink 集群有 100+ 台 32 核 128 G 3.5T SSD，日数据量 2000+ 亿，日查询量 21w+ 次，80% 查询在 1s 内完成。下图为单表测试结果。ClickHouse 单表测试速度快。但受制于架构，ClickHouse 的 Join 较弱。</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210831142905760.png" alt="clickhouse"></p>
+<p>下图是处理相对较为复杂的 SQL，count+group by+order by，ClickHouse 在 3.6s内完成 26 亿数据计算。</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210831142943666.png" alt="image-20210831142943666"></p>
+<h3 id="Why-ClickHouse-so-Fast"><a href="#Why-ClickHouse-so-Fast" class="headerlink" title="Why ClickHouse so Fast"></a>Why ClickHouse so Fast</h3><p>ClickHouse 采用列式存储 +LZ4、ZSTD 数据压缩。其次，计算存储结合本地化+向量化执行。Presto 数据可能存储在 Hadoop 集群或者 HDFS 中，实时拉取数据进行计算。而 ClickHouse 计算存储本地化是指每一台计算机器存在本地 SSD 盘，只需要计算自己的数据，再进行节点合并。同时，LSM merge tree+Index。将数据写入 ClickHouse 之后，会在后台开始一个线程将数据进行 merge，做 Index 索引。如建常见的 DT 索引和小时级数据索引，以提高查询性能。第四，SIMD+LLVM 优化。SIMD 是单指令多数据集。第五，SQL 语法及 UDF 完善。ClickHouse 对此有很大需求。在数据分析或者维度下拽时需要更高的特性，如时间窗口的一部分功能点。</p>
 <ul>
-<li>RemoteStreamEnvironment</li>
+<li><p><strong>Merge Tree</strong>：如下图所示。第一层为实时数据写入。后台进行每一层级数据的merge。merge 时会进行数据排序，做 Index 索引。</p>
+</li>
+<li><p><strong>ClickHouse Connector</strong>：ClickHouse 有两个概念，Local table 和Distributed table。一般是写 Local table ，读 Distributed table。ClickHouse 一般以 5~10w一个批次进行数据写入，5s一个周期。趣头条还实现了 RoundRobinClickHouseDataSource。</p>
+</li>
+<li><p><strong>BalancedClickHouseDataSource</strong> ：MySQL 中配置一个 IP 和端口号就可以写入数据，而 BalancedClickHouseDataSource 需要写 Local 表，因此必须要知道该集群有多少个 Local 表，每一个 Local 表的 IP 和端口号。如有一百台机器，需要将一百台机器的 IP 和端口号全部配置好，再进行写入。BalancedClickHouseDataSource 有两个 schedule。scheduleActualization和 scheduleConnectionsCleaning 。配置一百台机器的 IP 和端口号，会出现某些机器不连接或者服务不响应问题，scheduleActualization 会定期发现机器无法连接的问题，触发下线或删除 IP 等动作。scheduleConnectionsCleaning 会定期清理 ClickHouse 中无用的 http 请求。</p>
+<p><img src="C:/Users/wmy/AppData/Roaming/Typora/typora-user-images/image-20210831143140695.png" alt="image-20210831143140695"></p>
+</li>
+<li><p><strong>RoundRobinClickHouseDataSource</strong>：趣头条对BalancedClickHouseDataSource 进行加强的结果，实现了三个语义。testOnBorrow 设置为 true，尝试 ping 看能否获取连接。用 ClickHouse 写入时是一个 batch，再将 testOnReturn 设置为 false，testWhileIdel 设置为true，填入官方 scheduleActualization 和 scheduleConnectionsCleaning 的功能。ClickHouse 后台不断进行 merge，如果 insert 过快使后台 merge 速度变慢，跟不上 insert，出现报错。因此需要尽量不断往下写，等写完当前机器，再写下一个机器，以5s间隔进行写入，使 merge 速度能够尽量与 insert 速度保持一致。</p>
+</li>
 </ul>
-<p>​    在大规模数据中心中部署的Flink生产集群的执行环境。</p>
-<p>​    当将作业发布到Flink集群的时候，使用RemoteStreamEnvironment。</p>
-<p>​    其基本的工作流程如下：</p>
-<p>​    \1) 执行Flink作业的Main函数生成Streamgraph，转化为JobGraph。</p>
-<p>​    \2) 设置任务运行的配置信息。</p>
-<p>​    \3) 提交JobGraph到远程的Flink集群。</p>
-<ul>
-<li>StreamContextEnvironment</li>
-</ul>
-<p>​    在Cli命令行或者单元测试时候会被使用，执行步骤同上。</p>
-<ul>
-<li>StreamPlanEnvironment</li>
-</ul>
-<p>​    在Flink Web UI管理界面中可视化展现Job的时候，专门用来生成执行计划(实际上就是StreamGraph)</p>
-<ul>
-<li>ScalaShellStreamEnvironment</li>
-</ul>
-<p>​    这是Scala Shell执行环境，可以在命令行中交互式开发Flink作业。</p>
-<p>​    其基本工作流程如下：</p>
-<p>​    \1) 校验部署模式，目前Scala Shell仅支持attached模式。</p>
-<p>​    \2) 上传每个作业需要的Jar文件。</p>
-<p>​    其余步骤与RemoteStreamEnvironment类似。</p>
-<h2 id="1-2-运行时环境"><a href="#1-2-运行时环境" class="headerlink" title="1.2 运行时环境"></a>1.2 运行时环境</h2><ul>
-<li>RuntimeEnvironment</li>
-</ul>
-<p>​    在Task开始执行时进行初始化，把Task运行相关的信息都封装到该对象中，其中不光包含了配置信息，运行时的各种服务也会被包装到其中。</p>
-<ul>
-<li>SavepointEnvironment</li>
-</ul>
-<p>​    SavepointEnvironment是Environment的最小化实现，在状态处理器的API中使用。</p>
-<h2 id="1-3-运行时上下文"><a href="#1-3-运行时上下文" class="headerlink" title="1.3 运行时上下文"></a>1.3 运行时上下文</h2><p>​    RuntimeContext是Function运行时的上下文，封装了Function运行时可能需要的所有信息，让Function在运行时能够获取到作业级别的信息，如并行度相关信息、Task名称、执行配置信息(ExecutionConfig)、State等。</p>
-<p>​     Function的每个实例都有一个RuntimeContext对象，在RichFunction中通过getRunctionContext()可以访问该对象。</p>
-<p>​    RuntimeContext的类体系图如下:</p>
-<ul>
-<li>StreamingRuntimeContext：在流计算UDF中使用的上下文，用来访问作业信息、状态等。</li>
-<li>DistributedRuntimeUDFContext：由运行时UDF所在的批处理算子创建，在DataSet批处理中使用。</li>
-<li>RuntimeUDFContext：在批处理应用的UDF中使用。</li>
-<li>SavepointRuntimeContext：支持对检查点和保存点进行操作，包括读取、变更、写入等。</li>
-<li>CepRuntimeContext：CEP复杂事件处理中使用的上下文。</li>
-</ul>
-<h1 id="二、数据流元素"><a href="#二、数据流元素" class="headerlink" title="二、数据流元素"></a>二、数据流元素</h1><p>  数据流元素在Flink中叫做StreamElement，有数据记录StreamRecord,延迟标记LatencyMarker、Watermark、流状态标记StreamStatus这四种。在执行层面，4种数据流元素都被序列化成二进制数据，形成混合的数据流，在算子中将混合数据流中的数据流元素反序列化出来。</p>
-<ul>
-<li> StreamRecord</li>
-</ul>
-<p>​    StreamRecord表示数据流中的一条记录(或者叫做一个事件)，也叫数据记录。</p>
-<p>​    包含以下内容：</p>
-<p>​    1）数据的值本身</p>
-<p>​    2）时间戳(可选)</p>
-<ul>
-<li>LatencyMarker</li>
-</ul>
-<p>​    用来近似评估延迟，LatencyMarker在Source中创建，并向下游发送，绕过业务处理逻辑，在Sink节点中使用LatencyMarker估计数据在整个DAG图中的流转花费的时间。</p>
-<p>​     LatencyMarker包含信息如下：</p>
-<p>​    1）周期性的在数据源算子中创造出来的时间戳。</p>
-<p>​    2）算子编号</p>
-<p>​    3）数据源算子所在的Task编号</p>
-<ul>
-<li>Watermark</li>
-</ul>
-<p>​    是一个时间戳，用来告诉算子所有时间早于等于Watermark的事件或记录都已经达到，不会再有比Watermark更早的记录。</p>
-<ul>
-<li>StreamStatus</li>
-</ul>
-<p>​    用来通知Task是否会继续接收到上游的记录或者Watermark。在数据源算子中生成，向下游沿着DataFlow传递。</p>
-<p>​    有两种表示状态:</p>
-<p>​    1）空闲状态(IDLE)</p>
-<p>​    2）活动状态(ACTIVE) </p>
-<h1 id="三、数据转换"><a href="#三、数据转换" class="headerlink" title="三、数据转换"></a>三、数据转换</h1><p>​    数据转换在Flink中叫做Transformation,是衔接DataStream Api和Flink内核的逻辑结构。</p>
-<p>​    Transformation有两大类：</p>
-<ul>
-<li>物理Transformation:会转换成算子，继承了PhysicalTransformation。</li>
-<li>虚拟Transformation: 不会转换成具体算子。</li>
-</ul>
-<p>​    Tranformation包含了Flink的运行时关键参数:</p>
-<p>​    1）name：转换器名称，主要用于可视化。</p>
-<p>​    2）uid：用户指定的uid,该uid的主要目的是在job重启时再次分配跟之前相同的uid,可以持久保存状态。</p>
-<p>​    3）bufferTimeout：buffer超时时间。</p>
-<p>​    4）parallelism：并行度。</p>
-<p>​    5）id：跟属性uid无关，生成方式是基于一个静态累加器。</p>
-<p>​    6）outputType：输出类型，用来进行序列化数据。</p>
-<p>​    7）slotSharingGroup：给当前的Transformation设置Slot共享组。</p>
-<h2 id="3-1-物理Transformation"><a href="#3-1-物理Transformation" class="headerlink" title="3.1 物理Transformation"></a>3.1 物理Transformation</h2><ul>
-<li>SourceTransformation</li>
-</ul>
-<p>​    从数据源读取数据的Transformation，是Flink作业的起点。只有下游Transformation，没有上游输入。</p>
-<ul>
-<li>SinkTransformation</li>
-</ul>
-<p>​    将数据写到外部存储的Transformation,是Flink作业的终点。</p>
-<ul>
-<li>OneInputTransformation</li>
-</ul>
-<p>​    单流输入的Transformation(只接收一个输入流)，跟上面的SinkTransformation构造器类似，同样需要input和operator参数。</p>
-<ul>
-<li>TwoInputTransformation</li>
-</ul>
-<p>​    双输入的Transformation(接收两种流作为输入)，分别叫做第一输入和第二输入。</p>
-<h2 id="3-2-虚拟Transformation"><a href="#3-2-虚拟Transformation" class="headerlink" title="3.2 虚拟Transformation"></a>3.2 虚拟Transformation</h2><ul>
-<li>SideOutputTransformation</li>
-</ul>
-<p>​    在旁路输出中转换而来，表示上游Transformation的一个分流。每个sideoutput通过OutputTag标识。</p>
-<ul>
-<li>SplitTransformation</li>
-</ul>
-<p>​    用来按条件切分数据流，该转换用于将一个流拆分成多个流。</p>
-<ul>
-<li>SelectTransformation</li>
-</ul>
-<p>​    与SplitTransformation配合使用，用来在下游选择SplitTransformation切分的数据流。</p>
-<ul>
-<li>PartitionTransformation</li>
-</ul>
-<p>​    该转换器用于改变输入元素的分区，其名称为Partition。工作时除了提供一个StreamTransformation作为输入外，还需要提供一个StreamPartitionor的实例来进行分区。</p>
-<ul>
-<li>UnionTransformation</li>
-</ul>
-<p>​    合并转换器，该转换器用于将多个输入StreamTransformation进行合并，因此该转换器接收StreamTransformation的集合。Union要求上游输入的数据的结构必须是完全相同的。</p>
-<ul>
-<li>FeedbackTransformation</li>
-</ul>
-<p>​    表示FlinkDAG中的一个反馈点。简单来说，就是把符合条件的数据发回上游Transformation处理，一个反馈点可以连接一个或多个上游的Transformation,这些连接关系叫反馈边。符合反馈条件并交给上游的Transformation的数据流叫做反馈流。</p>
-<p>​    FeedbackTransformation的固定名称为Feedback，有两个重要参数：</p>
-<p>​    1）input：上游输入StreamTransformation</p>
-<p>​    2）waitTime：默认为0，即永远等待，如果设置了等待时间，一旦超过该等待时间，则计算结束并且不再接收数据。</p>
-<p>​    实例化FeedbackTransformation时，会自动创建一个用于存储反馈边的集合feedbackEdges。FeedbackTransformation通过定义一个实力方法addFeedbackEdge来收集，在加入的StreamTransformation的实例有一个要求，当前FeedbackTransformation跟待加入的StreamTransformation并行度一致。</p>
-<ul>
-<li>CoFeedbackTransformation</li>
-</ul>
-<p>​    与FeedbackTransformation类似，也是FlinkDAG中的一个反馈点。不同之处在于，CoFeedbackTransformation反馈给上游的数据流与上游Transformation的输入类型不同，所以要求上游的Transformation必须是TwoInputTransformation。</p>
-<h1 id="四、算子行为"><a href="#四、算子行为" class="headerlink" title="四、算子行为"></a>四、算子行为</h1><h2 id="4-1-生命周期管理"><a href="#4-1-生命周期管理" class="headerlink" title="4.1 生命周期管理"></a>4.1 生命周期管理</h2><p>​    1）setup：初始化环境、时间服务、注册监控等。</p>
-<p>​    2）open：该行为由各个具体的算子负责实现，包含了算子的初始化逻辑。</p>
-<p>​    3）close：所有的数据处理完毕之后关闭算子，此时需要去报将所有的缓存数据向下游发送。</p>
-<p>​    4）dispose：该方法在算子生命周期的最后执行阶段，此时算子已经关闭，停止处理数据，进行资源的释放。</p>
-<p>​    StreamTask作为算子的容器，负责管理算子的生命周期。</p>
-<h2 id="4-2-异步算子"><a href="#4-2-异步算子" class="headerlink" title="4.2 异步算子"></a>4.2 异步算子</h2><p> 异步算子的目的是解决与外部系统交互时网络延迟所导致的系统瓶颈问题。</p>
-<p>​    异步算子的两种输出模式</p>
-<p>​    1）顺序输出</p>
-<p>​        先收到的数据先输出，后续数据元素的异步函数调用无论是否先完成，都需要等待，顺序模式可以保证消息不乱序，但是可能增加延迟，降低算子的吞吐量。</p>
-<p>​    2）无序输出</p>
-<p>​        先处理完的数据元素先输出，不保证消息顺序，相比于顺序模式，无序输出模式算子延迟低、吞吐量高。无序输出模式并不是完全无序的，仍然要保持Watermark不能超越其前面数据元素的原则。等待完成队列将按照Watermakr切分成组，组内可以无序输出，组之间必须严格保证顺序。</p>
-<h1 id="五、处理函数"><a href="#五、处理函数" class="headerlink" title="五、处理函数"></a>五、处理函数</h1><h2 id="5-1-双流Join"><a href="#5-1-双流Join" class="headerlink" title="5.1 双流Join"></a>5.1 双流Join</h2><ul>
-<li>即时Join</li>
-</ul>
-<p>​    逻辑如下:</p>
-<p>​    \1) 创建一个State对象</p>
-<p>​    2）接收到输入流 1事件后更新Sate。</p>
-<p>​    3）接收到输出流 2的事件后遍历State，根据Join条件进行匹配，将匹配结果发送到下游。</p>
-<ul>
-<li>延迟双流Join</li>
-</ul>
-<p>​    在流式数据里，数据可能是乱序的，数据会延迟到达，并且为了提供处理效率，使用小批量模式计算，而不是每个事件触发一次Join计算。</p>
-<p>​    逻辑如下:</p>
-<p>​    1）创建2个state对象，分别缓存输入流1和输入流2的事件。</p>
-<p>​    2）创建一个定时器，等待数据的到达，定时延迟触发Join计算。</p>
-<p>​    3）接收到输入流1事件后更新State。</p>
-<p>​    4）接收到输入流2事件后更新State。</p>
-<p>​    5）定时器遍历State1和State2，根据Join条件进行匹配，将匹配结果发送到下游。</p>
-<h1 id="六、数据分区"><a href="#六、数据分区" class="headerlink" title="六、数据分区"></a>六、数据分区</h1><p> 数据分区在Flink中叫做Partition。本质上说，分布式计算就是把一个作业切分成子任务Task，将不同的数据交给不同的Task计算。StreamParitioner是Flink中的数据流分区抽象接口，决定了在实际运行中的数据流分发模式。</p>
-<ul>
-<li>自定义分区</li>
-</ul>
-<p>​    使用用户自定义分区函数，为每一个元组选择目标分区。</p>
-<ul>
-<li>ForwardParitioner</li>
-</ul>
-<p>​    用于在同一个OperatorChain中上下游算子之间的数据转发， 实际上数据是直接传递给下游的。</p>
-<ul>
-<li>ShufflePartitioner</li>
-</ul>
-<p>​    随机将元素进行分区，可以确保下游的Task能够均匀的获取数据。</p>
-<ul>
-<li>ReblancePartitioner</li>
-</ul>
-<p>​    以Round-robin的方式为每个元素分配分区，确保下游的Task可以均匀的获取数据，以免数据倾斜。</p>
-<ul>
-<li>RescalingPartitioner</li>
-</ul>
-<p>​    根据上下游Task的数据进行分区。使用Round-robin选择下游的一个Task进行数据分区，如上游有2个Source,下游有6个Map,那么每个Source会分配3个固定下游的map,不会向未分配给自己的分区写入数据。</p>
-<ul>
-<li>BroadcastPartitioner</li>
-</ul>
-<p>​    将该记录广播给所有分区，即有N个分区，就把数据复制N份，每个分区1份。</p>
-<ul>
-<li>KeyGroupStreamPartitioner</li>
-</ul>
-<p>​    keyedStream根据KeyGroup索引编号进行分区，该分区器不是提供给用户来用。KeyedStream在构造Transformation的时候默认使用KeyedGroup分区形式，从而在底层上支持作业Rescale功能。</p>
-<h1 id="七、分布式ID"><a href="#七、分布式ID" class="headerlink" title="七、分布式ID"></a>七、分布式ID</h1>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210831143227712.png" alt="image-20210831143227712"></p>
+<h3 id="Backfill"><a href="#Backfill" class="headerlink" title="Backfill"></a>Backfill</h3><p>Flink 导入 ClickHouse，在数据查询或展示报表时，会遇到一些问题，比如 Flink 任务出现故障、报错或数据反压等，或 ClickHouse 集群出现不可响应，zk 跟不上，insert 过快或集群负载等问题，这会导致整个任务出现问题。</p>
+<p>如果流数据量突然暴增，启动 Flink 可能出现一段时间内不断追数据的情况，需要进行调整并行度等操作帮助 Flink 追数据。但这时已经出现数据积压，若还要加大 Flink 并发度处理数据，ClickHouse 限制 insert 不能过快，否则会导致恶性循环。因此当 Flink 故障或 ClickHouse 集群故障时，等待 ClickHouse 集群恢复后，Flink 任务从最新数据开始消费，不再追过去一段时间的数据，通过 Hive 将数据导入到 ClickHouse。</p>
+<p>由于之前已经通过 Kafka 将数据实时落地到 Hive，通过 Hive 将数据写入 ClickHouse 中。ClickHouse 有分区，只需要将上一个小时的数据删除，导入 Hive 的一小时数据，就可以继续进行数据查询操作。Backfill 提供了 Flink 任务小时级容错以及 ClickHouse 集群小时级容错机制。</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210831143319041.png" alt="image-20210831143319041"></p>
+<h2 id="未来发展与思考"><a href="#未来发展与思考" class="headerlink" title="未来发展与思考"></a>未来发展与思考</h2><h3 id="Connector-SQL-化"><a href="#Connector-SQL-化" class="headerlink" title="Connector SQL 化"></a>Connector SQL 化</h3><p>目前， Flink-to-Hive 以及 Flink-to-ClickHouse 都是趣头条较为固化的场景，只需指定 HDFS 路径以及用户，其余过程都可以通过 SQL 化描述。</p>
+<h3 id="Delta-lake"><a href="#Delta-lake" class="headerlink" title="Delta lake"></a>Delta lake</h3><p>Flink 是流批一体计算引擎，但是没有流批一体的存储。趣头条会用 HBase、Kudu、Redis 等能够与 Flink 实时交互的 KV 存储进行数据计算。如计算新增问题，目前趣头条的方案是需要将 Hive 历史用户刷到 Redis 或 HBase 中，与 Flink 进行实时交互判断用户是否新增。</p>
+<p>但因为 Hive 中的数据和 Redis 中的数据是存储为两份数据。其次 Binlog 抽取数据会涉及 delete 动作，Hbase，Kudu 支持数据修改，定期回到 Hive 中。带来的问题是 HBase，Kudu 中存在数据，Hive 又保存了一份数据，多出一份或多份数据。如果有流批一体的存储支持上述场景，当 Flink 任务过来，可以与离线数据进行实时交互，包括实时查询 Hive 数据等，可以实时判断用户是否新增，对数据进行实时修改、更新或 delete，也能支持 Hive 的批的动作存储。</p>
+<p>未来，趣头条考虑对 Flink 做流批的存储，使 Flink 生态统一为流批结合。</p>
+
                 
             </div>
             <hr/>
@@ -712,7 +567,7 @@
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://github.com/wmybigdata/2021/08/31/Flink%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E6%80%8E%E4%B9%88%E4%BC%9A%E7%94%A8%E5%88%B0%E8%BF%99%E4%BA%9B/">https://github.com/wmybigdata/2021/08/31/Flink%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E6%80%8E%E4%B9%88%E4%BC%9A%E7%94%A8%E5%88%B0%E8%BF%99%E4%BA%9B/</a>
+                    <a href="https://github.com/wmybigdata/2021/08/31/%E8%B6%A3%E5%A4%B4%E6%9D%A1%E5%9F%BA%E4%BA%8E-Flink-ClickHouse%E6%9E%84%E5%BB%BA%E5%AE%9E%E6%97%B6%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90%E5%B9%B3%E5%8F%B0/">https://github.com/wmybigdata/2021/08/31/%E8%B6%A3%E5%A4%B4%E6%9D%A1%E5%9F%BA%E4%BA%8E-Flink-ClickHouse%E6%9E%84%E5%BB%BA%E5%AE%9E%E6%97%B6%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90%E5%B9%B3%E5%8F%B0/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -749,11 +604,7 @@
                 <div class="post-meta__tag-list" style="display: inline-block;">
                     
                         <div class="article-tag">
-                            
-                                <a href="/tags/Flink%E6%B5%81%E5%BC%8F%E5%BC%95%E6%93%8E/">
-                                    <span class="chip bg-color">Flink流式引擎</span>
-                                </a>
-                            
+                            <span class="chip bg-color">无标签</span>
                         </div>
                     
                 </div>
@@ -921,9 +772,48 @@
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+                <i class="far fa-dot-circle"></i>&nbsp;本篇
+            </div>
+            <div class="card">
+                <a href="/2021/08/31/%E8%B6%A3%E5%A4%B4%E6%9D%A1%E5%9F%BA%E4%BA%8E-Flink-ClickHouse%E6%9E%84%E5%BB%BA%E5%AE%9E%E6%97%B6%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90%E5%B9%B3%E5%8F%B0/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/23.jpg" class="responsive-img" alt="趣头条基于-Flink-ClickHouse构建实时数据分析平台">
+                        
+                        <span class="card-title">趣头条基于-Flink-ClickHouse构建实时数据分析平台</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-08-31
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-user fa-fw"></i>
+                            情深骚明
+                            
+                        </span>
+                    </div>
+                </div>
+
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
             <div class="card">
                 <a href="/2021/08/31/Flink%E5%AE%9E%E6%97%B6OLAP/">
                     <div class="card-image">
@@ -941,9 +831,9 @@
                         
                     </div>
                     <div class="publish-info">
-                        <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2021-08-31
-                        </span>
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-08-31
+                            </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
@@ -961,55 +851,6 @@
                     
                     <a href="/tags/Flink%E6%B5%81%E5%BC%8F%E5%BC%95%E6%93%8E/">
                         <span class="chip bg-color">Flink流式引擎</span>
-                    </a>
-                    
-                </div>
-                
-            </div>
-        </div>
-        
-        
-        <div class="article col s12 m6" data-aos="fade-up">
-            <div class="article-badge right-badge text-color">
-                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
-            </div>
-            <div class="card">
-                <a href="/2021/08/31/%E5%AE%9E%E6%97%B6%E6%95%B0%E4%BB%93%E6%95%B0%E6%8D%AE%E6%8E%A5%E5%8F%A3%E5%B1%95%E7%A4%BA/">
-                    <div class="card-image">
-                        
-                        
-                        <img src="/medias/featureimages/4.jpg" class="responsive-img" alt="实时数仓数据接口展示">
-                        
-                        <span class="card-title">实时数仓数据接口展示</span>
-                    </div>
-                </a>
-                <div class="card-content article-content">
-                    <div class="summary block-with-text">
-                        
-                            学习心得记录
-                        
-                    </div>
-                    <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2021-08-31
-                            </span>
-                        <span class="publish-author">
-                            
-                            <i class="fas fa-bookmark fa-fw icon-category"></i>
-                            
-                            <a href="/categories/%E4%BC%81%E4%B8%9A%E7%BA%A7%E6%95%B0%E6%8D%AE%E4%BB%93%E5%BA%93/" class="post-category">
-                                    企业级数据仓库
-                                </a>
-                            
-                            
-                        </span>
-                    </div>
-                </div>
-                
-                <div class="card-action article-tags">
-                    
-                    <a href="/tags/%E4%BC%81%E4%B8%9A%E7%BA%A7%E6%95%B0%E6%8D%AE%E4%BB%93%E5%BA%93/">
-                        <span class="chip bg-color">企业级数据仓库</span>
                     </a>
                     
                 </div>
