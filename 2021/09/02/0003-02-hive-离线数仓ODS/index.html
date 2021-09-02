@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="0003-01-离线数仓数据准备, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
+    <meta name="keywords" content="0003-02-hive-离线数仓ODS, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
     <meta name="description" content="本网站是个人兴趣爱好，总结分享经验，记录生活点滴的平台，希望在以后的学习旅途中，走出自己的风景。">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -16,7 +16,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>0003-01-离线数仓数据准备 | 情深骚明大数据之旅</title>
+    <title>0003-02-hive-离线数仓ODS | 情深骚明大数据之旅</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -314,12 +314,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/0.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/11.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">0003-01-离线数仓数据准备</h1>
+                    <h1 class="description center-align post-title">0003-02-hive-离线数仓ODS</h1>
                 </div>
             </div>
         </div>
@@ -481,113 +481,48 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h1 id="0003-01-离线数仓数据准备"><a href="#0003-01-离线数仓数据准备" class="headerlink" title="0003-01-离线数仓数据准备"></a>0003-01-离线数仓数据准备</h1><h2 id="1、行为数据采集"><a href="#1、行为数据采集" class="headerlink" title="1、行为数据采集"></a>1、行为数据采集</h2><h3 id="1-1-模拟数据"><a href="#1-1-模拟数据" class="headerlink" title="1.1 模拟数据"></a>1.1 模拟数据</h3><h4 id="1-1-1-使用说明"><a href="#1-1-1-使用说明" class="headerlink" title="1.1.1 使用说明"></a>1.1.1 使用说明</h4><p>1）将application.yml、gmall2020-mock-log-2021-01-22.jar、path.json、logback.xml上传到flink04的/opt/module/applog目录下</p>
-<p>（1）创建log路径</p>
-<pre class=" language-properties"><code class="language-properties"><span class="token attr-name">mkdir</span> <span class="token attr-value">/opt/flink/warehouse/warehouse4.0/log</span>
+                <h1 id="0003-02-hive-离线数仓ODS"><a href="#0003-02-hive-离线数仓ODS" class="headerlink" title="0003-02-hive-离线数仓ODS"></a>0003-02-hive-离线数仓ODS</h1><h2 id="错误"><a href="#错误" class="headerlink" title="错误"></a>错误</h2><p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210902184653360.png" alt="错误解决"></p>
+<pre class=" language-properties"><code class="language-properties"><span class="token attr-name">hdfs</span> <span class="token attr-value">dfs -rm -r /spark-history/application_1630214450313_0001_1</span>
+<span class="token attr-name">hdfs</span> <span class="token attr-value">dfs -rm -r /tmp/logs/root/logs-tfile/application_1630214450313_0001/flink04_35686</span>
+<span class="token attr-name">hdfs</span> <span class="token attr-value">dfs -rm -r /tmp/logs/root/logs-tfile/application_1630214450313_0001/flink05_46674</span>
 </code></pre>
-<p>2）配置文件</p>
-<p>（1）application.yml文件</p>
-<p>​    可以根据需求生成对应日期的用户行为日志。</p>
-<p>（2）path.json，该文件用来配置访问路径</p>
-<p>（3）logback配置文件</p>
-<p>​    修改自己得路径</p>
-<h4 id="1-1-2-运行程序"><a href="#1-1-2-运行程序" class="headerlink" title="1.1.2 运行程序"></a>1.1.2 运行程序</h4><pre class=" language-bash"><code class="language-bash">java -jar gmall2020-mock-log-2021-01-22.jar
+<p>遇到这种情况的话，直接删除就好了</p>
+<h2 id="ODS建表"><a href="#ODS建表" class="headerlink" title="ODS建表"></a>ODS建表</h2><pre class=" language-sql"><code class="language-sql"><span class="token keyword">create</span> <span class="token keyword">database</span> warehouse<span class="token punctuation">;</span>
 </code></pre>
-<h3 id="1-2、采集数据到hdfs"><a href="#1-2、采集数据到hdfs" class="headerlink" title="1.2、采集数据到hdfs"></a>1.2、采集数据到hdfs</h3><h4 id="1-2-1-file-kafka"><a href="#1-2-1-file-kafka" class="headerlink" title="1.2.1 file-kafka"></a>1.2.1 file-kafka</h4><pre class=" language-properties"><code class="language-properties"><span class="token comment" spellcheck="true">#为各组件命名</span>
-<span class="token attr-name">a1.sources</span> <span class="token punctuation">=</span> <span class="token attr-value">r1</span>
-<span class="token attr-name">a1.channels</span> <span class="token punctuation">=</span> <span class="token attr-value">c1</span>
-
-<span class="token comment" spellcheck="true">#描述source</span>
-<span class="token attr-name">a1.sources.r1.type</span> <span class="token punctuation">=</span> <span class="token attr-value">TAILDIR</span>
-<span class="token attr-name">a1.sources.r1.filegroups</span> <span class="token punctuation">=</span> <span class="token attr-value">f1</span>
-<span class="token attr-name">a1.sources.r1.filegroups.f1</span> <span class="token punctuation">=</span> <span class="token attr-value">/opt/flink/warehouse/warehouse4.0/log/log/app.*</span>
-<span class="token attr-name">a1.sources.r1.positionFile</span> <span class="token punctuation">=</span> <span class="token attr-value">/opt/flink/platform/flume-1.9.0/taildir_position.json</span>
-<span class="token attr-name">a1.sources.r1.interceptors</span> <span class="token punctuation">=</span>  <span class="token attr-value">i1</span>
-<span class="token attr-name">a1.sources.r1.interceptors.i1.type</span> <span class="token punctuation">=</span> <span class="token attr-value">com.atguigu.flume.interceptor.ETLInterceptor$Builder</span>
-
-<span class="token comment" spellcheck="true">#描述channel</span>
-<span class="token attr-name">a1.channels.c1.type</span> <span class="token punctuation">=</span> <span class="token attr-value">org.apache.flume.channel.kafka.KafkaChannel</span>
-<span class="token attr-name">a1.channels.c1.kafka.bootstrap.servers</span> <span class="token punctuation">=</span> <span class="token attr-value">flink04:9092,flink05:9092,flink06:9092</span>
-<span class="token attr-name">a1.channels.c1.kafka.topic</span> <span class="token punctuation">=</span> <span class="token attr-value">off_line_topic_log</span>
-<span class="token attr-name">a1.channels.c1.parseAsFlumeEvent</span> <span class="token punctuation">=</span> <span class="token attr-value">false</span>
-
-<span class="token comment" spellcheck="true">#绑定source和channel以及sink和channel的关系</span>
-<span class="token attr-name">a1.sources.r1.channels</span> <span class="token punctuation">=</span> <span class="token attr-value">c1</span>
+<h3 id="1、用户行为日志"><a href="#1、用户行为日志" class="headerlink" title="1、用户行为日志"></a>1、用户行为日志</h3><pre class=" language-sql"><code class="language-sql"><span class="token keyword">drop</span> <span class="token keyword">table</span> <span class="token keyword">if</span> <span class="token keyword">exists</span> ods_log<span class="token punctuation">;</span>
+<span class="token keyword">create</span> external <span class="token keyword">table</span> ods_log
+<span class="token punctuation">(</span>
+<span class="token punctuation">`</span>line<span class="token punctuation">`</span> string  <span class="token keyword">comment</span> <span class="token string">'用户的一行数据'</span>
+<span class="token punctuation">)</span>
+partitioned <span class="token keyword">by</span> <span class="token punctuation">(</span><span class="token punctuation">`</span>dt<span class="token punctuation">`</span> string<span class="token punctuation">)</span>
+stored <span class="token keyword">as</span> 
+inputformat <span class="token string">'com.hadoop.mapred.DeprecatedLzoTextInputFormat'</span>
+outputformat <span class="token string">'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'</span>
+location <span class="token string">'/user/hive/warehouse/warehouse.db/ods/ods_log'</span><span class="token punctuation">;</span>
 </code></pre>
-<h4 id="1-2-2-fileTokafka-sh"><a href="#1-2-2-fileTokafka-sh" class="headerlink" title="1.2.2 fileTokafka.sh"></a>1.2.2 fileTokafka.sh</h4><pre class=" language-bash"><code class="language-bash">/opt/flink/platform/flume-1.9.0/bin/flume-ng agent --conf-file /opt/flink/platform/flume-1.9.0/conf/file-flume-kafka.conf --name a1 -Dflume.root.logger<span class="token operator">=</span>INFO,LOGFILE
+<h4 id="1-1-数据装载"><a href="#1-1-数据装载" class="headerlink" title="1.1 数据装载"></a>1.1 数据装载</h4><pre class=" language-sql"><code class="language-sql"><span class="token keyword">load</span> <span class="token keyword">data</span> inpath <span class="token string">'/off_line_warehouse/data/log/off_line_topic_log/2021-09-02'</span> <span class="token keyword">into</span> <span class="token keyword">table</span> ods_log <span class="token keyword">partition</span><span class="token punctuation">(</span>dt<span class="token operator">=</span><span class="token string">'2021-09-02'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 </code></pre>
-<h4 id="1-2-3-kafka-hdfs"><a href="#1-2-3-kafka-hdfs" class="headerlink" title="1.2.3 kafka-hdfs"></a>1.2.3 kafka-hdfs</h4><pre class=" language-properties"><code class="language-properties"><span class="token comment" spellcheck="true">#为各组件命名</span>
-<span class="token attr-name">a1.sources</span> <span class="token punctuation">=</span> <span class="token attr-value">r1</span>
-<span class="token attr-name">a1.channels</span> <span class="token punctuation">=</span> <span class="token attr-value">c1</span>
+<h4 id="1-2-脚本"><a href="#1-2-脚本" class="headerlink" title="1.2 脚本"></a>1.2 脚本</h4><pre class=" language-bash"><code class="language-bash"><span class="token shebang important">#!/bin/bash</span>
 
-<span class="token comment" spellcheck="true">#描述source</span>
-<span class="token attr-name">a1.sources.r1.type</span> <span class="token punctuation">=</span> <span class="token attr-value">TAILDIR</span>
-<span class="token attr-name">a1.sources.r1.filegroups</span> <span class="token punctuation">=</span> <span class="token attr-value">f1</span>
-<span class="token attr-name">a1.sources.r1.filegroups.f1</span> <span class="token punctuation">=</span> <span class="token attr-value">/opt/flink/warehouse/warehouse4.0/log/log/app.*</span>
-<span class="token attr-name">a1.sources.r1.positionFile</span> <span class="token punctuation">=</span> <span class="token attr-value">/opt/flink/platform/flume-1.9.0/taildir_position.json</span>
-<span class="token attr-name">a1.sources.r1.interceptors</span> <span class="token punctuation">=</span>  <span class="token attr-value">i1</span>
-<span class="token attr-name">a1.sources.r1.interceptors.i1.type</span> <span class="token punctuation">=</span> <span class="token attr-value">com.atguigu.flume.interceptor.ETLInterceptor$Builder</span>
+<span class="token comment" spellcheck="true"># 定义变量方便修改</span>
+APP<span class="token operator">=</span>warehouse
 
-<span class="token comment" spellcheck="true">#描述channel</span>
-<span class="token attr-name">a1.channels.c1.type</span> <span class="token punctuation">=</span> <span class="token attr-value">org.apache.flume.channel.kafka.KafkaChannel</span>
-<span class="token attr-name">a1.channels.c1.kafka.bootstrap.servers</span> <span class="token punctuation">=</span> <span class="token attr-value">flink04:9092,flink05:9092,flink06:9092</span>
-<span class="token attr-name">a1.channels.c1.kafka.topic</span> <span class="token punctuation">=</span> <span class="token attr-value">off_line_topic_log</span>
-<span class="token attr-name">a1.channels.c1.parseAsFlumeEvent</span> <span class="token punctuation">=</span> <span class="token attr-value">false</span>
+<span class="token comment" spellcheck="true"># 如果是输入的日期按照取输入日期；如果没输入日期取当前时间的前一天</span>
+<span class="token keyword">if</span> <span class="token punctuation">[</span> -n <span class="token string">"<span class="token variable">$1</span>"</span> <span class="token punctuation">]</span> <span class="token punctuation">;</span><span class="token keyword">then</span>
+   do_date<span class="token operator">=</span><span class="token variable">$1</span>
+<span class="token keyword">else</span> 
+   do_date<span class="token operator">=</span>`date -d <span class="token string">"-1 day"</span> +%F`
+<span class="token keyword">fi</span> 
 
-<span class="token comment" spellcheck="true">#绑定source和channel以及sink和channel的关系</span>
-<span class="token attr-name">a1.sources.r1.channels</span> <span class="token punctuation">=</span> <span class="token attr-value">c1</span>
-<span class="token attr-name">[root@flink04</span> <span class="token attr-value">conf]# cat kafka-flume-hdfs.conf </span>
-<span class="token comment" spellcheck="true">## 组件</span>
-<span class="token attr-name">a1.sources</span><span class="token punctuation">=</span><span class="token attr-value">r1</span>
-<span class="token attr-name">a1.channels</span><span class="token punctuation">=</span><span class="token attr-value">c1</span>
-<span class="token attr-name">a1.sinks</span><span class="token punctuation">=</span><span class="token attr-value">k1</span>
+<span class="token keyword">echo</span> <span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span> 日志日期为 <span class="token variable">$do_date</span> <span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span>
+sql<span class="token operator">=</span><span class="token string">"
+load data inpath '/off_line_warehouse/data/log/off_line_topic_log/<span class="token variable">$do_date</span>' into table <span class="token variable">${APP}</span>.ods_log partition(dt='<span class="token variable">$do_date</span>');
+"</span>
 
-<span class="token comment" spellcheck="true">## source1</span>
-<span class="token attr-name">a1.sources.r1.type</span> <span class="token punctuation">=</span> <span class="token attr-value">org.apache.flume.source.kafka.KafkaSource</span>
-<span class="token attr-name">a1.sources.r1.batchSize</span> <span class="token punctuation">=</span> <span class="token attr-value">5000</span>
-<span class="token attr-name">a1.sources.r1.batchDurationMillis</span> <span class="token punctuation">=</span> <span class="token attr-value">2000</span>
-<span class="token attr-name">a1.sources.r1.kafka.bootstrap.servers</span> <span class="token punctuation">=</span> <span class="token attr-value">flink04:9092,flink05:9092,flink06:9092</span>
-<span class="token attr-name">a1.sources.r1.kafka.topics</span><span class="token punctuation">=</span><span class="token attr-value">off_line_topic_log</span>
-<span class="token attr-name">a1.sources.r1.interceptors</span> <span class="token punctuation">=</span> <span class="token attr-value">i1</span>
-<span class="token attr-name">a1.sources.r1.interceptors.i1.type</span> <span class="token punctuation">=</span> <span class="token attr-value">com.atguigu.flume.interceptor.TimeStampInterceptor$Builder</span>
+hive -e <span class="token string">"<span class="token variable">$sql</span>"</span>
 
-<span class="token comment" spellcheck="true">## channel1</span>
-<span class="token attr-name">a1.channels.c1.type</span> <span class="token punctuation">=</span> <span class="token attr-value">file</span>
-<span class="token attr-name">a1.channels.c1.checkpointDir</span> <span class="token punctuation">=</span> <span class="token attr-value">/opt/flink/platform/flume-1.9.0/checkpoint/behavior1</span>
-<span class="token attr-name">a1.channels.c1.dataDirs</span> <span class="token punctuation">=</span> <span class="token attr-value">/opt/flink/platform/flume-1.9.0/data/behavior1/</span>
-
-
-<span class="token comment" spellcheck="true">## sink1</span>
-<span class="token attr-name">a1.sinks.k1.type</span> <span class="token punctuation">=</span> <span class="token attr-value">hdfs</span>
-<span class="token attr-name">a1.sinks.k1.hdfs.path</span> <span class="token punctuation">=</span> <span class="token attr-value">/off_line_warehouse/data/log/off_line_topic_log/%Y-%m-%d</span>
-<span class="token attr-name">a1.sinks.k1.hdfs.filePrefix</span> <span class="token punctuation">=</span> <span class="token attr-value">log-</span>
-<span class="token attr-name">a1.sinks.k1.hdfs.round</span> <span class="token punctuation">=</span> <span class="token attr-value">false</span>
-
-<span class="token comment" spellcheck="true">#控制生成的小文件</span>
-<span class="token attr-name">a1.sinks.k1.hdfs.rollInterval</span> <span class="token punctuation">=</span> <span class="token attr-value">10</span>
-<span class="token attr-name">a1.sinks.k1.hdfs.rollSize</span> <span class="token punctuation">=</span> <span class="token attr-value">134217728</span>
-<span class="token attr-name">a1.sinks.k1.hdfs.rollCount</span> <span class="token punctuation">=</span> <span class="token attr-value">0</span>
-
-<span class="token comment" spellcheck="true">## 控制输出文件是原生文件。</span>
-<span class="token attr-name">a1.sinks.k1.hdfs.fileType</span> <span class="token punctuation">=</span> <span class="token attr-value">CompressedStream</span>
-<span class="token attr-name">a1.sinks.k1.hdfs.codeC</span> <span class="token punctuation">=</span> <span class="token attr-value">lzop</span>
-
-<span class="token comment" spellcheck="true">## 拼装</span>
-<span class="token attr-name">a1.sources.r1.channels</span> <span class="token punctuation">=</span> <span class="token attr-value">c1</span>
-<span class="token attr-name">a1.sinks.k1.channel</span><span class="token punctuation">=</span> <span class="token attr-value">c1</span>
+hadoop jar /opt/flink/platform/hadoop-3.1.3/share/hadoop/common/hadoop-lzo-0.4.20.jar com.hadoop.compression.lzo.DistributedLzoIndexer /user/hive/warehouse/warehouse.db/ods/ods_log/dt<span class="token operator">=</span><span class="token variable">$do_date</span>
 </code></pre>
-<h4 id="1-2-4-kafkaTohdfs-sh"><a href="#1-2-4-kafkaTohdfs-sh" class="headerlink" title="1.2.4 kafkaTohdfs.sh"></a>1.2.4 kafkaTohdfs.sh</h4><pre class=" language-bash"><code class="language-bash">/opt/flink/platform/flume-1.9.0/bin/flume-ng agent --conf-file /opt/flink/platform/flume-1.9.0/conf/kafka-flume-hdfs.conf --name a1 -Dflume.root.logger<span class="token operator">=</span>INFO,LOGFILE
-</code></pre>
-<p>准备好路径就行</p>
-<p>使用前台进程启动就可以了</p>
-<h2 id="2、业务数据采集"><a href="#2、业务数据采集" class="headerlink" title="2、业务数据采集"></a>2、业务数据采集</h2><p>创建hive数据库，建表，到库</p>
-<p>运行gmall.sql</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210902174944357.png" alt="命令导入"></p>
-<h2 id="3、业务数据导入hdfs"><a href="#3、业务数据导入hdfs" class="headerlink" title="3、业务数据导入hdfs"></a>3、业务数据导入hdfs</h2><pre class=" language-properties"><code class="language-properties"><span class="token attr-name">mysqlTohdfs.sh</span> <span class="token attr-value">all 2021-09-02</span>
-</code></pre>
-<p>这个时候数据就已经初步给准备好了</p>
-<p>导入hdfs中一共25张表</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210902181015007.png" alt="离线数仓的学习数据"></p>
 
                 
             </div>
@@ -614,7 +549,7 @@
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://github.com/wmybigdata/2021/09/02/0003-01-%E7%A6%BB%E7%BA%BF%E6%95%B0%E4%BB%93%E6%95%B0%E6%8D%AE%E5%87%86%E5%A4%87/">https://github.com/wmybigdata/2021/09/02/0003-01-%E7%A6%BB%E7%BA%BF%E6%95%B0%E4%BB%93%E6%95%B0%E6%8D%AE%E5%87%86%E5%A4%87/</a>
+                    <a href="https://github.com/wmybigdata/2021/09/02/0003-02-hive-%E7%A6%BB%E7%BA%BF%E6%95%B0%E4%BB%93ODS/">https://github.com/wmybigdata/2021/09/02/0003-02-hive-%E7%A6%BB%E7%BA%BF%E6%95%B0%E4%BB%93ODS/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -823,9 +758,10 @@
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+                <i class="far fa-dot-circle"></i>&nbsp;本篇
+            </div>
             <div class="card">
                 <a href="/2021/09/02/0003-02-hive-%E7%A6%BB%E7%BA%BF%E6%95%B0%E4%BB%93ODS/">
                     <div class="card-image">
@@ -843,9 +779,9 @@
                         
                     </div>
                     <div class="publish-info">
-                        <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2021-09-02
-                        </span>
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-09-02
+                            </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
@@ -858,6 +794,7 @@
                         </span>
                     </div>
                 </div>
+
                 
                 <div class="card-action article-tags">
                     
@@ -876,13 +813,13 @@
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2021/09/02/Flink%E4%BD%9C%E4%B8%9A%E6%89%A7%E8%A1%8C%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/">
+                <a href="/2021/09/02/0003-01-%E7%A6%BB%E7%BA%BF%E6%95%B0%E4%BB%93%E6%95%B0%E6%8D%AE%E5%87%86%E5%A4%87/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/21.jpg" class="responsive-img" alt="Flink作业执行深度解析">
+                        <img src="/medias/featureimages/0.jpg" class="responsive-img" alt="0003-01-离线数仓数据准备">
                         
-                        <span class="card-title">Flink作业执行深度解析</span>
+                        <span class="card-title">0003-01-离线数仓数据准备</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -899,8 +836,8 @@
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Flink%E6%B5%81%E5%BC%8F%E5%BC%95%E6%93%8E/" class="post-category">
-                                    Flink流式引擎
+                            <a href="/categories/%E7%A6%BB%E7%BA%BF%E6%95%B0%E4%BB%93%E5%BB%BA%E8%AE%BE/" class="post-category">
+                                    离线数仓建设
                                 </a>
                             
                             
@@ -910,8 +847,8 @@
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/Flink%E6%B5%81%E5%BC%8F%E5%BC%95%E6%93%8E/">
-                        <span class="chip bg-color">Flink流式引擎</span>
+                    <a href="/tags/%E7%A6%BB%E7%BA%BF%E6%95%B0%E4%BB%93%E5%BB%BA%E8%AE%BE/">
+                        <span class="chip bg-color">离线数仓建设</span>
                     </a>
                     
                 </div>
