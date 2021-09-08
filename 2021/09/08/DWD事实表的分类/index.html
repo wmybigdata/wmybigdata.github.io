@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="Phoenix二级索引-讲原理, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
+    <meta name="keywords" content="DWD事实表的分类, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
     <meta name="description" content="本网站是个人兴趣爱好，总结分享经验，记录生活点滴的平台，希望在以后的学习旅途中，走出自己的风景。">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -16,7 +16,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>Phoenix二级索引-讲原理 | 情深骚明大数据之旅</title>
+    <title>DWD事实表的分类 | 情深骚明大数据之旅</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -314,12 +314,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/23.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/5.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">Phoenix二级索引-讲原理</h1>
+                    <h1 class="description center-align post-title">DWD事实表的分类</h1>
                 </div>
             </div>
         </div>
@@ -433,12 +433,25 @@
             <div class="row tag-cate">
                 <div class="col s7">
                     
-                          <div class="article-tag">
-                            <span class="chip bg-color">无标签</span>
-                          </div>
+                    <div class="article-tag">
+                        
+                            <a href="/tags/%E7%A6%BB%E7%BA%BF%E6%95%B0%E4%BB%93/">
+                                <span class="chip bg-color">离线数仓</span>
+                            </a>
+                        
+                    </div>
                     
                 </div>
                 <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/%E7%A6%BB%E7%BA%BF%E6%95%B0%E4%BB%93%E5%BB%BA%E8%AE%BE/" class="post-category">
+                                离线数仓建设
+                            </a>
+                        
+                    </div>
                     
                 </div>
             </div>
@@ -447,7 +460,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2021-08-30
+                    2021-09-08
                 </div>
                 
 
@@ -468,7 +481,36 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                
+                <h1 id="DWD事实表的分类"><a href="#DWD事实表的分类" class="headerlink" title="DWD事实表的分类"></a>DWD事实表的分类</h1><p>维度建模数仓领域中的事实表大致分以下三种：事务事实表，周期快照事实表，累计事实表。</p>
+<p>事务事实表与周期快照事实表、累积快照事实表虽然使用相同的一致性维度，但是它们在内容构成以及业务描述上还是有很大的区别。</p>
+<h2 id="1-事务事实表"><a href="#1-事务事实表" class="headerlink" title="1.事务事实表"></a>1.事务事实表</h2><p>事务事实表记录的事务层面的事实，保存的是最原子的数据，也称“原子事实表”。事务事实表中的数据在事务事件发生后产生，数据的粒度通常是每个事务记录一条记录。一旦事务被提交，事实表数据被插入，数据就不再进行更改，其更新方式为增量更新。由于事实表具有稀疏性质 ，因此只有当天数据才会进入 当天的事实表中，相当于每个分区里面都是每天的数据，不包含之前的数据。 </p>
+<p>事务事实表的日期维度记录的是事务发生的日期，它记录的事实是事务活动的内容。用户可以通过事务事实表对事务行为进行特别详细的分析。</p>
+<p>为什么事务事实表具有稀疏性质？</p>
+<p>事实表一般围绕着度量来建立，当度量产生的时候，事实记录就生成了。度量可以是销售数量、交易流水值、月末节余等数值。如果同时生成多个度量值的话，我们可以在一个事实表中建立多个事实。当我们的事实表中的事实比较多时，有可能多个事实不同时发生，如果同时生成的几率很小，我们称之为稀疏事实表（Sparse Facts）。</p>
+<h2 id="2-周期快照事实表"><a href="#2-周期快照事实表" class="headerlink" title="2.周期快照事实表"></a>2.周期快照事实表</h2><p>周期快照事实表以具有规律性的、可预见的时间间隔来记录事实，时间间隔如每天、每月、每年等等。典型的例子如销售日快照表、库存日快照表等。它统计的是间隔周期内的度量统计，如历史至今、自然年至今、季度至今等等</p>
+<p>周期快照表没有粒度的概念，取而代之的是周期+状态度量的组合，如历史至今的订单总数，其中历史至今是一个周期，订单总数是度量。</p>
+<p>周期快照事实表的粒度是每个时间段一条记录，通常比事务事实表的粒度要粗，是在事务事实表之上建立的聚集表，比如说时间周期是1周，那么这个周期快照事实表的一条记录就是这一周的对于某个度量的统计值（我理解的）。</p>
+<p>周期快照事实表的维度个数比事务事实表要少，但是记录的事实要比事务事实表多(为什么记录的事会比事务事实表表多呢？)。事务事实表是稀疏表，周期快照表是稠密表。</p>
+<p>什么是稀疏表，什么是稠密表？</p>
+<p>稀疏表：当天只有发生了操作才会有记录</p>
+<p>稠密表：当天没有操作也会有记录，便于下游使用</p>
+<p>周期快照事实表的日期维度通常是记录时间段的终止日，记录的事实是这个时间段内一些聚集事实值。事实表的数据一旦插入即不能更改，其更新方式为增量更新。</p>
+<p>为什么周期快照事实表纪录的纪录会比事务事实表多呢？</p>
+<p>根据阿里大数据之路第11章212页所说：</p>
+<p>事务事实表是 稀疏的，只有当天发生的业务过程，事实表才会记录该业务过程的事 实， 如下单、支付等;而快照事实表是稠密的，无论当天是否有业务过程发 生，都会记录一行，比如针对卖家的历史至今的下单和支付金额，无论 当天卖家是否有下单支付事实，都会给该卖家记录一行。</p>
+<p>假如卖家之前下单6笔，昨天没有下单，但是还是会给他在昨天的分区里面纪录它截止目前为止下单6笔的纪录。</p>
+<h2 id="3-累计快照事实表"><a href="#3-累计快照事实表" class="headerlink" title="3.累计快照事实表"></a>3.累计快照事实表</h2><p>累积快照事实表和周期快照事实表有些相似之处，它们存储的都是事务数据的快照信息。但是它们之间也有着很大的不同，周期快照事实表记录的确定的周期的数据，而累积快照事实表记录的不确定的周期的数据。累积快照事实表代表的是完全覆盖一个事务或产品的生命周期的时间跨度，它通常具有多个日期字段，用来记录整个生命周期中的关键时间点。例如订单累计快照事实表会有付款日期，发货日期，收货日期等时间点。</p>
+<p>事务事实表中一条交易记录会每天有一条数据来记录整个交易过程；而累积快照事实表只会有一条记录，数据会一致更新直到过程结束。</p>
+<p>累积快照事实表代表的是完全覆盖一个事务或产品的生命周期的时间跨度，它通常具有多个日期字段，用来记录整个生命周期中的关键时间点。另外，它还会有一个用于指示最后更新日期的附加日期字段。由于事实表中许多日期在首次加载时是不知道的，所以必须使用代理关键字来处理未定义的日期，而且这类事实表在数据加载完后，是可以对它进行更新的，来补充随后知道的日期信息。</p>
+<p>周期快照事实表记录的是重复的可预测到的时间间隔的事实，例如帐户月结余事实表，用来记录每个月末的帐户结余信息。一般周期快照的数据会按报表需要的周期进行记录，比较适合周期长一些的情况。</p>
+<p>而累计快照适用于较短周期，有着明确的开始和结束状态的过程，如一个订单执行的过程，并记录过程中每个步骤的执行时间，使分析人员对执行的过程有整体的把握。周期快照事实表记录上每个步骤的执行时间是逐步建立的，随着执行的过程逐步更新的事实表中。</p>
+<p>最后来用表格比较一下三种事实表的区别：<br><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210908175437698.png" alt="事实表"></p>
+<p>参考文章：</p>
+<p><a href="https://www.jianshu.com/p/453afb5382ea" target="_blank" rel="noopener">https://www.jianshu.com/p/453afb5382ea</a></p>
+<p><a href="https://www.jianshu.com/p/ff8dcb089d3d" target="_blank" rel="noopener">https://www.jianshu.com/p/ff8dcb089d3d</a></p>
+<p><a href="https://www.jianshu.com/p/f55238c6e0b4" target="_blank" rel="noopener">https://www.jianshu.com/p/f55238c6e0b4</a></p>
+<p><a href="https://blog.csdn.net/maenlai0086/article/details/93998924" target="_blank" rel="noopener">https://blog.csdn.net/maenlai0086/article/details/93998924</a></p>
+
                 
             </div>
             <hr/>
@@ -494,7 +536,7 @@
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://github.com/wmybigdata/2021/08/30/Phoenix%E4%BA%8C%E7%BA%A7%E7%B4%A2%E5%BC%95-%E8%AE%B2%E5%8E%9F%E7%90%86/">https://github.com/wmybigdata/2021/08/30/Phoenix%E4%BA%8C%E7%BA%A7%E7%B4%A2%E5%BC%95-%E8%AE%B2%E5%8E%9F%E7%90%86/</a>
+                    <a href="https://github.com/wmybigdata/2021/09/08/DWD%E4%BA%8B%E5%AE%9E%E8%A1%A8%E7%9A%84%E5%88%86%E7%B1%BB/">https://github.com/wmybigdata/2021/09/08/DWD%E4%BA%8B%E5%AE%9E%E8%A1%A8%E7%9A%84%E5%88%86%E7%B1%BB/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -531,7 +573,11 @@
                 <div class="post-meta__tag-list" style="display: inline-block;">
                     
                         <div class="article-tag">
-                            <span class="chip bg-color">无标签</span>
+                            
+                                <a href="/tags/%E7%A6%BB%E7%BA%BF%E6%95%B0%E4%BB%93/">
+                                    <span class="chip bg-color">离线数仓</span>
+                                </a>
+                            
                         </div>
                     
                 </div>
@@ -699,17 +745,18 @@
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+                <i class="far fa-dot-circle"></i>&nbsp;本篇
+            </div>
             <div class="card">
-                <a href="/2021/08/30/Flink%E7%8A%B6%E6%80%81%E7%BC%96%E7%A8%8B-%E8%AE%A2%E5%8D%95%E8%B6%85%E6%97%B6%E5%91%8A%E8%AD%A6/">
+                <a href="/2021/09/08/DWD%E4%BA%8B%E5%AE%9E%E8%A1%A8%E7%9A%84%E5%88%86%E7%B1%BB/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/13.jpg" class="responsive-img" alt="Flink状态编程-订单超时告警">
+                        <img src="/medias/featureimages/5.jpg" class="responsive-img" alt="DWD事实表的分类">
                         
-                        <span class="card-title">Flink状态编程-订单超时告警</span>
+                        <span class="card-title">DWD事实表的分类</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -719,26 +766,27 @@
                         
                     </div>
                     <div class="publish-info">
-                        <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2021-08-30
-                        </span>
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-09-08
+                            </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Flink%E6%B5%81%E5%BC%8F%E5%BC%95%E6%93%8E/" class="post-category">
-                                    Flink流式引擎
+                            <a href="/categories/%E7%A6%BB%E7%BA%BF%E6%95%B0%E4%BB%93%E5%BB%BA%E8%AE%BE/" class="post-category">
+                                    离线数仓建设
                                 </a>
                             
                             
                         </span>
                     </div>
                 </div>
+
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/Flink%E6%B5%81%E5%BC%8F%E5%BC%95%E6%93%8E/">
-                        <span class="chip bg-color">Flink流式引擎</span>
+                    <a href="/tags/%E7%A6%BB%E7%BA%BF%E6%95%B0%E4%BB%93/">
+                        <span class="chip bg-color">离线数仓</span>
                     </a>
                     
                 </div>
@@ -752,13 +800,13 @@
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2021/08/30/Rowkey%E5%A6%82%E4%BD%95%E8%AE%BE%E8%AE%A1/">
+                <a href="/2021/09/06/0003-03-hive-%E7%A6%BB%E7%BA%BF%E6%95%B0%E4%BB%93DIM/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/21.jpg" class="responsive-img" alt="Rowkey如何设计">
+                        <img src="/medias/featureimages/7.jpg" class="responsive-img" alt="0003-03-hive-离线数仓DIM.md">
                         
-                        <span class="card-title">Rowkey如何设计</span>
+                        <span class="card-title">0003-03-hive-离线数仓DIM.md</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -769,15 +817,27 @@
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2021-08-30
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-09-06
                             </span>
                         <span class="publish-author">
                             
-                            <i class="fas fa-user fa-fw"></i>
-                            情深骚明
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E7%A6%BB%E7%BA%BF%E6%95%B0%E4%BB%93%E5%BB%BA%E8%AE%BE/" class="post-category">
+                                    离线数仓建设
+                                </a>
+                            
                             
                         </span>
                     </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/%E7%A6%BB%E7%BA%BF%E6%95%B0%E4%BB%93%E5%BB%BA%E8%AE%BE/">
+                        <span class="chip bg-color">离线数仓建设</span>
+                    </a>
+                    
                 </div>
                 
             </div>

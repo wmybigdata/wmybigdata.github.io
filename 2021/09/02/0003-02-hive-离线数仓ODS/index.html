@@ -487,6 +487,7 @@
 <span class="token attr-name">hdfs</span> <span class="token attr-value">dfs -rm -r /tmp/logs/root/logs-tfile/application_1630214450313_0001/flink05_46674</span>
 </code></pre>
 <p>遇到这种情况的话，直接删除就好了</p>
+<p>记住在导入的时候，如果资源不够的话就会一直卡在哪里，最好的办法就是关掉机器，重新加到内存然后在启动</p>
 <h2 id="ODS建表"><a href="#ODS建表" class="headerlink" title="ODS建表"></a>ODS建表</h2><pre class=" language-sql"><code class="language-sql"><span class="token keyword">create</span> <span class="token keyword">database</span> warehouse<span class="token punctuation">;</span>
 </code></pre>
 <h3 id="1、用户行为日志"><a href="#1、用户行为日志" class="headerlink" title="1、用户行为日志"></a>1、用户行为日志</h3><pre class=" language-sql"><code class="language-sql"><span class="token keyword">drop</span> <span class="token keyword">table</span> <span class="token keyword">if</span> <span class="token keyword">exists</span> ods_log<span class="token punctuation">;</span>
@@ -522,6 +523,712 @@ load data inpath '/off_line_warehouse/data/log/off_line_topic_log/<span class="t
 hive -e <span class="token string">"<span class="token variable">$sql</span>"</span>
 
 hadoop jar /opt/flink/platform/hadoop-3.1.3/share/hadoop/common/hadoop-lzo-0.4.20.jar com.hadoop.compression.lzo.DistributedLzoIndexer /user/hive/warehouse/warehouse.db/ods/ods_log/dt<span class="token operator">=</span><span class="token variable">$do_date</span>
+</code></pre>
+<h3 id="2、业务数据"><a href="#2、业务数据" class="headerlink" title="2、业务数据"></a>2、业务数据</h3><h5 id="2-1-业务表创建-27张"><a href="#2-1-业务表创建-27张" class="headerlink" title="2.1 业务表创建(27张)"></a>2.1 业务表创建(27张)</h5><pre class=" language-sql"><code class="language-sql"><span class="token comment" spellcheck="true">-- 1、活动信息表</span>
+<span class="token keyword">DROP</span> <span class="token keyword">TABLE</span> <span class="token keyword">IF</span> <span class="token keyword">EXISTS</span> ods_activity_info<span class="token punctuation">;</span>
+<span class="token keyword">CREATE</span> EXTERNAL <span class="token keyword">TABLE</span> ods_activity_info<span class="token punctuation">(</span>
+    <span class="token punctuation">`</span>id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'编号'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>activity_name<span class="token punctuation">`</span> STRING  <span class="token keyword">COMMENT</span> <span class="token string">'活动名称'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>activity_type<span class="token punctuation">`</span> STRING  <span class="token keyword">COMMENT</span> <span class="token string">'活动类型'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>start_time<span class="token punctuation">`</span> STRING  <span class="token keyword">COMMENT</span> <span class="token string">'开始时间'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>end_time<span class="token punctuation">`</span> STRING  <span class="token keyword">COMMENT</span> <span class="token string">'结束时间'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>create_time<span class="token punctuation">`</span> STRING  <span class="token keyword">COMMENT</span> <span class="token string">'创建时间'</span>
+<span class="token punctuation">)</span> <span class="token keyword">COMMENT</span> <span class="token string">'活动信息表'</span>
+PARTITIONED <span class="token keyword">BY</span> <span class="token punctuation">(</span><span class="token punctuation">`</span>dt<span class="token punctuation">`</span> STRING<span class="token punctuation">)</span>
+<span class="token keyword">ROW</span> FORMAT DELIMITED <span class="token keyword">FIELDS</span> <span class="token keyword">TERMINATED BY</span> <span class="token string">'\t'</span>
+STORED <span class="token keyword">AS</span>
+  INPUTFORMAT <span class="token string">'com.hadoop.mapred.DeprecatedLzoTextInputFormat'</span>
+  OUTPUTFORMAT <span class="token string">'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'</span>
+LOCATION <span class="token string">'/user/hive/warehouse/warehouse.db/ods/ods_activity_info/'</span><span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true">-- 2、活动规则表</span>
+<span class="token keyword">DROP</span> <span class="token keyword">TABLE</span> <span class="token keyword">IF</span> <span class="token keyword">EXISTS</span> ods_activity_rule<span class="token punctuation">;</span>
+<span class="token keyword">CREATE</span> EXTERNAL <span class="token keyword">TABLE</span> ods_activity_rule<span class="token punctuation">(</span>
+    <span class="token punctuation">`</span>id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'编号'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>activity_id<span class="token punctuation">`</span> STRING  <span class="token keyword">COMMENT</span> <span class="token string">'活动ID'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>activity_type<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'活动类型'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>condition_amount<span class="token punctuation">`</span> <span class="token keyword">DECIMAL</span><span class="token punctuation">(</span><span class="token number">16</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">)</span> <span class="token keyword">COMMENT</span> <span class="token string">'满减金额'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>condition_num<span class="token punctuation">`</span> <span class="token keyword">BIGINT</span> <span class="token keyword">COMMENT</span> <span class="token string">'满减件数'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>benefit_amount<span class="token punctuation">`</span> <span class="token keyword">DECIMAL</span><span class="token punctuation">(</span><span class="token number">16</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">)</span> <span class="token keyword">COMMENT</span> <span class="token string">'优惠金额'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>benefit_discount<span class="token punctuation">`</span> <span class="token keyword">DECIMAL</span><span class="token punctuation">(</span><span class="token number">16</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">)</span> <span class="token keyword">COMMENT</span> <span class="token string">'优惠折扣'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>benefit_level<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'优惠级别'</span>
+<span class="token punctuation">)</span> <span class="token keyword">COMMENT</span> <span class="token string">'活动规则表'</span>
+PARTITIONED <span class="token keyword">BY</span> <span class="token punctuation">(</span><span class="token punctuation">`</span>dt<span class="token punctuation">`</span> STRING<span class="token punctuation">)</span>
+<span class="token keyword">ROW</span> FORMAT DELIMITED <span class="token keyword">FIELDS</span> <span class="token keyword">TERMINATED BY</span> <span class="token string">'\t'</span>
+STORED <span class="token keyword">AS</span>
+  INPUTFORMAT <span class="token string">'com.hadoop.mapred.DeprecatedLzoTextInputFormat'</span>
+  OUTPUTFORMAT <span class="token string">'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'</span>
+LOCATION <span class="token string">'/user/hive/warehouse/warehouse.db/ods/ods_activity_rule/'</span><span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true">-- 3、一级品类表</span>
+<span class="token keyword">DROP</span> <span class="token keyword">TABLE</span> <span class="token keyword">IF</span> <span class="token keyword">EXISTS</span> ods_base_category1<span class="token punctuation">;</span>
+<span class="token keyword">CREATE</span> EXTERNAL <span class="token keyword">TABLE</span> ods_base_category1<span class="token punctuation">(</span>
+    <span class="token punctuation">`</span>id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'id'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>name<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'名称'</span>
+<span class="token punctuation">)</span> <span class="token keyword">COMMENT</span> <span class="token string">'商品一级分类表'</span>
+PARTITIONED <span class="token keyword">BY</span> <span class="token punctuation">(</span><span class="token punctuation">`</span>dt<span class="token punctuation">`</span> STRING<span class="token punctuation">)</span>
+<span class="token keyword">ROW</span> FORMAT DELIMITED <span class="token keyword">FIELDS</span> <span class="token keyword">TERMINATED BY</span> <span class="token string">'\t'</span>
+STORED <span class="token keyword">AS</span>
+  INPUTFORMAT <span class="token string">'com.hadoop.mapred.DeprecatedLzoTextInputFormat'</span>
+  OUTPUTFORMAT <span class="token string">'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'</span>
+LOCATION <span class="token string">'/user/hive/warehouse/warehouse.db/ods/ods_base_category1/'</span><span class="token punctuation">;</span>
+
+
+<span class="token comment" spellcheck="true">-- 4、二级品类表</span>
+<span class="token keyword">DROP</span> <span class="token keyword">TABLE</span> <span class="token keyword">IF</span> <span class="token keyword">EXISTS</span> ods_base_category2<span class="token punctuation">;</span>
+<span class="token keyword">CREATE</span> EXTERNAL <span class="token keyword">TABLE</span> ods_base_category2<span class="token punctuation">(</span>
+    <span class="token punctuation">`</span>id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">' id'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>name<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'名称'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>category1_id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'一级品类id'</span>
+<span class="token punctuation">)</span> <span class="token keyword">COMMENT</span> <span class="token string">'商品二级分类表'</span>
+PARTITIONED <span class="token keyword">BY</span> <span class="token punctuation">(</span><span class="token punctuation">`</span>dt<span class="token punctuation">`</span> STRING<span class="token punctuation">)</span>
+<span class="token keyword">ROW</span> FORMAT DELIMITED <span class="token keyword">FIELDS</span> <span class="token keyword">TERMINATED BY</span> <span class="token string">'\t'</span>
+STORED <span class="token keyword">AS</span>
+  INPUTFORMAT <span class="token string">'com.hadoop.mapred.DeprecatedLzoTextInputFormat'</span>
+  OUTPUTFORMAT <span class="token string">'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'</span>
+LOCATION <span class="token string">'/user/hive/warehouse/warehouse.db/ods/ods_base_category2/'</span><span class="token punctuation">;</span>
+
+
+<span class="token comment" spellcheck="true">-- 5、三级品类表</span>
+<span class="token keyword">DROP</span> <span class="token keyword">TABLE</span> <span class="token keyword">IF</span> <span class="token keyword">EXISTS</span> ods_base_category3<span class="token punctuation">;</span>
+<span class="token keyword">CREATE</span> EXTERNAL <span class="token keyword">TABLE</span> ods_base_category3<span class="token punctuation">(</span>
+    <span class="token punctuation">`</span>id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">' id'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>name<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'名称'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>category2_id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'二级品类id'</span>
+<span class="token punctuation">)</span> <span class="token keyword">COMMENT</span> <span class="token string">'商品三级分类表'</span>
+PARTITIONED <span class="token keyword">BY</span> <span class="token punctuation">(</span><span class="token punctuation">`</span>dt<span class="token punctuation">`</span> STRING<span class="token punctuation">)</span>
+<span class="token keyword">ROW</span> FORMAT DELIMITED <span class="token keyword">FIELDS</span> <span class="token keyword">TERMINATED BY</span> <span class="token string">'\t'</span>
+STORED <span class="token keyword">AS</span>
+  INPUTFORMAT <span class="token string">'com.hadoop.mapred.DeprecatedLzoTextInputFormat'</span>
+  OUTPUTFORMAT <span class="token string">'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'</span>
+LOCATION <span class="token string">'/user/hive/warehouse/warehouse.db/ods/ods_base_category3/'</span><span class="token punctuation">;</span>
+
+
+<span class="token comment" spellcheck="true">-- 6、编码字典表</span>
+<span class="token keyword">DROP</span> <span class="token keyword">TABLE</span> <span class="token keyword">IF</span> <span class="token keyword">EXISTS</span> ods_base_dic<span class="token punctuation">;</span>
+<span class="token keyword">CREATE</span> EXTERNAL <span class="token keyword">TABLE</span> ods_base_dic<span class="token punctuation">(</span>
+    <span class="token punctuation">`</span>dic_code<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'编号'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>dic_name<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'编码名称'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>parent_code<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'父编码'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>create_time<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'创建日期'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>operate_time<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'操作日期'</span>
+<span class="token punctuation">)</span> <span class="token keyword">COMMENT</span> <span class="token string">'编码字典表'</span>
+PARTITIONED <span class="token keyword">BY</span> <span class="token punctuation">(</span><span class="token punctuation">`</span>dt<span class="token punctuation">`</span> STRING<span class="token punctuation">)</span>
+<span class="token keyword">ROW</span> FORMAT DELIMITED <span class="token keyword">FIELDS</span> <span class="token keyword">TERMINATED BY</span> <span class="token string">'\t'</span>
+STORED <span class="token keyword">AS</span>
+  INPUTFORMAT <span class="token string">'com.hadoop.mapred.DeprecatedLzoTextInputFormat'</span>
+  OUTPUTFORMAT <span class="token string">'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'</span>
+LOCATION <span class="token string">'/user/hive/warehouse/warehouse.db/ods/ods_base_dic/'</span><span class="token punctuation">;</span>
+
+
+<span class="token comment" spellcheck="true">-- 7、省份表</span>
+<span class="token keyword">DROP</span> <span class="token keyword">TABLE</span> <span class="token keyword">IF</span> <span class="token keyword">EXISTS</span> ods_base_province<span class="token punctuation">;</span>
+<span class="token keyword">CREATE</span> EXTERNAL <span class="token keyword">TABLE</span> ods_base_province <span class="token punctuation">(</span>
+    <span class="token punctuation">`</span>id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'编号'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>name<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'省份名称'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>region_id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'地区ID'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>area_code<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'地区编码'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>iso_code<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'ISO-3166编码，供可视化使用'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>iso_3166_2<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'IOS-3166-2编码，供可视化使用'</span>
+<span class="token punctuation">)</span>  <span class="token keyword">COMMENT</span> <span class="token string">'省份表'</span>
+<span class="token keyword">ROW</span> FORMAT DELIMITED <span class="token keyword">FIELDS</span> <span class="token keyword">TERMINATED BY</span> <span class="token string">'\t'</span>
+STORED <span class="token keyword">AS</span>
+  INPUTFORMAT <span class="token string">'com.hadoop.mapred.DeprecatedLzoTextInputFormat'</span>
+  OUTPUTFORMAT <span class="token string">'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'</span>
+LOCATION <span class="token string">'/user/hive/warehouse/warehouse.db/ods/ods_base_province/'</span><span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true">-- 8、地区表</span>
+<span class="token keyword">DROP</span> <span class="token keyword">TABLE</span> <span class="token keyword">IF</span> <span class="token keyword">EXISTS</span> ods_base_region<span class="token punctuation">;</span>
+<span class="token keyword">CREATE</span> EXTERNAL <span class="token keyword">TABLE</span> ods_base_region <span class="token punctuation">(</span>
+    <span class="token punctuation">`</span>id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'编号'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>region_name<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'地区名称'</span>
+<span class="token punctuation">)</span>  <span class="token keyword">COMMENT</span> <span class="token string">'地区表'</span>
+<span class="token keyword">ROW</span> FORMAT DELIMITED <span class="token keyword">FIELDS</span> <span class="token keyword">TERMINATED BY</span> <span class="token string">'\t'</span>
+STORED <span class="token keyword">AS</span>
+  INPUTFORMAT <span class="token string">'com.hadoop.mapred.DeprecatedLzoTextInputFormat'</span>
+  OUTPUTFORMAT <span class="token string">'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'</span>
+LOCATION <span class="token string">'/user/hive/warehouse/warehouse.db/ods/ods_base_region/'</span><span class="token punctuation">;</span>
+
+
+
+<span class="token comment" spellcheck="true">-- 9、品牌表</span>
+<span class="token keyword">DROP</span> <span class="token keyword">TABLE</span> <span class="token keyword">IF</span> <span class="token keyword">EXISTS</span> ods_base_trademark<span class="token punctuation">;</span>
+<span class="token keyword">CREATE</span> EXTERNAL <span class="token keyword">TABLE</span> ods_base_trademark <span class="token punctuation">(</span>
+    <span class="token punctuation">`</span>id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'编号'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>tm_name<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'品牌名称'</span>
+<span class="token punctuation">)</span>  <span class="token keyword">COMMENT</span> <span class="token string">'品牌表'</span>
+PARTITIONED <span class="token keyword">BY</span> <span class="token punctuation">(</span><span class="token punctuation">`</span>dt<span class="token punctuation">`</span> STRING<span class="token punctuation">)</span>
+<span class="token keyword">ROW</span> FORMAT DELIMITED <span class="token keyword">FIELDS</span> <span class="token keyword">TERMINATED BY</span> <span class="token string">'\t'</span>
+STORED <span class="token keyword">AS</span>
+  INPUTFORMAT <span class="token string">'com.hadoop.mapred.DeprecatedLzoTextInputFormat'</span>
+  OUTPUTFORMAT <span class="token string">'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'</span>
+LOCATION <span class="token string">'/user/hive/warehouse/warehouse.db/ods/ods_base_trademark/'</span><span class="token punctuation">;</span>
+
+
+
+<span class="token comment" spellcheck="true">-- 10、购物车表</span>
+<span class="token keyword">DROP</span> <span class="token keyword">TABLE</span> <span class="token keyword">IF</span> <span class="token keyword">EXISTS</span> ods_cart_info<span class="token punctuation">;</span>
+<span class="token keyword">CREATE</span> EXTERNAL <span class="token keyword">TABLE</span> ods_cart_info<span class="token punctuation">(</span>
+    <span class="token punctuation">`</span>id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'编号'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>user_id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'用户id'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>sku_id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'skuid'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>cart_price<span class="token punctuation">`</span> <span class="token keyword">DECIMAL</span><span class="token punctuation">(</span><span class="token number">16</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">)</span>  <span class="token keyword">COMMENT</span> <span class="token string">'放入购物车时价格'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>sku_num<span class="token punctuation">`</span> <span class="token keyword">BIGINT</span> <span class="token keyword">COMMENT</span> <span class="token string">'数量'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>sku_name<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'sku名称 (冗余)'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>create_time<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'创建时间'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>operate_time<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'修改时间'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>is_ordered<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'是否已经下单'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>order_time<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'下单时间'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>source_type<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'来源类型'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>source_id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'来源编号'</span>
+<span class="token punctuation">)</span> <span class="token keyword">COMMENT</span> <span class="token string">'加购表'</span>
+PARTITIONED <span class="token keyword">BY</span> <span class="token punctuation">(</span><span class="token punctuation">`</span>dt<span class="token punctuation">`</span> STRING<span class="token punctuation">)</span>
+<span class="token keyword">ROW</span> FORMAT DELIMITED <span class="token keyword">FIELDS</span> <span class="token keyword">TERMINATED BY</span> <span class="token string">'\t'</span>
+STORED <span class="token keyword">AS</span>
+  INPUTFORMAT <span class="token string">'com.hadoop.mapred.DeprecatedLzoTextInputFormat'</span>
+  OUTPUTFORMAT <span class="token string">'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'</span>
+LOCATION <span class="token string">'/user/hive/warehouse/warehouse.db/ods/ods_cart_info/'</span><span class="token punctuation">;</span>
+
+
+
+<span class="token comment" spellcheck="true">-- 11、评论表</span>
+<span class="token keyword">DROP</span> <span class="token keyword">TABLE</span> <span class="token keyword">IF</span> <span class="token keyword">EXISTS</span> ods_comment_info<span class="token punctuation">;</span>
+<span class="token keyword">CREATE</span> EXTERNAL <span class="token keyword">TABLE</span> ods_comment_info<span class="token punctuation">(</span>
+    <span class="token punctuation">`</span>id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'编号'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>user_id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'用户ID'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>sku_id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'商品sku'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>spu_id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'商品spu'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>order_id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'订单ID'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>appraise<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'评价'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>create_time<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'评价时间'</span>
+<span class="token punctuation">)</span> <span class="token keyword">COMMENT</span> <span class="token string">'商品评论表'</span>
+PARTITIONED <span class="token keyword">BY</span> <span class="token punctuation">(</span><span class="token punctuation">`</span>dt<span class="token punctuation">`</span> STRING<span class="token punctuation">)</span>
+<span class="token keyword">ROW</span> FORMAT DELIMITED <span class="token keyword">FIELDS</span> <span class="token keyword">TERMINATED BY</span> <span class="token string">'\t'</span>
+STORED <span class="token keyword">AS</span>
+  INPUTFORMAT <span class="token string">'com.hadoop.mapred.DeprecatedLzoTextInputFormat'</span>
+  OUTPUTFORMAT <span class="token string">'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'</span>
+LOCATION <span class="token string">'/user/hive/warehouse/warehouse.db/ods/ods_comment_info/'</span><span class="token punctuation">;</span>
+
+
+
+<span class="token comment" spellcheck="true">-- 12、优惠券信息表</span>
+<span class="token keyword">DROP</span> <span class="token keyword">TABLE</span> <span class="token keyword">IF</span> <span class="token keyword">EXISTS</span> ods_coupon_info<span class="token punctuation">;</span>
+<span class="token keyword">CREATE</span> EXTERNAL <span class="token keyword">TABLE</span> ods_coupon_info<span class="token punctuation">(</span>
+    <span class="token punctuation">`</span>id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'购物券编号'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>coupon_name<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'购物券名称'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>coupon_type<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'购物券类型 1 现金券 2 折扣券 3 满减券 4 满件打折券'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>condition_amount<span class="token punctuation">`</span> <span class="token keyword">DECIMAL</span><span class="token punctuation">(</span><span class="token number">16</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">)</span> <span class="token keyword">COMMENT</span> <span class="token string">'满额数'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>condition_num<span class="token punctuation">`</span> <span class="token keyword">BIGINT</span> <span class="token keyword">COMMENT</span> <span class="token string">'满件数'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>activity_id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'活动编号'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>benefit_amount<span class="token punctuation">`</span> <span class="token keyword">DECIMAL</span><span class="token punctuation">(</span><span class="token number">16</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">)</span> <span class="token keyword">COMMENT</span> <span class="token string">'减金额'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>benefit_discount<span class="token punctuation">`</span> <span class="token keyword">DECIMAL</span><span class="token punctuation">(</span><span class="token number">16</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">)</span> <span class="token keyword">COMMENT</span> <span class="token string">'折扣'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>create_time<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'创建时间'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>range_type<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'范围类型 1、商品 2、品类 3、品牌'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>limit_num<span class="token punctuation">`</span> <span class="token keyword">BIGINT</span> <span class="token keyword">COMMENT</span> <span class="token string">'最多领用次数'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>taken_count<span class="token punctuation">`</span> <span class="token keyword">BIGINT</span> <span class="token keyword">COMMENT</span> <span class="token string">'已领用次数'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>start_time<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'开始领取时间'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>end_time<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'结束领取时间'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>operate_time<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'修改时间'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>expire_time<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'过期时间'</span>
+<span class="token punctuation">)</span> <span class="token keyword">COMMENT</span> <span class="token string">'优惠券表'</span>
+PARTITIONED <span class="token keyword">BY</span> <span class="token punctuation">(</span><span class="token punctuation">`</span>dt<span class="token punctuation">`</span> STRING<span class="token punctuation">)</span>
+<span class="token keyword">ROW</span> FORMAT DELIMITED <span class="token keyword">FIELDS</span> <span class="token keyword">TERMINATED BY</span> <span class="token string">'\t'</span>
+STORED <span class="token keyword">AS</span>
+  INPUTFORMAT <span class="token string">'com.hadoop.mapred.DeprecatedLzoTextInputFormat'</span>
+  OUTPUTFORMAT <span class="token string">'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'</span>
+LOCATION <span class="token string">'/user/hive/warehouse/warehouse.db/ods/ods_coupon_info/'</span><span class="token punctuation">;</span>
+
+
+<span class="token comment" spellcheck="true">-- 13、优惠券领用表</span>
+<span class="token keyword">DROP</span> <span class="token keyword">TABLE</span> <span class="token keyword">IF</span> <span class="token keyword">EXISTS</span> ods_coupon_use<span class="token punctuation">;</span>
+<span class="token keyword">CREATE</span> EXTERNAL <span class="token keyword">TABLE</span> ods_coupon_use<span class="token punctuation">(</span>
+    <span class="token punctuation">`</span>id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'编号'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>coupon_id<span class="token punctuation">`</span> STRING  <span class="token keyword">COMMENT</span> <span class="token string">'优惠券ID'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>user_id<span class="token punctuation">`</span> STRING  <span class="token keyword">COMMENT</span> <span class="token string">'skuid'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>order_id<span class="token punctuation">`</span> STRING  <span class="token keyword">COMMENT</span> <span class="token string">'spuid'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>coupon_status<span class="token punctuation">`</span> STRING  <span class="token keyword">COMMENT</span> <span class="token string">'优惠券状态'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>get_time<span class="token punctuation">`</span> STRING  <span class="token keyword">COMMENT</span> <span class="token string">'领取时间'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>using_time<span class="token punctuation">`</span> STRING  <span class="token keyword">COMMENT</span> <span class="token string">'使用时间(下单)'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>used_time<span class="token punctuation">`</span> STRING  <span class="token keyword">COMMENT</span> <span class="token string">'使用时间(支付)'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>expire_time<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'过期时间'</span>
+<span class="token punctuation">)</span> <span class="token keyword">COMMENT</span> <span class="token string">'优惠券领用表'</span>
+PARTITIONED <span class="token keyword">BY</span> <span class="token punctuation">(</span><span class="token punctuation">`</span>dt<span class="token punctuation">`</span> STRING<span class="token punctuation">)</span>
+<span class="token keyword">ROW</span> FORMAT DELIMITED <span class="token keyword">FIELDS</span> <span class="token keyword">TERMINATED BY</span> <span class="token string">'\t'</span>
+STORED <span class="token keyword">AS</span>
+  INPUTFORMAT <span class="token string">'com.hadoop.mapred.DeprecatedLzoTextInputFormat'</span>
+  OUTPUTFORMAT <span class="token string">'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'</span>
+LOCATION <span class="token string">'/user/hive/warehouse/warehouse.db/ods/ods_coupon_use/'</span><span class="token punctuation">;</span>
+
+
+<span class="token comment" spellcheck="true">-- 14、收藏表</span>
+<span class="token keyword">DROP</span> <span class="token keyword">TABLE</span> <span class="token keyword">IF</span> <span class="token keyword">EXISTS</span> ods_favor_info<span class="token punctuation">;</span>
+<span class="token keyword">CREATE</span> EXTERNAL <span class="token keyword">TABLE</span> ods_favor_info<span class="token punctuation">(</span>
+    <span class="token punctuation">`</span>id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'编号'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>user_id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'用户id'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>sku_id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'skuid'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>spu_id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'spuid'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>is_cancel<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'是否取消'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>create_time<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'收藏时间'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>cancel_time<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'取消时间'</span>
+<span class="token punctuation">)</span> <span class="token keyword">COMMENT</span> <span class="token string">'商品收藏表'</span>
+PARTITIONED <span class="token keyword">BY</span> <span class="token punctuation">(</span><span class="token punctuation">`</span>dt<span class="token punctuation">`</span> STRING<span class="token punctuation">)</span>
+<span class="token keyword">ROW</span> FORMAT DELIMITED <span class="token keyword">FIELDS</span> <span class="token keyword">TERMINATED BY</span> <span class="token string">'\t'</span>
+STORED <span class="token keyword">AS</span>
+  INPUTFORMAT <span class="token string">'com.hadoop.mapred.DeprecatedLzoTextInputFormat'</span>
+  OUTPUTFORMAT <span class="token string">'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'</span>
+LOCATION <span class="token string">'/user/hive/warehouse/warehouse.db/ods/ods_favor_info/'</span><span class="token punctuation">;</span>
+
+
+<span class="token comment" spellcheck="true">-- 15、订单明细表</span>
+<span class="token keyword">DROP</span> <span class="token keyword">TABLE</span> <span class="token keyword">IF</span> <span class="token keyword">EXISTS</span> ods_order_detail<span class="token punctuation">;</span>
+<span class="token keyword">CREATE</span> EXTERNAL <span class="token keyword">TABLE</span> ods_order_detail<span class="token punctuation">(</span>
+    <span class="token punctuation">`</span>id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'编号'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>order_id<span class="token punctuation">`</span> STRING  <span class="token keyword">COMMENT</span> <span class="token string">'订单号'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>sku_id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'商品id'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>sku_name<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'商品名称'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>order_price<span class="token punctuation">`</span> <span class="token keyword">DECIMAL</span><span class="token punctuation">(</span><span class="token number">16</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">)</span> <span class="token keyword">COMMENT</span> <span class="token string">'商品价格'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>sku_num<span class="token punctuation">`</span> <span class="token keyword">BIGINT</span> <span class="token keyword">COMMENT</span> <span class="token string">'商品数量'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>create_time<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'创建时间'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>source_type<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'来源类型'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>source_id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'来源编号'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>split_final_amount<span class="token punctuation">`</span> <span class="token keyword">DECIMAL</span><span class="token punctuation">(</span><span class="token number">16</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">)</span> <span class="token keyword">COMMENT</span> <span class="token string">'分摊最终金额'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>split_activity_amount<span class="token punctuation">`</span> <span class="token keyword">DECIMAL</span><span class="token punctuation">(</span><span class="token number">16</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">)</span> <span class="token keyword">COMMENT</span> <span class="token string">'分摊活动优惠'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>split_coupon_amount<span class="token punctuation">`</span> <span class="token keyword">DECIMAL</span><span class="token punctuation">(</span><span class="token number">16</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">)</span> <span class="token keyword">COMMENT</span> <span class="token string">'分摊优惠券优惠'</span>
+<span class="token punctuation">)</span> <span class="token keyword">COMMENT</span> <span class="token string">'订单详情表'</span>
+PARTITIONED <span class="token keyword">BY</span> <span class="token punctuation">(</span><span class="token punctuation">`</span>dt<span class="token punctuation">`</span> STRING<span class="token punctuation">)</span>
+<span class="token keyword">ROW</span> FORMAT DELIMITED <span class="token keyword">FIELDS</span> <span class="token keyword">TERMINATED BY</span> <span class="token string">'\t'</span>
+STORED <span class="token keyword">AS</span>
+  INPUTFORMAT <span class="token string">'com.hadoop.mapred.DeprecatedLzoTextInputFormat'</span>
+  OUTPUTFORMAT <span class="token string">'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'</span>
+LOCATION <span class="token string">'/user/hive/warehouse/warehouse.db/ods/ods_order_detail/'</span><span class="token punctuation">;</span>
+
+
+
+<span class="token comment" spellcheck="true">-- 16、订单明细活动关联表</span>
+<span class="token keyword">DROP</span> <span class="token keyword">TABLE</span> <span class="token keyword">IF</span> <span class="token keyword">EXISTS</span> ods_order_detail_activity<span class="token punctuation">;</span>
+<span class="token keyword">CREATE</span> EXTERNAL <span class="token keyword">TABLE</span> ods_order_detail_activity<span class="token punctuation">(</span>
+    <span class="token punctuation">`</span>id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'编号'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>order_id<span class="token punctuation">`</span> STRING  <span class="token keyword">COMMENT</span> <span class="token string">'订单号'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>order_detail_id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'订单明细id'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>activity_id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'活动id'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>activity_rule_id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'活动规则id'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>sku_id<span class="token punctuation">`</span> <span class="token keyword">BIGINT</span> <span class="token keyword">COMMENT</span> <span class="token string">'商品id'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>create_time<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'创建时间'</span>
+<span class="token punctuation">)</span> <span class="token keyword">COMMENT</span> <span class="token string">'订单详情活动关联表'</span>
+PARTITIONED <span class="token keyword">BY</span> <span class="token punctuation">(</span><span class="token punctuation">`</span>dt<span class="token punctuation">`</span> STRING<span class="token punctuation">)</span>
+<span class="token keyword">ROW</span> FORMAT DELIMITED <span class="token keyword">FIELDS</span> <span class="token keyword">TERMINATED BY</span> <span class="token string">'\t'</span>
+STORED <span class="token keyword">AS</span>
+  INPUTFORMAT <span class="token string">'com.hadoop.mapred.DeprecatedLzoTextInputFormat'</span>
+  OUTPUTFORMAT <span class="token string">'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'</span>
+LOCATION <span class="token string">'/user/hive/warehouse/warehouse.db/ods/ods_order_detail_activity/'</span><span class="token punctuation">;</span>
+
+
+
+<span class="token comment" spellcheck="true">-- 17、订单明细优惠券关联表</span>
+<span class="token keyword">DROP</span> <span class="token keyword">TABLE</span> <span class="token keyword">IF</span> <span class="token keyword">EXISTS</span> ods_order_detail_coupon<span class="token punctuation">;</span>
+<span class="token keyword">CREATE</span> EXTERNAL <span class="token keyword">TABLE</span> ods_order_detail_coupon<span class="token punctuation">(</span>
+    <span class="token punctuation">`</span>id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'编号'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>order_id<span class="token punctuation">`</span> STRING  <span class="token keyword">COMMENT</span> <span class="token string">'订单号'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>order_detail_id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'订单明细id'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>coupon_id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'优惠券id'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>coupon_use_id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'优惠券领用记录id'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>sku_id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'商品id'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>create_time<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'创建时间'</span>
+<span class="token punctuation">)</span> <span class="token keyword">COMMENT</span> <span class="token string">'订单详情活动关联表'</span>
+PARTITIONED <span class="token keyword">BY</span> <span class="token punctuation">(</span><span class="token punctuation">`</span>dt<span class="token punctuation">`</span> STRING<span class="token punctuation">)</span>
+<span class="token keyword">ROW</span> FORMAT DELIMITED <span class="token keyword">FIELDS</span> <span class="token keyword">TERMINATED BY</span> <span class="token string">'\t'</span>
+STORED <span class="token keyword">AS</span>
+  INPUTFORMAT <span class="token string">'com.hadoop.mapred.DeprecatedLzoTextInputFormat'</span>
+  OUTPUTFORMAT <span class="token string">'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'</span>
+LOCATION <span class="token string">'/user/hive/warehouse/warehouse.db/ods/ods_order_detail_coupon/'</span><span class="token punctuation">;</span>
+
+
+
+<span class="token comment" spellcheck="true">-- 18、订单表</span>
+<span class="token keyword">DROP</span> <span class="token keyword">TABLE</span> <span class="token keyword">IF</span> <span class="token keyword">EXISTS</span> ods_order_info<span class="token punctuation">;</span>
+<span class="token keyword">CREATE</span> EXTERNAL <span class="token keyword">TABLE</span> ods_order_info <span class="token punctuation">(</span>
+    <span class="token punctuation">`</span>id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'订单号'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>final_amount<span class="token punctuation">`</span> <span class="token keyword">DECIMAL</span><span class="token punctuation">(</span><span class="token number">16</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">)</span> <span class="token keyword">COMMENT</span> <span class="token string">'订单最终金额'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>order_status<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'订单状态'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>user_id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'用户id'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>payment_way<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'支付方式'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>delivery_address<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'送货地址'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>out_trade_no<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'支付流水号'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>create_time<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'创建时间'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>operate_time<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'操作时间'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>expire_time<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'过期时间'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>tracking_no<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'物流单编号'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>province_id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'省份ID'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>activity_reduce_amount<span class="token punctuation">`</span> <span class="token keyword">DECIMAL</span><span class="token punctuation">(</span><span class="token number">16</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">)</span> <span class="token keyword">COMMENT</span> <span class="token string">'活动减免金额'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>coupon_reduce_amount<span class="token punctuation">`</span> <span class="token keyword">DECIMAL</span><span class="token punctuation">(</span><span class="token number">16</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">)</span> <span class="token keyword">COMMENT</span> <span class="token string">'优惠券减免金额'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>original_amount<span class="token punctuation">`</span> <span class="token keyword">DECIMAL</span><span class="token punctuation">(</span><span class="token number">16</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">)</span>  <span class="token keyword">COMMENT</span> <span class="token string">'订单原价金额'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>feight_fee<span class="token punctuation">`</span> <span class="token keyword">DECIMAL</span><span class="token punctuation">(</span><span class="token number">16</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">)</span>  <span class="token keyword">COMMENT</span> <span class="token string">'运费'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>feight_fee_reduce<span class="token punctuation">`</span> <span class="token keyword">DECIMAL</span><span class="token punctuation">(</span><span class="token number">16</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">)</span>  <span class="token keyword">COMMENT</span> <span class="token string">'运费减免'</span>
+<span class="token punctuation">)</span> <span class="token keyword">COMMENT</span> <span class="token string">'订单表'</span>
+PARTITIONED <span class="token keyword">BY</span> <span class="token punctuation">(</span><span class="token punctuation">`</span>dt<span class="token punctuation">`</span> STRING<span class="token punctuation">)</span>
+<span class="token keyword">ROW</span> FORMAT DELIMITED <span class="token keyword">FIELDS</span> <span class="token keyword">TERMINATED BY</span> <span class="token string">'\t'</span>
+STORED <span class="token keyword">AS</span>
+  INPUTFORMAT <span class="token string">'com.hadoop.mapred.DeprecatedLzoTextInputFormat'</span>
+  OUTPUTFORMAT <span class="token string">'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'</span>
+LOCATION <span class="token string">'/user/hive/warehouse/warehouse.db/ods/ods_order_info/'</span><span class="token punctuation">;</span>
+
+
+<span class="token comment" spellcheck="true">-- 19、退单表</span>
+<span class="token keyword">DROP</span> <span class="token keyword">TABLE</span> <span class="token keyword">IF</span> <span class="token keyword">EXISTS</span> ods_order_refund_info<span class="token punctuation">;</span>
+<span class="token keyword">CREATE</span> EXTERNAL <span class="token keyword">TABLE</span> ods_order_refund_info<span class="token punctuation">(</span>
+    <span class="token punctuation">`</span>id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'编号'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>user_id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'用户ID'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>order_id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'订单ID'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>sku_id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'商品ID'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>refund_type<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'退单类型'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>refund_num<span class="token punctuation">`</span> <span class="token keyword">BIGINT</span> <span class="token keyword">COMMENT</span> <span class="token string">'退单件数'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>refund_amount<span class="token punctuation">`</span> <span class="token keyword">DECIMAL</span><span class="token punctuation">(</span><span class="token number">16</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">)</span> <span class="token keyword">COMMENT</span> <span class="token string">'退单金额'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>refund_reason_type<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'退单原因类型'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>refund_status<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'退单状态'</span><span class="token punctuation">,</span><span class="token comment" spellcheck="true">--退单状态应包含买家申请、卖家审核、卖家收货、退款完成等状态。此处未涉及到，故该表按增量处理</span>
+    <span class="token punctuation">`</span>create_time<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'退单时间'</span>
+<span class="token punctuation">)</span> <span class="token keyword">COMMENT</span> <span class="token string">'退单表'</span>
+PARTITIONED <span class="token keyword">BY</span> <span class="token punctuation">(</span><span class="token punctuation">`</span>dt<span class="token punctuation">`</span> STRING<span class="token punctuation">)</span>
+<span class="token keyword">ROW</span> FORMAT DELIMITED <span class="token keyword">FIELDS</span> <span class="token keyword">TERMINATED BY</span> <span class="token string">'\t'</span>
+STORED <span class="token keyword">AS</span>
+  INPUTFORMAT <span class="token string">'com.hadoop.mapred.DeprecatedLzoTextInputFormat'</span>
+  OUTPUTFORMAT <span class="token string">'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'</span>
+LOCATION <span class="token string">'/user/hive/warehouse/warehouse.db/ods/ods_order_refund_info/'</span><span class="token punctuation">;</span>
+
+
+<span class="token comment" spellcheck="true">-- 20、订单状态日志表</span>
+<span class="token keyword">DROP</span> <span class="token keyword">TABLE</span> <span class="token keyword">IF</span> <span class="token keyword">EXISTS</span> ods_order_status_log<span class="token punctuation">;</span>
+<span class="token keyword">CREATE</span> EXTERNAL <span class="token keyword">TABLE</span> ods_order_status_log <span class="token punctuation">(</span>
+    <span class="token punctuation">`</span>id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'编号'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>order_id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'订单ID'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>order_status<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'订单状态'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>operate_time<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'修改时间'</span>
+<span class="token punctuation">)</span>  <span class="token keyword">COMMENT</span> <span class="token string">'订单状态表'</span>
+PARTITIONED <span class="token keyword">BY</span> <span class="token punctuation">(</span><span class="token punctuation">`</span>dt<span class="token punctuation">`</span> STRING<span class="token punctuation">)</span>
+<span class="token keyword">ROW</span> FORMAT DELIMITED <span class="token keyword">FIELDS</span> <span class="token keyword">TERMINATED BY</span> <span class="token string">'\t'</span>
+STORED <span class="token keyword">AS</span>
+  INPUTFORMAT <span class="token string">'com.hadoop.mapred.DeprecatedLzoTextInputFormat'</span>
+  OUTPUTFORMAT <span class="token string">'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'</span>
+LOCATION <span class="token string">'/user/hive/warehouse/warehouse.db/ods/ods_order_status_log/'</span><span class="token punctuation">;</span>
+
+
+<span class="token comment" spellcheck="true">-- 21、支付表</span>
+<span class="token keyword">DROP</span> <span class="token keyword">TABLE</span> <span class="token keyword">IF</span> <span class="token keyword">EXISTS</span> ods_payment_info<span class="token punctuation">;</span>
+<span class="token keyword">CREATE</span> EXTERNAL <span class="token keyword">TABLE</span> ods_payment_info<span class="token punctuation">(</span>
+    <span class="token punctuation">`</span>id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'编号'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>out_trade_no<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'对外业务编号'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>order_id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'订单编号'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>user_id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'用户编号'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>payment_type<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'支付类型'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>trade_no<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'交易编号'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>payment_amount<span class="token punctuation">`</span> <span class="token keyword">DECIMAL</span><span class="token punctuation">(</span><span class="token number">16</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">)</span> <span class="token keyword">COMMENT</span> <span class="token string">'支付金额'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>subject<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'交易内容'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>payment_status<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'支付状态'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>create_time<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'创建时间'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>callback_time<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'回调时间'</span>
+<span class="token punctuation">)</span>  <span class="token keyword">COMMENT</span> <span class="token string">'支付流水表'</span>
+PARTITIONED <span class="token keyword">BY</span> <span class="token punctuation">(</span><span class="token punctuation">`</span>dt<span class="token punctuation">`</span> STRING<span class="token punctuation">)</span>
+<span class="token keyword">ROW</span> FORMAT DELIMITED <span class="token keyword">FIELDS</span> <span class="token keyword">TERMINATED BY</span> <span class="token string">'\t'</span>
+STORED <span class="token keyword">AS</span>
+  INPUTFORMAT <span class="token string">'com.hadoop.mapred.DeprecatedLzoTextInputFormat'</span>
+  OUTPUTFORMAT <span class="token string">'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'</span>
+LOCATION <span class="token string">'/user/hive/warehouse/warehouse.db/ods/ods_payment_info/'</span><span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true">-- 22、退款表</span>
+<span class="token keyword">DROP</span> <span class="token keyword">TABLE</span> <span class="token keyword">IF</span> <span class="token keyword">EXISTS</span> ods_refund_payment<span class="token punctuation">;</span>
+<span class="token keyword">CREATE</span> EXTERNAL <span class="token keyword">TABLE</span> ods_refund_payment<span class="token punctuation">(</span>
+    <span class="token punctuation">`</span>id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'编号'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>out_trade_no<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'对外业务编号'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>order_id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'订单编号'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>sku_id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'SKU编号'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>payment_type<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'支付类型'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>trade_no<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'交易编号'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>refund_amount<span class="token punctuation">`</span> <span class="token keyword">DECIMAL</span><span class="token punctuation">(</span><span class="token number">16</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">)</span> <span class="token keyword">COMMENT</span> <span class="token string">'支付金额'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>subject<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'交易内容'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>refund_status<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'支付状态'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>create_time<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'创建时间'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>callback_time<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'回调时间'</span>
+<span class="token punctuation">)</span>  <span class="token keyword">COMMENT</span> <span class="token string">'支付流水表'</span>
+PARTITIONED <span class="token keyword">BY</span> <span class="token punctuation">(</span><span class="token punctuation">`</span>dt<span class="token punctuation">`</span> STRING<span class="token punctuation">)</span>
+<span class="token keyword">ROW</span> FORMAT DELIMITED <span class="token keyword">FIELDS</span> <span class="token keyword">TERMINATED BY</span> <span class="token string">'\t'</span>
+STORED <span class="token keyword">AS</span>
+  INPUTFORMAT <span class="token string">'com.hadoop.mapred.DeprecatedLzoTextInputFormat'</span>
+  OUTPUTFORMAT <span class="token string">'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'</span>
+LOCATION <span class="token string">'/user/hive/warehouse/warehouse.db/ods/ods_refund_payment/'</span><span class="token punctuation">;</span>
+
+
+<span class="token comment" spellcheck="true">-- 23、商品平台属性表</span>
+<span class="token keyword">DROP</span> <span class="token keyword">TABLE</span> <span class="token keyword">IF</span> <span class="token keyword">EXISTS</span> ods_sku_attr_value<span class="token punctuation">;</span>
+<span class="token keyword">CREATE</span> EXTERNAL <span class="token keyword">TABLE</span> ods_sku_attr_value<span class="token punctuation">(</span>
+    <span class="token punctuation">`</span>id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'编号'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>attr_id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'平台属性ID'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>value_id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'平台属性值ID'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>sku_id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'商品ID'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>attr_name<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'平台属性名称'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>value_name<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'平台属性值名称'</span>
+<span class="token punctuation">)</span> <span class="token keyword">COMMENT</span> <span class="token string">'sku平台属性表'</span>
+PARTITIONED <span class="token keyword">BY</span> <span class="token punctuation">(</span><span class="token punctuation">`</span>dt<span class="token punctuation">`</span> STRING<span class="token punctuation">)</span>
+<span class="token keyword">ROW</span> FORMAT DELIMITED <span class="token keyword">FIELDS</span> <span class="token keyword">TERMINATED BY</span> <span class="token string">'\t'</span>
+STORED <span class="token keyword">AS</span>
+  INPUTFORMAT <span class="token string">'com.hadoop.mapred.DeprecatedLzoTextInputFormat'</span>
+  OUTPUTFORMAT <span class="token string">'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'</span>
+LOCATION <span class="token string">'/user/hive/warehouse/warehouse.db/ods/ods_sku_attr_value/'</span><span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true">-- 24、商品（SKU）表</span>
+<span class="token keyword">DROP</span> <span class="token keyword">TABLE</span> <span class="token keyword">IF</span> <span class="token keyword">EXISTS</span> ods_sku_info<span class="token punctuation">;</span>
+<span class="token keyword">CREATE</span> EXTERNAL <span class="token keyword">TABLE</span> ods_sku_info<span class="token punctuation">(</span>
+    <span class="token punctuation">`</span>id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'skuId'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>spu_id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'spuid'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>price<span class="token punctuation">`</span> <span class="token keyword">DECIMAL</span><span class="token punctuation">(</span><span class="token number">16</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">)</span> <span class="token keyword">COMMENT</span> <span class="token string">'价格'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>sku_name<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'商品名称'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>sku_desc<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'商品描述'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>weight<span class="token punctuation">`</span> <span class="token keyword">DECIMAL</span><span class="token punctuation">(</span><span class="token number">16</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">)</span> <span class="token keyword">COMMENT</span> <span class="token string">'重量'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>tm_id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'品牌id'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>category3_id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'品类id'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>is_sale<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'是否在售'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>create_time<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'创建时间'</span>
+<span class="token punctuation">)</span> <span class="token keyword">COMMENT</span> <span class="token string">'SKU商品表'</span>
+PARTITIONED <span class="token keyword">BY</span> <span class="token punctuation">(</span><span class="token punctuation">`</span>dt<span class="token punctuation">`</span> STRING<span class="token punctuation">)</span>
+<span class="token keyword">ROW</span> FORMAT DELIMITED <span class="token keyword">FIELDS</span> <span class="token keyword">TERMINATED BY</span> <span class="token string">'\t'</span>
+STORED <span class="token keyword">AS</span>
+  INPUTFORMAT <span class="token string">'com.hadoop.mapred.DeprecatedLzoTextInputFormat'</span>
+  OUTPUTFORMAT <span class="token string">'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'</span>
+LOCATION <span class="token string">'/user/hive/warehouse/warehouse.db/ods/ods_sku_info/'</span><span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true">-- 25、商品销售属性表</span>
+<span class="token keyword">DROP</span> <span class="token keyword">TABLE</span> <span class="token keyword">IF</span> <span class="token keyword">EXISTS</span> ods_sku_sale_attr_value<span class="token punctuation">;</span>
+<span class="token keyword">CREATE</span> EXTERNAL <span class="token keyword">TABLE</span> ods_sku_sale_attr_value<span class="token punctuation">(</span>
+    <span class="token punctuation">`</span>id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'编号'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>sku_id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'sku_id'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>spu_id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'spu_id'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>sale_attr_value_id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'销售属性值id'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>sale_attr_id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'销售属性id'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>sale_attr_name<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'销售属性名称'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>sale_attr_value_name<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'销售属性值名称'</span>
+<span class="token punctuation">)</span> <span class="token keyword">COMMENT</span> <span class="token string">'sku销售属性名称'</span>
+PARTITIONED <span class="token keyword">BY</span> <span class="token punctuation">(</span><span class="token punctuation">`</span>dt<span class="token punctuation">`</span> STRING<span class="token punctuation">)</span>
+<span class="token keyword">ROW</span> FORMAT DELIMITED <span class="token keyword">FIELDS</span> <span class="token keyword">TERMINATED BY</span> <span class="token string">'\t'</span>
+STORED <span class="token keyword">AS</span>
+  INPUTFORMAT <span class="token string">'com.hadoop.mapred.DeprecatedLzoTextInputFormat'</span>
+  OUTPUTFORMAT <span class="token string">'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'</span>
+LOCATION <span class="token string">'/user/hive/warehouse/warehouse.db/ods/ods_sku_sale_attr_value/'</span><span class="token punctuation">;</span>
+
+
+<span class="token comment" spellcheck="true">-- 26、商品（SPU）表</span>
+<span class="token keyword">DROP</span> <span class="token keyword">TABLE</span> <span class="token keyword">IF</span> <span class="token keyword">EXISTS</span> ods_spu_info<span class="token punctuation">;</span>
+<span class="token keyword">CREATE</span> EXTERNAL <span class="token keyword">TABLE</span> ods_spu_info<span class="token punctuation">(</span>
+    <span class="token punctuation">`</span>id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'spuid'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>spu_name<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'spu名称'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>category3_id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'品类id'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>tm_id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'品牌id'</span>
+<span class="token punctuation">)</span> <span class="token keyword">COMMENT</span> <span class="token string">'SPU商品表'</span>
+PARTITIONED <span class="token keyword">BY</span> <span class="token punctuation">(</span><span class="token punctuation">`</span>dt<span class="token punctuation">`</span> STRING<span class="token punctuation">)</span>
+<span class="token keyword">ROW</span> FORMAT DELIMITED <span class="token keyword">FIELDS</span> <span class="token keyword">TERMINATED BY</span> <span class="token string">'\t'</span>
+STORED <span class="token keyword">AS</span>
+  INPUTFORMAT <span class="token string">'com.hadoop.mapred.DeprecatedLzoTextInputFormat'</span>
+  OUTPUTFORMAT <span class="token string">'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'</span>
+LOCATION <span class="token string">'/user/hive/warehouse/warehouse.db/ods/ods_spu_info/'</span><span class="token punctuation">;</span>
+
+
+<span class="token comment" spellcheck="true">-- 27、用户表</span>
+<span class="token keyword">DROP</span> <span class="token keyword">TABLE</span> <span class="token keyword">IF</span> <span class="token keyword">EXISTS</span> ods_user_info<span class="token punctuation">;</span>
+<span class="token keyword">CREATE</span> EXTERNAL <span class="token keyword">TABLE</span> ods_user_info<span class="token punctuation">(</span>
+    <span class="token punctuation">`</span>id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'用户id'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>login_name<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'用户名称'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>nick_name<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'用户昵称'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>name<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'用户姓名'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>phone_num<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'手机号码'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>email<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'邮箱'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>user_level<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'用户等级'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>birthday<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'生日'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>gender<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'性别'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>create_time<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'创建时间'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>operate_time<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'操作时间'</span>
+<span class="token punctuation">)</span> <span class="token keyword">COMMENT</span> <span class="token string">'用户表'</span>
+PARTITIONED <span class="token keyword">BY</span> <span class="token punctuation">(</span><span class="token punctuation">`</span>dt<span class="token punctuation">`</span> STRING<span class="token punctuation">)</span>
+<span class="token keyword">ROW</span> FORMAT DELIMITED <span class="token keyword">FIELDS</span> <span class="token keyword">TERMINATED BY</span> <span class="token string">'\t'</span>
+STORED <span class="token keyword">AS</span>
+  INPUTFORMAT <span class="token string">'com.hadoop.mapred.DeprecatedLzoTextInputFormat'</span>
+  OUTPUTFORMAT <span class="token string">'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'</span>
+LOCATION <span class="token string">'/user/hive/warehouse/warehouse.db/ods/ods_user_info/'</span><span class="token punctuation">;</span>
+</code></pre>
+<h5 id="2-2-数据装载"><a href="#2-2-数据装载" class="headerlink" title="2.2 数据装载"></a>2.2 数据装载</h5><pre class=" language-bash"><code class="language-bash"><span class="token shebang important">#!/bin/bash</span>
+
+APP<span class="token operator">=</span>warehouse
+
+<span class="token keyword">if</span> <span class="token punctuation">[</span> -n <span class="token string">"<span class="token variable">$2</span>"</span> <span class="token punctuation">]</span> <span class="token punctuation">;</span><span class="token keyword">then</span>
+   do_date<span class="token operator">=</span><span class="token variable">$2</span>
+<span class="token keyword">else</span> 
+   <span class="token keyword">echo</span> <span class="token string">"请传入日期参数"</span>
+   <span class="token keyword">exit</span>
+<span class="token keyword">fi</span> 
+
+ods_order_info<span class="token operator">=</span><span class="token string">" 
+load data inpath '/off_line_warehouse/data/db/order_info/<span class="token variable">$do_date</span>' OVERWRITE into table <span class="token variable">${APP}</span>.ods_order_info partition(dt='<span class="token variable">$do_date</span>');"</span>
+
+ods_order_detail<span class="token operator">=</span><span class="token string">"
+load data inpath '/off_line_warehouse/data/db/order_detail/<span class="token variable">$do_date</span>' OVERWRITE into table <span class="token variable">${APP}</span>.ods_order_detail partition(dt='<span class="token variable">$do_date</span>');"</span>
+
+ods_sku_info<span class="token operator">=</span><span class="token string">"
+load data inpath '/off_line_warehouse/data/db/sku_info/<span class="token variable">$do_date</span>' OVERWRITE into table <span class="token variable">${APP}</span>.ods_sku_info partition(dt='<span class="token variable">$do_date</span>');"</span>
+
+ods_user_info<span class="token operator">=</span><span class="token string">"
+load data inpath '/off_line_warehouse/data/db/user_info/<span class="token variable">$do_date</span>' OVERWRITE into table <span class="token variable">${APP}</span>.ods_user_info partition(dt='<span class="token variable">$do_date</span>');"</span>
+
+ods_payment_info<span class="token operator">=</span><span class="token string">"
+load data inpath '/off_line_warehouse/data/db/payment_info/<span class="token variable">$do_date</span>' OVERWRITE into table <span class="token variable">${APP}</span>.ods_payment_info partition(dt='<span class="token variable">$do_date</span>');"</span>
+
+ods_base_category1<span class="token operator">=</span><span class="token string">"
+load data inpath '/off_line_warehouse/data/db/base_category1/<span class="token variable">$do_date</span>' OVERWRITE into table <span class="token variable">${APP}</span>.ods_base_category1 partition(dt='<span class="token variable">$do_date</span>');"</span>
+
+ods_base_category2<span class="token operator">=</span><span class="token string">"
+load data inpath '/off_line_warehouse/data/db/base_category2/<span class="token variable">$do_date</span>' OVERWRITE into table <span class="token variable">${APP}</span>.ods_base_category2 partition(dt='<span class="token variable">$do_date</span>');"</span>
+
+ods_base_category3<span class="token operator">=</span><span class="token string">"
+load data inpath '/off_line_warehouse/data/db/base_category3/<span class="token variable">$do_date</span>' OVERWRITE into table <span class="token variable">${APP}</span>.ods_base_category3 partition(dt='<span class="token variable">$do_date</span>'); "</span>
+
+ods_base_trademark<span class="token operator">=</span><span class="token string">"
+load data inpath '/off_line_warehouse/data/db/base_trademark/<span class="token variable">$do_date</span>' OVERWRITE into table <span class="token variable">${APP}</span>.ods_base_trademark partition(dt='<span class="token variable">$do_date</span>'); "</span>
+
+ods_activity_info<span class="token operator">=</span><span class="token string">"
+load data inpath '/off_line_warehouse/data/db/activity_info/<span class="token variable">$do_date</span>' OVERWRITE into table <span class="token variable">${APP}</span>.ods_activity_info partition(dt='<span class="token variable">$do_date</span>'); "</span>
+
+ods_cart_info<span class="token operator">=</span><span class="token string">"
+load data inpath '/off_line_warehouse/data/db/cart_info/<span class="token variable">$do_date</span>' OVERWRITE into table <span class="token variable">${APP}</span>.ods_cart_info partition(dt='<span class="token variable">$do_date</span>'); "</span>
+
+ods_comment_info<span class="token operator">=</span><span class="token string">"
+load data inpath '/off_line_warehouse/data/db/comment_info/<span class="token variable">$do_date</span>' OVERWRITE into table <span class="token variable">${APP}</span>.ods_comment_info partition(dt='<span class="token variable">$do_date</span>'); "</span>
+
+ods_coupon_info<span class="token operator">=</span><span class="token string">"
+load data inpath '/off_line_warehouse/data/db/coupon_info/<span class="token variable">$do_date</span>' OVERWRITE into table <span class="token variable">${APP}</span>.ods_coupon_info partition(dt='<span class="token variable">$do_date</span>'); "</span>
+
+ods_coupon_use<span class="token operator">=</span><span class="token string">"
+load data inpath '/off_line_warehouse/data/db/coupon_use/<span class="token variable">$do_date</span>' OVERWRITE into table <span class="token variable">${APP}</span>.ods_coupon_use partition(dt='<span class="token variable">$do_date</span>'); "</span>
+
+ods_favor_info<span class="token operator">=</span><span class="token string">"
+load data inpath '/off_line_warehouse/data/db/favor_info/<span class="token variable">$do_date</span>' OVERWRITE into table <span class="token variable">${APP}</span>.ods_favor_info partition(dt='<span class="token variable">$do_date</span>'); "</span>
+
+ods_order_refund_info<span class="token operator">=</span><span class="token string">"
+load data inpath '/off_line_warehouse/data/db/order_refund_info/<span class="token variable">$do_date</span>' OVERWRITE into table <span class="token variable">${APP}</span>.ods_order_refund_info partition(dt='<span class="token variable">$do_date</span>'); "</span>
+
+ods_order_status_log<span class="token operator">=</span><span class="token string">"
+load data inpath '/off_line_warehouse/data/db/order_status_log/<span class="token variable">$do_date</span>' OVERWRITE into table <span class="token variable">${APP}</span>.ods_order_status_log partition(dt='<span class="token variable">$do_date</span>'); "</span>
+
+ods_spu_info<span class="token operator">=</span><span class="token string">"
+load data inpath '/off_line_warehouse/data/db/spu_info/<span class="token variable">$do_date</span>' OVERWRITE into table <span class="token variable">${APP}</span>.ods_spu_info partition(dt='<span class="token variable">$do_date</span>'); "</span>
+
+ods_activity_rule<span class="token operator">=</span><span class="token string">"
+load data inpath '/off_line_warehouse/data/db/activity_rule/<span class="token variable">$do_date</span>' OVERWRITE into table <span class="token variable">${APP}</span>.ods_activity_rule partition(dt='<span class="token variable">$do_date</span>');"</span> 
+
+ods_base_dic<span class="token operator">=</span><span class="token string">"
+load data inpath '/off_line_warehouse/data/db/base_dic/<span class="token variable">$do_date</span>' OVERWRITE into table <span class="token variable">${APP}</span>.ods_base_dic partition(dt='<span class="token variable">$do_date</span>'); "</span>
+
+ods_order_detail_activity<span class="token operator">=</span><span class="token string">"
+load data inpath '/off_line_warehouse/data/db/order_detail_activity/<span class="token variable">$do_date</span>' OVERWRITE into table <span class="token variable">${APP}</span>.ods_order_detail_activity partition(dt='<span class="token variable">$do_date</span>'); "</span>
+
+ods_order_detail_coupon<span class="token operator">=</span><span class="token string">"
+load data inpath '/off_line_warehouse/data/db/order_detail_coupon/<span class="token variable">$do_date</span>' OVERWRITE into table <span class="token variable">${APP}</span>.ods_order_detail_coupon partition(dt='<span class="token variable">$do_date</span>'); "</span>
+
+ods_refund_payment<span class="token operator">=</span><span class="token string">"
+load data inpath '/off_line_warehouse/data/db/refund_payment/<span class="token variable">$do_date</span>' OVERWRITE into table <span class="token variable">${APP}</span>.ods_refund_payment partition(dt='<span class="token variable">$do_date</span>'); "</span>
+
+ods_sku_attr_value<span class="token operator">=</span><span class="token string">"
+load data inpath '/off_line_warehouse/data/db/sku_attr_value/<span class="token variable">$do_date</span>' OVERWRITE into table <span class="token variable">${APP}</span>.ods_sku_attr_value partition(dt='<span class="token variable">$do_date</span>'); "</span>
+
+ods_sku_sale_attr_value<span class="token operator">=</span><span class="token string">"
+load data inpath '/off_line_warehouse/data/db/sku_sale_attr_value/<span class="token variable">$do_date</span>' OVERWRITE into table <span class="token variable">${APP}</span>.ods_sku_sale_attr_value partition(dt='<span class="token variable">$do_date</span>'); "</span>
+
+ods_base_province<span class="token operator">=</span><span class="token string">" 
+load data inpath '/off_line_warehouse/data/db/base_province/<span class="token variable">$do_date</span>' OVERWRITE into table <span class="token variable">${APP}</span>.ods_base_province;"</span>
+
+ods_base_region<span class="token operator">=</span><span class="token string">"
+load data inpath '/off_line_warehouse/data/db/base_region/<span class="token variable">$do_date</span>' OVERWRITE into table <span class="token variable">${APP}</span>.ods_base_region;"</span>
+
+<span class="token keyword">case</span> <span class="token variable">$1</span> <span class="token keyword">in</span>
+    <span class="token string">"ods_order_info"</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        hive -e <span class="token string">"<span class="token variable">$ods_order_info</span>"</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span><span class="token punctuation">;</span>
+    <span class="token string">"ods_order_detail"</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        hive -e <span class="token string">"<span class="token variable">$ods_order_detail</span>"</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span><span class="token punctuation">;</span>
+    <span class="token string">"ods_sku_info"</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        hive -e <span class="token string">"<span class="token variable">$ods_sku_info</span>"</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span><span class="token punctuation">;</span>
+    <span class="token string">"ods_user_info"</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        hive -e <span class="token string">"<span class="token variable">$ods_user_info</span>"</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span><span class="token punctuation">;</span>
+    <span class="token string">"ods_payment_info"</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        hive -e <span class="token string">"<span class="token variable">$ods_payment_info</span>"</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span><span class="token punctuation">;</span>
+    <span class="token string">"ods_base_category1"</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        hive -e <span class="token string">"<span class="token variable">$ods_base_category1</span>"</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span><span class="token punctuation">;</span>
+    <span class="token string">"ods_base_category2"</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        hive -e <span class="token string">"<span class="token variable">$ods_base_category2</span>"</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span><span class="token punctuation">;</span>
+    <span class="token string">"ods_base_category3"</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        hive -e <span class="token string">"<span class="token variable">$ods_base_category3</span>"</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span><span class="token punctuation">;</span>
+    <span class="token string">"ods_base_trademark"</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        hive -e <span class="token string">"<span class="token variable">$ods_base_trademark</span>"</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span><span class="token punctuation">;</span>
+    <span class="token string">"ods_activity_info"</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        hive -e <span class="token string">"<span class="token variable">$ods_activity_info</span>"</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span><span class="token punctuation">;</span>
+    <span class="token string">"ods_cart_info"</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        hive -e <span class="token string">"<span class="token variable">$ods_cart_info</span>"</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span><span class="token punctuation">;</span>
+    <span class="token string">"ods_comment_info"</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        hive -e <span class="token string">"<span class="token variable">$ods_comment_info</span>"</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span><span class="token punctuation">;</span>
+    <span class="token string">"ods_coupon_info"</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        hive -e <span class="token string">"<span class="token variable">$ods_coupon_info</span>"</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span><span class="token punctuation">;</span>
+    <span class="token string">"ods_coupon_use"</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        hive -e <span class="token string">"<span class="token variable">$ods_coupon_use</span>"</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span><span class="token punctuation">;</span>
+    <span class="token string">"ods_favor_info"</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        hive -e <span class="token string">"<span class="token variable">$ods_favor_info</span>"</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span><span class="token punctuation">;</span>
+    <span class="token string">"ods_order_refund_info"</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        hive -e <span class="token string">"<span class="token variable">$ods_order_refund_info</span>"</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span><span class="token punctuation">;</span>
+    <span class="token string">"ods_order_status_log"</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        hive -e <span class="token string">"<span class="token variable">$ods_order_status_log</span>"</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span><span class="token punctuation">;</span>
+    <span class="token string">"ods_spu_info"</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        hive -e <span class="token string">"<span class="token variable">$ods_spu_info</span>"</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span><span class="token punctuation">;</span>
+    <span class="token string">"ods_activity_rule"</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        hive -e <span class="token string">"<span class="token variable">$ods_activity_rule</span>"</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span><span class="token punctuation">;</span>
+    <span class="token string">"ods_base_dic"</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        hive -e <span class="token string">"<span class="token variable">$ods_base_dic</span>"</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span><span class="token punctuation">;</span>
+    <span class="token string">"ods_order_detail_activity"</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        hive -e <span class="token string">"<span class="token variable">$ods_order_detail_activity</span>"</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span><span class="token punctuation">;</span>
+    <span class="token string">"ods_order_detail_coupon"</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        hive -e <span class="token string">"<span class="token variable">$ods_order_detail_coupon</span>"</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span><span class="token punctuation">;</span>
+    <span class="token string">"ods_refund_payment"</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        hive -e <span class="token string">"<span class="token variable">$ods_refund_payment</span>"</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span><span class="token punctuation">;</span>
+    <span class="token string">"ods_sku_attr_value"</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        hive -e <span class="token string">"<span class="token variable">$ods_sku_attr_value</span>"</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span><span class="token punctuation">;</span>
+    <span class="token string">"ods_sku_sale_attr_value"</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        hive -e <span class="token string">"<span class="token variable">$ods_sku_sale_attr_value</span>"</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span><span class="token punctuation">;</span>
+    <span class="token string">"ods_base_province"</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        hive -e <span class="token string">"<span class="token variable">$ods_base_province</span>"</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span><span class="token punctuation">;</span>
+    <span class="token string">"ods_base_region"</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        hive -e <span class="token string">"<span class="token variable">$ods_base_region</span>"</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span><span class="token punctuation">;</span>
+    <span class="token string">"all"</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        hive -e <span class="token string">"<span class="token variable">$ods_order_info</span><span class="token variable">$ods_order_detail</span><span class="token variable">$ods_sku_info</span><span class="token variable">$ods_user_info</span><span class="token variable">$ods_payment_info</span><span class="token variable">$ods_base_category1</span><span class="token variable">$ods_base_category2</span><span class="token variable">$ods_base_category3</span><span class="token variable">$ods_base_trademark</span><span class="token variable">$ods_activity_info</span><span class="token variable">$ods_cart_info</span><span class="token variable">$ods_comment_info</span><span class="token variable">$ods_coupon_info</span><span class="token variable">$ods_coupon_use</span><span class="token variable">$ods_favor_info</span><span class="token variable">$ods_order_refund_info</span><span class="token variable">$ods_order_status_log</span><span class="token variable">$ods_spu_info</span><span class="token variable">$ods_activity_rule</span><span class="token variable">$ods_base_dic</span><span class="token variable">$ods_order_detail_activity</span><span class="token variable">$ods_order_detail_coupon</span><span class="token variable">$ods_refund_payment</span><span class="token variable">$ods_sku_attr_value</span><span class="token variable">$ods_sku_sale_attr_value</span><span class="token variable">$ods_base_province</span><span class="token variable">$ods_base_region</span>"</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span><span class="token punctuation">;</span>
+esac
 </code></pre>
 
                 
