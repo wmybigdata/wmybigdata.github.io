@@ -1,0 +1,1625 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="keywords" content="hive-sql-记录, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
+    <meta name="description" content="本网站是个人兴趣爱好，总结分享经验，记录生活点滴的平台，希望在以后的学习旅途中，走出自己的风景。">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>hive-sql-记录 | 情深骚明大数据之旅</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+
+    <script src="/libs/jquery/jquery.min.js"></script>
+
+<meta name="generator" content="Hexo 4.2.0">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+</head>
+
+
+
+<script src="/js/FunnyTitle.js"></script>
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">情深骚明大数据之旅</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/contact" class="waves-effect waves-light">
+      
+      <i class="fas fa-comments" style="zoom: 0.6;"></i>
+      
+      <span>留言板</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">情深骚明大数据之旅</div>
+        <div class="logo-desc">
+            
+            本网站是个人兴趣爱好，总结分享经验，记录生活点滴的平台，希望在以后的学习旅途中，走出自己的风景。
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/contact" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-comments"></i>
+			
+			留言板
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/blinkfox/hexo-theme-matery" class="waves-effect waves-light" target="_blank">
+                <i class="fab fa-github-square fa-fw"></i>Fork Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/blinkfox/hexo-theme-matery" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
+   data-tooltip="Fork Me" data-position="left" data-delay="50">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor" class="octo-body"></path>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+    
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/17.jpg')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">hive-sql-记录</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        width: 345px;
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        padding: 35px 0 15px 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content {
+        padding-bottom: 30px;
+        overflow: auto;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+
+        position: absolute;
+        right: 23.5vw;
+        display: block;
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #floating-toc-btn {
+        position: fixed;
+        right: 15px;
+        bottom: 76px;
+        padding-top: 15px;
+        margin-bottom: 0;
+        z-index: 998;
+    }
+
+    #floating-toc-btn .btn-floating {
+        width: 48px;
+        height: 48px;
+    }
+
+    #floating-toc-btn .btn-floating i {
+        line-height: 48px;
+        font-size: 1.4rem;
+    }
+</style>
+<div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/hive/">
+                                <span class="chip bg-color">hive</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/hive/" class="post-category">
+                                hive
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2021-09-17
+                </div>
+                
+
+                
+
+                
+
+                
+
+                
+            </div>
+        </div>
+        <hr class="clearfix">
+
+        
+
+        
+
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <h1 id="Hive-SQL总结"><a href="#Hive-SQL总结" class="headerlink" title="Hive SQL总结"></a>Hive SQL总结</h1><h2 id="1、内置运算"><a href="#1、内置运算" class="headerlink" title="1、内置运算"></a>1、内置运算</h2><h3 id="1-1-字符串运算符"><a href="#1-1-字符串运算符" class="headerlink" title="1.1 字符串运算符"></a>1.1 字符串运算符</h3><h4 id="1-1-1-length"><a href="#1-1-1-length" class="headerlink" title="1.1.1 length"></a>1.1.1 length</h4><pre class=" language-sql"><code class="language-sql"><span class="token comment" spellcheck="true">-- 语法: length(string A)</span>
+<span class="token keyword">select</span> length<span class="token punctuation">(</span><span class="token string">'wmy-love-bigdata'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h4 id="1-1-2-reverse"><a href="#1-1-2-reverse" class="headerlink" title="1.1.2 reverse"></a>1.1.2 reverse</h4><pre class=" language-sql"><code class="language-sql"><span class="token comment" spellcheck="true">-- 语法: reverse(string A)</span>
+<span class="token keyword">select</span> reverse<span class="token punctuation">(</span><span class="token string">'wmy-love-bigdata'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h4 id="1-1-3-concat"><a href="#1-1-3-concat" class="headerlink" title="1.1.3 concat"></a>1.1.3 concat</h4><pre class=" language-sql"><code class="language-sql"><span class="token comment" spellcheck="true">-- 语法: concat(string A, string B…)</span>
+<span class="token keyword">select</span> concat<span class="token punctuation">(</span><span class="token string">'wmy'</span><span class="token punctuation">,</span><span class="token string">','</span><span class="token punctuation">,</span><span class="token string">'bigdata'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h4 id="1-1-4-concat-ws"><a href="#1-1-4-concat-ws" class="headerlink" title="1.1.4  concat_ws"></a>1.1.4  concat_ws</h4><pre class=" language-sql"><code class="language-sql"><span class="token comment" spellcheck="true">-- 语法: concat_ws(string SEP, string A, string B…)</span>
+<span class="token keyword">select</span> concat_ws<span class="token punctuation">(</span><span class="token string">'==='</span><span class="token punctuation">,</span><span class="token string">'wmy'</span><span class="token punctuation">,</span><span class="token string">'bigdata'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h4 id="1-1-5-substr-substring"><a href="#1-1-5-substr-substring" class="headerlink" title="1.1.5 substr,substring"></a>1.1.5 substr,substring</h4><pre class=" language-sql"><code class="language-sql"><span class="token comment" spellcheck="true">-- 语法: substr(string A, int start, int len),substring(string A, int start, int len)</span>
+<span class="token keyword">select</span> substr<span class="token punctuation">(</span><span class="token string">'wmybigdatalove'</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">select</span> substring<span class="token punctuation">(</span><span class="token string">'wmybigdatalove'</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h4 id="1-1-6-upper-ucase"><a href="#1-1-6-upper-ucase" class="headerlink" title="1.1.6 upper,ucase"></a>1.1.6 upper,ucase</h4><pre class=" language-sql"><code class="language-sql"><span class="token comment" spellcheck="true">-- 语法: upper(string A) ucase(string A)</span>
+<span class="token keyword">select</span> upper<span class="token punctuation">(</span><span class="token string">'wmy'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">select</span> <span class="token function">ucase</span><span class="token punctuation">(</span><span class="token string">'wmy'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h4 id="1-1-7-lower-lcase"><a href="#1-1-7-lower-lcase" class="headerlink" title="1.1.7 lower,lcase"></a>1.1.7 lower,lcase</h4><pre class=" language-sql"><code class="language-sql"><span class="token comment" spellcheck="true">-- 语法: lower(string A) lcase(string A)</span>
+<span class="token keyword">select</span> lower<span class="token punctuation">(</span><span class="token string">'WMY'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">select</span> <span class="token function">lcase</span><span class="token punctuation">(</span><span class="token string">'WMY'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h4 id="1-1-8-trim"><a href="#1-1-8-trim" class="headerlink" title="1.1.8 trim"></a>1.1.8 trim</h4><pre class=" language-sql"><code class="language-sql"><span class="token comment" spellcheck="true">-- 语法: trim(string A)</span>
+<span class="token keyword">select</span> trim<span class="token punctuation">(</span><span class="token string">' wmy '</span><span class="token punctuation">)</span>
+</code></pre>
+<h4 id="1-1-9-ltrim"><a href="#1-1-9-ltrim" class="headerlink" title="1.1.9 ltrim"></a>1.1.9 ltrim</h4><pre class=" language-sql"><code class="language-sql"><span class="token comment" spellcheck="true">-- 语法: ltrim(string A)</span>
+<span class="token keyword">select</span> ltrim<span class="token punctuation">(</span><span class="token string">' wmy'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h4 id="1-1-10-rtrim"><a href="#1-1-10-rtrim" class="headerlink" title="1.1.10 rtrim"></a>1.1.10 rtrim</h4><pre class=" language-sql"><code class="language-sql"><span class="token comment" spellcheck="true">-- 语法: rtrim(string A)</span>
+<span class="token keyword">select</span> rtrim<span class="token punctuation">(</span><span class="token string">'wmy '</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h4 id="1-1-11-regexp-replace"><a href="#1-1-11-regexp-replace" class="headerlink" title="1.1.11 regexp_replace"></a>1.1.11 regexp_replace</h4><pre class=" language-sql"><code class="language-sql"><span class="token comment" spellcheck="true">-- 语法：regexp_replace(string A, string B, string C)</span>
+<span class="token keyword">select</span> regexp_replace<span class="token punctuation">(</span><span class="token string">'wmy==bigdata'</span><span class="token punctuation">,</span><span class="token string">'=='</span><span class="token punctuation">,</span><span class="token string">'**'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h4 id="1-1-12-regexp-extract"><a href="#1-1-12-regexp-extract" class="headerlink" title="1.1.12  regexp_extract"></a>1.1.12  regexp_extract</h4><pre class=" language-sql"><code class="language-sql"><span class="token comment" spellcheck="true">-- 语法: regexp_extract(string subject, string pattern, int index)</span>
+<span class="token keyword">select</span> regexp_extract<span class="token punctuation">(</span><span class="token string">'wmylovebigdata'</span><span class="token punctuation">,</span> <span class="token string">'wmy(.*?)(bigdata)'</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h4 id="1-1-13-parse-url"><a href="#1-1-13-parse-url" class="headerlink" title="1.1.13 parse_url"></a>1.1.13 parse_url</h4><pre class=" language-sql"><code class="language-sql"><span class="token comment" spellcheck="true">-- 语法: parse_url(string urlString, string partToExtract [, string keyToExtract])</span>
+<span class="token keyword">select</span> parse_url<span class="token punctuation">(</span>'http:<span class="token comment" spellcheck="true">//facebook.com/path1/p.php?k1=v1&amp;k2=v2#Ref1', 'HOST');</span>
+<span class="token keyword">select</span> parse_url<span class="token punctuation">(</span>'http:<span class="token comment" spellcheck="true">//facebook.com/path1/p.php?k1=v1&amp;k2=v2#Ref1', 'QUERY', 'k1');</span>
+</code></pre>
+<h4 id="1-1-14-get-json-object"><a href="#1-1-14-get-json-object" class="headerlink" title="1.1.14  get_json_object"></a>1.1.14  get_json_object</h4><pre class=" language-sql"><code class="language-sql"><span class="token comment" spellcheck="true">-- 语法: get_json_object(string json_string, string path)</span>
+<span class="token keyword">select</span> get_json_object<span class="token punctuation">(</span><span class="token string">'{"id":"1001","name":"wmy","age":22}'</span><span class="token punctuation">,</span><span class="token string">'$.name'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h4 id="1-1-15-space"><a href="#1-1-15-space" class="headerlink" title="1.1.15  space"></a>1.1.15  space</h4><pre class=" language-sql"><code class="language-sql"><span class="token comment" spellcheck="true">-- 语法: space(int n)</span>
+<span class="token keyword">select</span> length<span class="token punctuation">(</span>space<span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h4 id="1-1-16-repeat"><a href="#1-1-16-repeat" class="headerlink" title="1.1.16  repeat"></a>1.1.16  repeat</h4><pre class=" language-sql"><code class="language-sql"><span class="token comment" spellcheck="true">-- 语法: repeat(string str, int n)</span>
+<span class="token keyword">select</span> repeat<span class="token punctuation">(</span><span class="token string">'wmy='</span><span class="token punctuation">,</span><span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h4 id="1-1-17-ascii"><a href="#1-1-17-ascii" class="headerlink" title="1.1.17  ascii"></a>1.1.17  ascii</h4><pre class=" language-sql"><code class="language-sql"><span class="token comment" spellcheck="true">/*
+语法: ascii(string str)
+返回值: int
+说明：返回字符串str第一个字符的ascii码
+*/</span>
+<span class="token keyword">select</span> ascii<span class="token punctuation">(</span><span class="token string">'wmy'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h4 id="1-1-18-lpad"><a href="#1-1-18-lpad" class="headerlink" title="1.1.18  lpad"></a>1.1.18  lpad</h4><pre class=" language-sql"><code class="language-sql"><span class="token comment" spellcheck="true">/*
+语法: lpad(string str, int len, string pad)
+
+返回值: string
+
+说明：将str进行用pad进行左补足到len位
+*/</span>
+
+<span class="token keyword">select</span> lpad<span class="token punctuation">(</span><span class="token string">'wmy'</span><span class="token punctuation">,</span><span class="token number">10</span><span class="token punctuation">,</span><span class="token string">'|'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h4 id="1-1-19-rpad"><a href="#1-1-19-rpad" class="headerlink" title="1.1.19  rpad"></a>1.1.19  rpad</h4><pre class=" language-sql"><code class="language-sql"><span class="token comment" spellcheck="true">/*
+语法: rpad(string str, int len, string pad)
+
+返回值: string
+
+说明：将str进行用pad进行右补足到len位
+*/</span>
+
+<span class="token keyword">select</span> rpad<span class="token punctuation">(</span><span class="token string">'wmy'</span><span class="token punctuation">,</span><span class="token number">10</span><span class="token punctuation">,</span><span class="token string">'|'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h4 id="1-1-20-split"><a href="#1-1-20-split" class="headerlink" title="1.1.20  split"></a>1.1.20  split</h4><pre class=" language-sql"><code class="language-sql"><span class="token comment" spellcheck="true">/*
+语法: split(string str, string pat)
+
+返回值: array
+
+说明: 按照pat字符串分割str，会返回分割后的字符串数组
+*/</span>
+
+<span class="token keyword">select</span> split<span class="token punctuation">(</span><span class="token string">'wmy-love-bigdata'</span><span class="token punctuation">,</span><span class="token string">'-'</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">,</span>split<span class="token punctuation">(</span><span class="token string">'wmy-love-bigdata'</span><span class="token punctuation">,</span><span class="token string">'-'</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">,</span>split<span class="token punctuation">(</span><span class="token string">'wmy-love-bigdata'</span><span class="token punctuation">,</span><span class="token string">'-'</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+</code></pre>
+<h4 id="1-1-21-find-in-set"><a href="#1-1-21-find-in-set" class="headerlink" title="1.1.21 find_in_set"></a>1.1.21 find_in_set</h4><pre class=" language-sql"><code class="language-sql"><span class="token comment" spellcheck="true">/*
+语法: find_in_set(string str, string strList)
+
+返回值: int
+
+说明: 返回str在strlist第一次出现的位置，strlist是用逗号分割的字符串。如果没有找该str字符，则返回0
+*/</span>
+
+<span class="token keyword">select</span> find_in_set<span class="token punctuation">(</span><span class="token string">'wmy'</span><span class="token punctuation">,</span><span class="token string">'wmy,love,bigdata'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h4 id="1-1-22-instr"><a href="#1-1-22-instr" class="headerlink" title="1.1.22 instr"></a>1.1.22 instr</h4><pre class=" language-sql"><code class="language-sql"><span class="token comment" spellcheck="true">/*
+语法：INSTR(string C1,string C2,int I,int J)
+返回:int。substr在str中第一次出现的位置，若任何参数为null返回null，若substr不在str中返回0，Str中第一个字符的位置为1
+
+说明：C1 被搜索的字符串
+
+C2 希望搜索的字符串
+
+I 搜索的开始位置,默认为1
+
+J 出现的位置,默认为1
+*/</span>
+
+<span class="token keyword">select</span> instr<span class="token punctuation">(</span><span class="token string">'love bigdata, wmy is a boy'</span><span class="token punctuation">,</span><span class="token string">'wmy'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h4 id="1-1-23-str-to-map"><a href="#1-1-23-str-to-map" class="headerlink" title="1.1.23  str_to_map"></a>1.1.23  str_to_map</h4><pre class=" language-sql"><code class="language-sql"><span class="token comment" spellcheck="true">/*
+使用两个分隔符将文本拆分为键值对
+语法：str_to_map(text[, delimiter1, delimiter2])
+返回：map
+
+Delimiter1将文本分成K-V对，Delimiter2分割每个K-V对。对于delimiter1默认分隔符是','，对于delimiter2默认分隔符是'='
+*/</span>
+
+<span class="token keyword">select</span> str_to_map<span class="token punctuation">(</span><span class="token string">'id:11@name:wmy@age:man'</span><span class="token punctuation">,</span><span class="token string">'@'</span><span class="token punctuation">,</span><span class="token string">':'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h4 id="1-1-24-unix-timestamp"><a href="#1-1-24-unix-timestamp" class="headerlink" title="1.1.24  unix_timestamp"></a>1.1.24  unix_timestamp</h4><pre class=" language-sql"><code class="language-sql"><span class="token comment" spellcheck="true">/*
+unix_timestamp() 返回当前时间戳。另外，current_timestamp() 也有同样作用。
+
+unix_timestamp(string date) 返回 date 对应的时间戳，date 格式必须为 yyyy-MM-dd HH:mm:ss。
+
+unix_timestamp(string date, string format) 返回 date 对应的时间戳，date 格式由 format 指定。
+*/</span>
+
+
+<span class="token keyword">select</span> unix_timestamp<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">select</span> <span class="token keyword">current_timestamp</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">select</span> unix_timestamp<span class="token punctuation">(</span><span class="token string">'2021-09-15 15:15:15'</span><span class="token punctuation">,</span><span class="token string">'yyyy-MM-dd HH:mm:ss'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h4 id="1-1-25-from-unixtime"><a href="#1-1-25-from-unixtime" class="headerlink" title="1.1.25 from_unixtime"></a>1.1.25 from_unixtime</h4><pre class=" language-sql"><code class="language-sql"><span class="token comment" spellcheck="true">/*
+from_unixtime(int/bigint timestamp) 返回 timestamp 时间戳对应的日期，格式为 yyyy-MM-dd HH:mm:ss。
+
+from_unixtime(int/bigint timestamp, string format) 返回 timestamp 时间戳对应的日期，格式由 format 指定。
+*/</span>
+
+<span class="token keyword">select</span> from_unixtime<span class="token punctuation">(</span><span class="token number">1631718915</span><span class="token punctuation">,</span><span class="token string">'yyyy-MM-dd HH:mm:ss'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h4 id="1-1-26-array-contains"><a href="#1-1-26-array-contains" class="headerlink" title="1.1.26 array_contains"></a>1.1.26 array_contains</h4><pre class=" language-sql"><code class="language-sql"><span class="token comment" spellcheck="true">/*
+字符串数组，元素包含操作
+语法：array_contains(array arr, element)
+返回数组中是否包含element元素：true or false
+*/</span>
+
+<span class="token keyword">select</span> <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token keyword">select</span> array_contains<span class="token punctuation">(</span>split<span class="token punctuation">(</span><span class="token string">"aaa:bbb:ccc:ddd"</span><span class="token punctuation">,</span><span class="token string">":"</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">"ccc"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h2 id="2、复杂类型构造函数"><a href="#2、复杂类型构造函数" class="headerlink" title="2、复杂类型构造函数"></a>2、复杂类型构造函数</h2><h3 id="2-1-map"><a href="#2-1-map" class="headerlink" title="2.1 map"></a>2.1 map</h3><h4 id="2-1-1-测试数据"><a href="#2-1-1-测试数据" class="headerlink" title="2.1.1 测试数据"></a>2.1.1 测试数据</h4><pre class=" language-properties"><code class="language-properties"><span class="token attr-name">0098.HK,104,2018-10-21T22</span><span class="token punctuation">:</span><span class="token attr-value">20:00.105Z,name:fayson|sex:男|age:18</span>
+<span class="token attr-name">0098.HK,104,2018-10-21T22</span><span class="token punctuation">:</span><span class="token attr-value">20:00.105Z,name:fayson1|sex:男|age:19</span>
+<span class="token attr-name">0098.HK,104,2018-10-21T22</span><span class="token punctuation">:</span><span class="token attr-value">20:00.105Z,name:fayson2|sex:男|age:20</span>
+<span class="token attr-name">0098.HK,104,2018-10-21T22</span><span class="token punctuation">:</span><span class="token attr-value">20:00.105Z,name:fayson3|sex:男|age:21</span>
+<span class="token attr-name">0098.HK,104,2018-10-21T22</span><span class="token punctuation">:</span><span class="token attr-value">20:00.105Z,name:fayson4|sex:男|age:22</span>
+</code></pre>
+<h4 id="2-1-2-建表插入"><a href="#2-1-2-建表插入" class="headerlink" title="2.1.2 建表插入"></a>2.1.2 建表插入</h4><pre class=" language-sql"><code class="language-sql"><span class="token keyword">CREATE</span> EXTERNAL <span class="token keyword">TABLE</span> 01_wmy_map<span class="token punctuation">(</span>
+    <span class="token punctuation">`</span>symbol<span class="token punctuation">`</span> string<span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>tickSequence<span class="token punctuation">`</span> string<span class="token punctuation">,</span>
+    <span class="token punctuation">`</span><span class="token keyword">timestamp</span><span class="token punctuation">`</span> string<span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>tickdata<span class="token punctuation">`</span> MAP<span class="token operator">&lt;</span>String<span class="token punctuation">,</span> string<span class="token operator">></span>
+<span class="token punctuation">)</span>
+<span class="token keyword">ROW</span> FORMAT DELIMITED <span class="token keyword">FIELDS</span> <span class="token keyword">TERMINATED BY</span> <span class="token string">','</span>
+COLLECTION ITEMS <span class="token keyword">TERMINATED BY</span> <span class="token string">'|'</span>
+MAP <span class="token keyword">KEYS</span> <span class="token keyword">TERMINATED BY</span> <span class="token string">":"</span>
+STORED <span class="token keyword">AS</span> TEXTFILE
+LOCATION <span class="token string">'/user/hive/warehouse/flink.db/01_wmy_map'</span><span class="token punctuation">;</span>
+
+<span class="token keyword">load</span> <span class="token keyword">data</span> <span class="token keyword">local</span> inpath <span class="token string">'/opt/flink/hive/data/01_wmy_map.txt'</span> <span class="token keyword">into</span> <span class="token keyword">table</span> 01_wmy_map<span class="token punctuation">;</span>
+</code></pre>
+<h4 id="2-1-3-SQL查询"><a href="#2-1-3-SQL查询" class="headerlink" title="2.1.3 SQL查询"></a>2.1.3 SQL查询</h4><pre class=" language-sql"><code class="language-sql"><span class="token keyword">select</span> symbol<span class="token punctuation">,</span>ticksequence<span class="token punctuation">,</span>tickdata<span class="token punctuation">[</span><span class="token string">'name'</span><span class="token punctuation">]</span> name<span class="token punctuation">,</span> tickdata<span class="token punctuation">[</span><span class="token string">'sex'</span><span class="token punctuation">]</span> sex<span class="token punctuation">,</span> tickdata<span class="token punctuation">[</span><span class="token string">'age'</span><span class="token punctuation">]</span> age <span class="token keyword">from</span> 01_wmy_map<span class="token punctuation">;</span>
+</code></pre>
+<h4 id="案例"><a href="#案例" class="headerlink" title="案例"></a>案例</h4><h5 id="1、行转列"><a href="#1、行转列" class="headerlink" title="1、行转列"></a>1、行转列</h5><p>数据</p>
+<pre class=" language-json"><code class="language-json"><span class="token punctuation">{</span><span class="token property">"student"</span><span class="token operator">:</span> <span class="token punctuation">{</span><span class="token property">"name"</span><span class="token operator">:</span><span class="token string">"king"</span><span class="token punctuation">,</span><span class="token property">"age"</span><span class="token operator">:</span><span class="token number">11</span><span class="token punctuation">,</span><span class="token property">"sex"</span><span class="token operator">:</span><span class="token string">"M"</span><span class="token punctuation">}</span><span class="token punctuation">,</span><span class="token property">"sub_score"</span><span class="token operator">:</span><span class="token punctuation">[</span><span class="token punctuation">{</span><span class="token property">"subject"</span><span class="token operator">:</span><span class="token string">"语文"</span><span class="token punctuation">,</span><span class="token property">"score"</span><span class="token operator">:</span><span class="token number">80</span><span class="token punctuation">}</span><span class="token punctuation">,</span><span class="token punctuation">{</span><span class="token property">"subject"</span><span class="token operator">:</span><span class="token string">"数学"</span><span class="token punctuation">,</span><span class="token property">"score"</span><span class="token operator">:</span><span class="token number">80</span><span class="token punctuation">}</span><span class="token punctuation">,</span><span class="token punctuation">{</span><span class="token property">"subject"</span><span class="token operator">:</span><span class="token string">"英语"</span><span class="token punctuation">,</span><span class="token property">"score"</span><span class="token operator">:</span><span class="token number">80</span><span class="token punctuation">}</span><span class="token punctuation">]</span><span class="token punctuation">}</span>
+<span class="token punctuation">{</span><span class="token property">"student"</span><span class="token operator">:</span> <span class="token punctuation">{</span><span class="token property">"name"</span><span class="token operator">:</span><span class="token string">"king1"</span><span class="token punctuation">,</span><span class="token property">"age"</span><span class="token operator">:</span><span class="token number">11</span><span class="token punctuation">,</span><span class="token property">"sex"</span><span class="token operator">:</span><span class="token string">"M"</span><span class="token punctuation">}</span><span class="token punctuation">,</span><span class="token property">"sub_score"</span><span class="token operator">:</span><span class="token punctuation">[</span><span class="token punctuation">{</span><span class="token property">"subject"</span><span class="token operator">:</span><span class="token string">"语文"</span><span class="token punctuation">,</span><span class="token property">"score"</span><span class="token operator">:</span><span class="token number">81</span><span class="token punctuation">}</span><span class="token punctuation">,</span><span class="token punctuation">{</span><span class="token property">"subject"</span><span class="token operator">:</span><span class="token string">"数学"</span><span class="token punctuation">,</span><span class="token property">"score"</span><span class="token operator">:</span><span class="token number">80</span><span class="token punctuation">}</span><span class="token punctuation">,</span><span class="token punctuation">{</span><span class="token property">"subject"</span><span class="token operator">:</span><span class="token string">"英语"</span><span class="token punctuation">,</span><span class="token property">"score"</span><span class="token operator">:</span><span class="token number">80</span><span class="token punctuation">}</span><span class="token punctuation">]</span><span class="token punctuation">}</span>
+<span class="token punctuation">{</span><span class="token property">"student"</span><span class="token operator">:</span> <span class="token punctuation">{</span><span class="token property">"name"</span><span class="token operator">:</span><span class="token string">"king2"</span><span class="token punctuation">,</span><span class="token property">"age"</span><span class="token operator">:</span><span class="token number">12</span><span class="token punctuation">,</span><span class="token property">"sex"</span><span class="token operator">:</span><span class="token string">"M"</span><span class="token punctuation">}</span><span class="token punctuation">,</span><span class="token property">"sub_score"</span><span class="token operator">:</span><span class="token punctuation">[</span><span class="token punctuation">{</span><span class="token property">"subject"</span><span class="token operator">:</span><span class="token string">"语文"</span><span class="token punctuation">,</span><span class="token property">"score"</span><span class="token operator">:</span><span class="token number">82</span><span class="token punctuation">}</span><span class="token punctuation">,</span><span class="token punctuation">{</span><span class="token property">"subject"</span><span class="token operator">:</span><span class="token string">"数学"</span><span class="token punctuation">,</span><span class="token property">"score"</span><span class="token operator">:</span><span class="token number">80</span><span class="token punctuation">}</span><span class="token punctuation">,</span><span class="token punctuation">{</span><span class="token property">"subject"</span><span class="token operator">:</span><span class="token string">"英语"</span><span class="token punctuation">,</span><span class="token property">"score"</span><span class="token operator">:</span><span class="token number">80</span><span class="token punctuation">}</span><span class="token punctuation">]</span><span class="token punctuation">}</span>
+<span class="token punctuation">{</span><span class="token property">"student"</span><span class="token operator">:</span> <span class="token punctuation">{</span><span class="token property">"name"</span><span class="token operator">:</span><span class="token string">"king3"</span><span class="token punctuation">,</span><span class="token property">"age"</span><span class="token operator">:</span><span class="token number">13</span><span class="token punctuation">,</span><span class="token property">"sex"</span><span class="token operator">:</span><span class="token string">"M"</span><span class="token punctuation">}</span><span class="token punctuation">,</span><span class="token property">"sub_score"</span><span class="token operator">:</span><span class="token punctuation">[</span><span class="token punctuation">{</span><span class="token property">"subject"</span><span class="token operator">:</span><span class="token string">"语文"</span><span class="token punctuation">,</span><span class="token property">"score"</span><span class="token operator">:</span><span class="token number">83</span><span class="token punctuation">}</span><span class="token punctuation">,</span><span class="token punctuation">{</span><span class="token property">"subject"</span><span class="token operator">:</span><span class="token string">"数学"</span><span class="token punctuation">,</span><span class="token property">"score"</span><span class="token operator">:</span><span class="token number">80</span><span class="token punctuation">}</span><span class="token punctuation">,</span><span class="token punctuation">{</span><span class="token property">"subject"</span><span class="token operator">:</span><span class="token string">"英语"</span><span class="token punctuation">,</span><span class="token property">"score"</span><span class="token operator">:</span><span class="token number">80</span><span class="token punctuation">}</span><span class="token punctuation">]</span><span class="token punctuation">}</span>
+<span class="token punctuation">{</span><span class="token property">"student"</span><span class="token operator">:</span> <span class="token punctuation">{</span><span class="token property">"name"</span><span class="token operator">:</span><span class="token string">"king4"</span><span class="token punctuation">,</span><span class="token property">"age"</span><span class="token operator">:</span><span class="token number">14</span><span class="token punctuation">,</span><span class="token property">"sex"</span><span class="token operator">:</span><span class="token string">"M"</span><span class="token punctuation">}</span><span class="token punctuation">,</span><span class="token property">"sub_score"</span><span class="token operator">:</span><span class="token punctuation">[</span><span class="token punctuation">{</span><span class="token property">"subject"</span><span class="token operator">:</span><span class="token string">"语文"</span><span class="token punctuation">,</span><span class="token property">"score"</span><span class="token operator">:</span><span class="token number">84</span><span class="token punctuation">}</span><span class="token punctuation">,</span><span class="token punctuation">{</span><span class="token property">"subject"</span><span class="token operator">:</span><span class="token string">"数学"</span><span class="token punctuation">,</span><span class="token property">"score"</span><span class="token operator">:</span><span class="token number">80</span><span class="token punctuation">}</span><span class="token punctuation">,</span><span class="token punctuation">{</span><span class="token property">"subject"</span><span class="token operator">:</span><span class="token string">"英语"</span><span class="token punctuation">,</span><span class="token property">"score"</span><span class="token operator">:</span><span class="token number">80</span><span class="token punctuation">}</span><span class="token punctuation">]</span><span class="token punctuation">}</span>
+<span class="token punctuation">{</span><span class="token property">"student"</span><span class="token operator">:</span> <span class="token punctuation">{</span><span class="token property">"name"</span><span class="token operator">:</span><span class="token string">"king5"</span><span class="token punctuation">,</span><span class="token property">"age"</span><span class="token operator">:</span><span class="token number">15</span><span class="token punctuation">,</span><span class="token property">"sex"</span><span class="token operator">:</span><span class="token string">"M"</span><span class="token punctuation">}</span><span class="token punctuation">,</span><span class="token property">"sub_score"</span><span class="token operator">:</span><span class="token punctuation">[</span><span class="token punctuation">{</span><span class="token property">"subject"</span><span class="token operator">:</span><span class="token string">"语文"</span><span class="token punctuation">,</span><span class="token property">"score"</span><span class="token operator">:</span><span class="token number">85</span><span class="token punctuation">}</span><span class="token punctuation">,</span><span class="token punctuation">{</span><span class="token property">"subject"</span><span class="token operator">:</span><span class="token string">"数学"</span><span class="token punctuation">,</span><span class="token property">"score"</span><span class="token operator">:</span><span class="token number">80</span><span class="token punctuation">}</span><span class="token punctuation">,</span><span class="token punctuation">{</span><span class="token property">"subject"</span><span class="token operator">:</span><span class="token string">"英语"</span><span class="token punctuation">,</span><span class="token property">"score"</span><span class="token operator">:</span><span class="token number">80</span><span class="token punctuation">}</span><span class="token punctuation">]</span><span class="token punctuation">}</span>
+<span class="token punctuation">{</span><span class="token property">"student"</span><span class="token operator">:</span> <span class="token punctuation">{</span><span class="token property">"name"</span><span class="token operator">:</span><span class="token string">"king5"</span><span class="token punctuation">,</span><span class="token property">"age"</span><span class="token operator">:</span><span class="token number">16</span><span class="token punctuation">,</span><span class="token property">"sex"</span><span class="token operator">:</span><span class="token string">"M"</span><span class="token punctuation">}</span><span class="token punctuation">,</span><span class="token property">"sub_score"</span><span class="token operator">:</span><span class="token punctuation">[</span><span class="token punctuation">{</span><span class="token property">"subject"</span><span class="token operator">:</span><span class="token string">"语文"</span><span class="token punctuation">,</span><span class="token property">"score"</span><span class="token operator">:</span><span class="token number">86</span><span class="token punctuation">}</span><span class="token punctuation">,</span><span class="token punctuation">{</span><span class="token property">"subject"</span><span class="token operator">:</span><span class="token string">"数学"</span><span class="token punctuation">,</span><span class="token property">"score"</span><span class="token operator">:</span><span class="token number">80</span><span class="token punctuation">}</span><span class="token punctuation">,</span><span class="token punctuation">{</span><span class="token property">"subject"</span><span class="token operator">:</span><span class="token string">"英语"</span><span class="token punctuation">,</span><span class="token property">"score"</span><span class="token operator">:</span><span class="token number">80</span><span class="token punctuation">}</span><span class="token punctuation">]</span><span class="token punctuation">}</span>
+<span class="token punctuation">{</span><span class="token property">"student"</span><span class="token operator">:</span> <span class="token punctuation">{</span><span class="token property">"name"</span><span class="token operator">:</span><span class="token string">"king5"</span><span class="token punctuation">,</span><span class="token property">"age"</span><span class="token operator">:</span><span class="token number">17</span><span class="token punctuation">,</span><span class="token property">"sex"</span><span class="token operator">:</span><span class="token string">"M"</span><span class="token punctuation">}</span><span class="token punctuation">,</span><span class="token property">"sub_score"</span><span class="token operator">:</span><span class="token punctuation">[</span><span class="token punctuation">{</span><span class="token property">"subject"</span><span class="token operator">:</span><span class="token string">"语文"</span><span class="token punctuation">,</span><span class="token property">"score"</span><span class="token operator">:</span><span class="token number">87</span><span class="token punctuation">}</span><span class="token punctuation">,</span><span class="token punctuation">{</span><span class="token property">"subject"</span><span class="token operator">:</span><span class="token string">"数学"</span><span class="token punctuation">,</span><span class="token property">"score"</span><span class="token operator">:</span><span class="token number">80</span><span class="token punctuation">}</span><span class="token punctuation">,</span><span class="token punctuation">{</span><span class="token property">"subject"</span><span class="token operator">:</span><span class="token string">"英语"</span><span class="token punctuation">,</span><span class="token property">"score"</span><span class="token operator">:</span><span class="token number">80</span><span class="token punctuation">}</span><span class="token punctuation">]</span><span class="token punctuation">}</span>
+</code></pre>
+<p>建表</p>
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">create</span> external <span class="token keyword">table</span> <span class="token keyword">if</span> <span class="token operator">not</span> <span class="token keyword">exists</span> 02_stu_score <span class="token punctuation">(</span>
+ <span class="token punctuation">`</span>student<span class="token punctuation">`</span> map<span class="token operator">&lt;</span>string<span class="token punctuation">,</span>string<span class="token operator">></span> <span class="token keyword">comment</span> <span class="token string">'学生信息表'</span><span class="token punctuation">,</span>
+ <span class="token punctuation">`</span>sub_score<span class="token punctuation">`</span> array<span class="token operator">&lt;</span>map<span class="token operator">&lt;</span>string<span class="token punctuation">,</span>string<span class="token operator">>></span> <span class="token keyword">comment</span> <span class="token string">'成绩表'</span>
+<span class="token punctuation">)</span> <span class="token keyword">comment</span> <span class="token string">'学生成绩表'</span>
+<span class="token keyword">row</span> format serde <span class="token string">'org.apache.hive.hcatalog.data.JsonSerDe'</span> 
+stored <span class="token keyword">as</span> textfile<span class="token punctuation">;</span>
+
+<span class="token keyword">load</span> <span class="token keyword">data</span> <span class="token keyword">local</span> inpath <span class="token string">'/opt/flink/hive/data/02_stu_score.txt'</span> <span class="token keyword">into</span> <span class="token keyword">table</span> 02_stu_score<span class="token punctuation">;</span>
+</code></pre>
+<p><em><strong>查询单个学生的成绩</strong></em></p>
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">select</span> 
+<span class="token operator">*</span>
+<span class="token keyword">from</span> 02_stu_score
+<span class="token keyword">where</span> student<span class="token punctuation">[</span><span class="token string">'name'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token string">'king5'</span><span class="token punctuation">;</span>
+</code></pre>
+<p><strong>行转列explode</strong></p>
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">select</span> 
+ student<span class="token punctuation">[</span><span class="token string">'name'</span><span class="token punctuation">]</span> name<span class="token punctuation">,</span>
+ score<span class="token punctuation">[</span><span class="token string">'subject'</span><span class="token punctuation">]</span> subject<span class="token punctuation">,</span>
+ score<span class="token punctuation">[</span><span class="token string">'score'</span><span class="token punctuation">]</span> score
+<span class="token keyword">from</span> 02_stu_score
+lateral <span class="token keyword">view</span> explode<span class="token punctuation">(</span>sub_score<span class="token punctuation">)</span> sc <span class="token keyword">as</span> score <span class="token punctuation">;</span>
+</code></pre>
+<p>学习记录点：<a href="https://cwiki.apache.org/confluence/display/Hive/LanguageManual+UDF#LanguageManualUDF-StringOperators" target="_blank" rel="noopener">https://cwiki.apache.org/confluence/display/Hive/LanguageManual+UDF#LanguageManualUDF-StringOperators</a></p>
+<h3 id="2-2-struct"><a href="#2-2-struct" class="headerlink" title="2.2 struct"></a>2.2 struct</h3><p>数据</p>
+<pre class=" language-text"><code class="language-text">1,zhangsan,18:male:深圳
+2,lisi,28:female:北京
+3,wangwu,38:male:广州
+4,赵六,26:female:上海
+5,钱琪,35:male:杭州
+6,王八,48:female:南京
+</code></pre>
+<p>建表</p>
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">drop</span> <span class="token keyword">table</span> <span class="token keyword">if</span> <span class="token keyword">exists</span> 01_wmy_struct_user<span class="token punctuation">;</span>
+<span class="token keyword">create</span> <span class="token keyword">table</span> 01_wmy_struct_user<span class="token punctuation">(</span>
+ <span class="token punctuation">`</span>id<span class="token punctuation">`</span> <span class="token keyword">int</span> <span class="token keyword">COMMENT</span> <span class="token string">'用户ID'</span><span class="token punctuation">,</span>
+ <span class="token punctuation">`</span>name<span class="token punctuation">`</span> string <span class="token keyword">COMMENT</span> <span class="token string">'姓名'</span><span class="token punctuation">,</span>
+ <span class="token punctuation">`</span>info<span class="token punctuation">`</span> struct<span class="token operator">&lt;</span>age:<span class="token keyword">int</span><span class="token punctuation">,</span>sex:string<span class="token punctuation">,</span>addr:string<span class="token operator">></span> <span class="token keyword">COMMENT</span> <span class="token string">'用户信息，使用struct结构体'</span>
+<span class="token punctuation">)</span>
+<span class="token keyword">row</span> format delimited <span class="token keyword">fields</span> <span class="token keyword">terminated by</span> <span class="token string">','</span>
+collection items <span class="token keyword">terminated by</span> <span class="token string">':'</span><span class="token punctuation">;</span>
+</code></pre>
+<p>导入数据</p>
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">load</span> <span class="token keyword">data</span> <span class="token keyword">local</span> inpath <span class="token string">'/opt/bigdata/wmy/hive/data/struct.txt'</span> <span class="token keyword">into</span> <span class="token keyword">table</span> 01_wmy_struct_user<span class="token punctuation">;</span>
+</code></pre>
+<p>查询每个人的id name 和addr</p>
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">select</span> 
+ id<span class="token punctuation">,</span>
+ name<span class="token punctuation">,</span>
+ info<span class="token punctuation">.</span>age <span class="token keyword">as</span> age<span class="token punctuation">,</span>
+ info<span class="token punctuation">.</span>sex <span class="token keyword">as</span> sex<span class="token punctuation">,</span>
+ info<span class="token punctuation">.</span>addr <span class="token keyword">as</span> addr
+<span class="token keyword">from</span> 01_wmy_struct_user<span class="token punctuation">;</span>
+</code></pre>
+<h3 id="2-3-named-struct"><a href="#2-3-named-struct" class="headerlink" title="2.3 named_struct"></a>2.3 named_struct</h3><p>数据准备</p>
+<pre class=" language-tex"><code class="language-tex">1,zhangsan,18,male,深圳
+2,lisi,28,female,北京
+3,wangwu,38,male,广州
+4,赵六,26,female,上海
+5,钱琪,35,male,杭州
+6,王八,48,female,南京
+</code></pre>
+<p>创建表</p>
+<p>从上一张表中获取对应的数据</p>
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">create</span> <span class="token keyword">table</span> 02_wmy_name_struct_user
+<span class="token keyword">as</span> 
+<span class="token keyword">select</span>
+id<span class="token punctuation">,</span>
+name<span class="token punctuation">,</span>
+named_struct<span class="token punctuation">(</span>
+<span class="token string">'age'</span><span class="token punctuation">,</span>info<span class="token punctuation">.</span>age<span class="token punctuation">,</span>
+<span class="token string">'sex'</span><span class="token punctuation">,</span>info<span class="token punctuation">.</span>sex<span class="token punctuation">,</span>
+<span class="token string">'addr'</span><span class="token punctuation">,</span>info<span class="token punctuation">.</span>addr
+<span class="token punctuation">)</span>
+<span class="token keyword">from</span> 01_wmy_struct_user <span class="token punctuation">;</span>
+</code></pre>
+<h3 id="2-4-array"><a href="#2-4-array" class="headerlink" title="2.4 array"></a>2.4 array</h3><p>数据</p>
+<pre class=" language-tex"><code class="language-tex">1,English:Chinese:French:Japanese
+2,Chinese:French
+3,Chinese:French:Japanese
+4,Chinese:French:India
+5,Chinese:French:Green
+</code></pre>
+<p>建表</p>
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">drop</span> <span class="token keyword">table</span> <span class="token keyword">if</span> <span class="token operator">not</span> <span class="token keyword">exists</span> 03_wmy_array_course<span class="token punctuation">;</span>
+<span class="token keyword">create</span> <span class="token keyword">table</span> 02_wmy_array_course<span class="token punctuation">(</span>
+ <span class="token punctuation">`</span>id<span class="token punctuation">`</span> string <span class="token keyword">COMMENT</span> <span class="token string">'学生的编号'</span><span class="token punctuation">,</span>
+ <span class="token punctuation">`</span>choose_course<span class="token punctuation">`</span> array<span class="token operator">&lt;</span>string<span class="token operator">></span> <span class="token keyword">COMMENT</span> <span class="token string">'选课名称'</span>
+<span class="token punctuation">)</span>
+<span class="token keyword">row</span> format delimited <span class="token keyword">fields</span> <span class="token keyword">terminated by</span> <span class="token string">':'</span>
+collection items <span class="token keyword">terminated by</span> <span class="token string">','</span><span class="token punctuation">;</span>
+</code></pre>
+<p>插入数据</p>
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">drop</span> <span class="token keyword">table</span> <span class="token keyword">if</span> <span class="token operator">not</span> <span class="token keyword">exists</span> 03_wmy_array_course<span class="token punctuation">;</span>
+<span class="token keyword">create</span> <span class="token keyword">table</span> 03_wmy_array_course<span class="token punctuation">(</span>
+ <span class="token punctuation">`</span>id<span class="token punctuation">`</span> string <span class="token keyword">COMMENT</span> <span class="token string">'学生的编号'</span><span class="token punctuation">,</span>
+ <span class="token punctuation">`</span>choose_course<span class="token punctuation">`</span> array<span class="token operator">&lt;</span>string<span class="token operator">></span> <span class="token keyword">COMMENT</span> <span class="token string">'选课名称'</span>
+<span class="token punctuation">)</span>
+<span class="token keyword">row</span> format delimited <span class="token keyword">fields</span> <span class="token keyword">terminated by</span> <span class="token string">','</span>
+collection items <span class="token keyword">terminated by</span> <span class="token string">':'</span><span class="token punctuation">;</span>
+
+
+<span class="token keyword">load</span> <span class="token keyword">data</span> <span class="token keyword">local</span> inpath <span class="token string">'/opt/bigdata/wmy/hive/data/array.txt'</span> <span class="token keyword">into</span> <span class="token keyword">table</span> 03_wmy_array_course<span class="token punctuation">;</span>
+</code></pre>
+<p>查询</p>
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">select</span>
+id<span class="token punctuation">,</span>
+choose_course<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>
+<span class="token keyword">from</span> 03_wmy_array_course<span class="token punctuation">;</span>
+</code></pre>
+<h3 id="2-5-create-union"><a href="#2-5-create-union" class="headerlink" title="2.5 create_union"></a>2.5 create_union</h3><pre class=" language-sql"><code class="language-sql"><span class="token keyword">select</span> create_union<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token string">'ss'</span><span class="token punctuation">,</span>array<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token keyword">from</span> iteblog<span class="token punctuation">;</span>
+
+{<span class="token number">0</span>:<span class="token string">"ss"</span>}
+<span class="token keyword">select</span> create_union<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token string">'ss'</span><span class="token punctuation">,</span>array<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token keyword">from</span> iteblog<span class="token punctuation">;</span>
+
+{<span class="token number">1</span>:<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">3</span><span class="token punctuation">]</span>}
+elect create_union<span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token string">'ss'</span><span class="token punctuation">,</span>array<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token string">'aa'</span><span class="token punctuation">)</span> <span class="token keyword">from</span> iteblog<span class="token punctuation">;</span>
+
+{<span class="token number">2</span>:<span class="token string">'aa'</span>}
+</code></pre>
+<h2 id="3、内置函数"><a href="#3、内置函数" class="headerlink" title="3、内置函数"></a>3、内置函数</h2><h3 id="1、类型转换函数"><a href="#1、类型转换函数" class="headerlink" title="1、类型转换函数"></a>1、类型转换函数</h3><p>Cast(字段名 as 转换的类型 )，其中类型可以为：</p>
+<p>CHAR[(N)] 字符型<br> DATE  日期型<br> DATETIME  日期和时间型<br> DECIMAL  float型<br> SIGNED  int<br> TIME  时间型</p>
+<h3 id="2、日期函数"><a href="#2、日期函数" class="headerlink" title="2、日期函数"></a>2、日期函数</h3><h4 id="1、to-date"><a href="#1、to-date" class="headerlink" title="1、to_date"></a>1、to_date</h4><pre class=" language-sql"><code class="language-sql">返回日期部分
+to_date
+<span class="token keyword">select</span> to_date<span class="token punctuation">(</span><span class="token string">"2021-01-01 00:00:00"</span><span class="token punctuation">)</span> <span class="token punctuation">;</span>
+</code></pre>
+<p>year | quarter | month | day | hour | minute | second | weekofyear | </p>
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">select</span> quarter<span class="token punctuation">(</span><span class="token string">'2021-09-17'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>从源（从 Hive 2.2.0 开始）检索字段，例如天数或小时数。来源必须是日期、时间戳、间隔或可以转换为日期或时间戳的字符串。支持的字段包括：天、星期几、小时、分钟、月、季度、秒、周和年。</p>
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">select</span> extract<span class="token punctuation">(</span>month <span class="token keyword">from</span> <span class="token string">"2016-10-20"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">select</span> extract<span class="token punctuation">(</span>hour <span class="token keyword">from</span> <span class="token string">"2016-10-20 05:06:07"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">select</span> extract<span class="token punctuation">(</span>dayofweek <span class="token keyword">from</span> <span class="token string">"2016-10-20 05:06:07"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true">-- 注意：一个星期是从周日开始的</span>
+<span class="token keyword">select</span> extract<span class="token punctuation">(</span>month <span class="token keyword">from</span> interval <span class="token string">'1-3'</span> year <span class="token keyword">to</span> month<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">select</span> extract<span class="token punctuation">(</span>minute <span class="token keyword">from</span> interval <span class="token string">'3 12:20:30'</span> day <span class="token keyword">to</span> second<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>date_add</p>
+<p>date_sub</p>
+<p>current_date </p>
+<p>add_months(string start_date, int num_months, output_date_format )</p>
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">select</span> add_months<span class="token punctuation">(</span><span class="token string">'2017-12-31 14:15:16'</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token string">'YYYY-MM-dd HH:mm:ss'</span><span class="token punctuation">)</span> <span class="token punctuation">;</span>
+</code></pre>
+<p>last_day</p>
+<p>next_day（字符串 start_date，字符串 day_of_week）</p>
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">select</span> next_day<span class="token punctuation">(</span><span class="token string">'2021-09-17'</span><span class="token punctuation">,</span> <span class="token string">'MO'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>date_format</p>
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">select</span> date_format<span class="token punctuation">(</span><span class="token keyword">current_date</span><span class="token punctuation">,</span><span class="token string">'yyyy/MM/dd'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h3 id="3、条件函数"><a href="#3、条件函数" class="headerlink" title="3、条件函数"></a>3、条件函数</h3><p>if</p>
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">select</span> <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token keyword">current_date</span><span class="token operator">=</span><span class="token string">'2021-09-17'</span><span class="token punctuation">,</span><span class="token string">'周五'</span><span class="token punctuation">,</span><span class="token string">'未知'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>isnull | isnotnull </p>
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">select</span> isnull<span class="token punctuation">(</span><span class="token keyword">current_date</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">select</span> isnotnull<span class="token punctuation">(</span><span class="token keyword">current_date</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>nvl</p>
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">select</span> nvl<span class="token punctuation">(</span><span class="token keyword">current_date</span><span class="token punctuation">,</span><span class="token string">'空字符串'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>coalesce</p>
+<pre class=" language-sql"><code class="language-sql">返回第一个非空的元素，如果都为空的话，返回<span class="token boolean">null</span>
+<span class="token keyword">select</span> <span class="token keyword">coalesce</span><span class="token punctuation">(</span><span class="token keyword">current_date</span><span class="token punctuation">,</span><span class="token string">''</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>case when then end</p>
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">select</span> 
+<span class="token keyword">case</span> name
+<span class="token keyword">when</span> <span class="token string">'zhangsan'</span> <span class="token keyword">then</span> <span class="token string">'xixi'</span> <span class="token keyword">else</span> <span class="token string">'haha'</span> <span class="token keyword">end</span>
+<span class="token keyword">from</span> 01_wmy_struct_user<span class="token punctuation">;</span>
+</code></pre>
+<p>nullif</p>
+<pre class=" language-sql"><code class="language-sql">如果两个相等返回<span class="token boolean">null</span>，否则的话返回第一个
+<span class="token comment" spellcheck="true">-- case condation when a==b then null else a end</span>
+<span class="token keyword">select</span> <span class="token keyword">nullif</span><span class="token punctuation">(</span><span class="token keyword">current_date</span><span class="token punctuation">,</span>date_add<span class="token punctuation">(</span><span class="token keyword">current_date</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>assert_true</p>
+<pre class=" language-sql"><code class="language-sql">如果条件成立，返回<span class="token boolean">null</span>，否则抛出异常
+<span class="token keyword">select</span> assert_true <span class="token punctuation">(</span><span class="token number">2</span><span class="token operator">></span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h3 id="4、md5"><a href="#4、md5" class="headerlink" title="4、md5"></a>4、md5</h3><pre class=" language-sql"><code class="language-sql"><span class="token keyword">select</span> md5<span class="token punctuation">(</span>concat<span class="token punctuation">(</span><span class="token keyword">current_date</span><span class="token punctuation">,</span><span class="token string">'xixihhaha'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h3 id="5、get-json-object"><a href="#5、get-json-object" class="headerlink" title="5、get_json_object"></a>5、get_json_object</h3><pre class=" language-sql"><code class="language-sql"><span class="token keyword">select</span> get_json_object<span class="token punctuation">(</span>
+<span class="token string">'{"store":{"fruit":[{"weight":8,"type":"apple"}, {"weight":9,"type":"pear"}],  "bicycle":{"price":19.95,"color":"red"}}, "email":"amy@only_for_json_udf_test.net", "owner":"amy" }'</span><span class="token punctuation">,</span>
+<span class="token string">'$.store.fruit.weight'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>只需要select get_json_object(fields,’$.field.field’)</p>
+<pre class=" language-shell"><code class="language-shell">get_json_object
+支持 JSONPath 的有限版本：
+
+$ : 根对象
+. : 子运算符
+[] : 数组的下标运算符
+* : [] 的通配符
+不支持的语法值得注意：
+
+: 零长度字符串作为键
+.. : 递归下降
+@ ：当前对象/元素
+() : 脚本表达式
+?() : 过滤（脚本）表达式。
+[,] : 联合运算符
+[start:end.step] : 数组切片操作符
+</code></pre>
+<h2 id="4、内置聚合函数-UDAF"><a href="#4、内置聚合函数-UDAF" class="headerlink" title="4、内置聚合函数 (UDAF)"></a>4、内置聚合函数 (UDAF)</h2><p>1、count(*), count(expr), count(DISTINCT expr[, expr…])</p>
+<p>2、sum(col), sum(DISTINCT col)</p>
+<p>3、avg(col), avg(DISTINCT col)</p>
+<p>4、min(col)</p>
+<h2 id="5、内置表生成函数（UDTF）"><a href="#5、内置表生成函数（UDTF）" class="headerlink" title="5、内置表生成函数（UDTF）"></a>5、内置表生成函数（UDTF）</h2><h2 id="6、分组和排序"><a href="#6、分组和排序" class="headerlink" title="6、分组和排序"></a>6、分组和排序</h2><h2 id="7、UDF内部结构"><a href="#7、UDF内部结构" class="headerlink" title="7、UDF内部结构"></a>7、UDF内部结构</h2><h2 id="8、创建自定义的UDF"><a href="#8、创建自定义的UDF" class="headerlink" title="8、创建自定义的UDF"></a>8、创建自定义的UDF</h2>
+                
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="/about" rel="external nofollow noreferrer">情深骚明</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="https://github.com/wmybigdata/2021/09/17/hive-sql-%E8%AE%B0%E5%BD%95/">https://github.com/wmybigdata/2021/09/17/hive-sql-%E8%AE%B0%E5%BD%95/</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="/about" target="_blank">情深骚明</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/hive/">
+                                    <span class="chip bg-color">hive</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <style>
+    #reward {
+        margin: 40px 0;
+        text-align: center;
+    }
+
+    #reward .reward-link {
+        font-size: 1.4rem;
+        line-height: 38px;
+    }
+
+    #reward .btn-floating:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #rewardModal {
+        width: 320px;
+        height: 350px;
+    }
+
+    #rewardModal .reward-title {
+        margin: 15px auto;
+        padding-bottom: 5px;
+    }
+
+    #rewardModal .modal-content {
+        padding: 10px;
+    }
+
+    #rewardModal .close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 1.3rem;
+        line-height: 20px;
+        cursor: pointer;
+    }
+
+    #rewardModal .close:hover {
+        color: #ef5350;
+        transform: scale(1.3);
+        -moz-transform:scale(1.3);
+        -webkit-transform:scale(1.3);
+        -o-transform:scale(1.3);
+    }
+
+    #rewardModal .reward-tabs {
+        margin: 0 auto;
+        width: 210px;
+    }
+
+    .reward-tabs .tabs {
+        height: 38px;
+        margin: 10px auto;
+        padding-left: 0;
+    }
+
+    .reward-content ul {
+        padding-left: 0 !important;
+    }
+
+    .reward-tabs .tabs .tab {
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .reward-tabs .tab a {
+        color: #fff;
+        background-color: #ccc;
+    }
+
+    .reward-tabs .tab a:hover {
+        background-color: #ccc;
+        color: #fff;
+    }
+
+    .reward-tabs .wechat-tab .active {
+        color: #fff !important;
+        background-color: #22AB38 !important;
+    }
+
+    .reward-tabs .alipay-tab .active {
+        color: #fff !important;
+        background-color: #019FE8 !important;
+    }
+
+    .reward-tabs .reward-img {
+        width: 210px;
+        height: 210px;
+    }
+</style>
+
+<div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/reward/wechat.png" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="far fa-dot-circle"></i>&nbsp;本篇
+            </div>
+            <div class="card">
+                <a href="/2021/09/17/hive-sql-%E8%AE%B0%E5%BD%95/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/17.jpg" class="responsive-img" alt="hive-sql-记录">
+                        
+                        <span class="card-title">hive-sql-记录</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            学习心得记录
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-09-17
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/hive/" class="post-category">
+                                    hive
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/hive/">
+                        <span class="chip bg-color">hive</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2021/09/17/git%E9%97%AE%E9%A2%98/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/4.jpg" class="responsive-img" alt="git问题">
+                        
+                        <span class="card-title">git问题</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            学习心得记录
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-09-17
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/git/" class="post-category">
+                                    git
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/git/">
+                        <span class="chip bg-color">git</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget card" style="background-color: white;">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('0'),
+            headingSelector: 'h2, h3, h4'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h2, h3, h4').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+    <div class="container row center-align" style="margin-bottom: 0px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            
+                <span id="year">2019-2021</span>
+            
+            <span id="year">2019</span>
+            <a href="/about" target="_blank">情深骚明</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+            
+            
+            
+            
+            
+            <span id="busuanzi_container_site_pv">
+                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
+                    class="white-color"></span>&nbsp;次
+            </span>
+            
+            
+            <span id="busuanzi_container_site_uv">
+                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
+                    class="white-color"></span>&nbsp;人
+            </span>
+            
+            <br>
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/wmybigdata/" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:wmy_2000@163.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="tencent://AddContact/?fromId=50&fromSubId=1&subcmd=all&uin=2647716549" class="tooltipped" target="_blank" data-tooltip="QQ联系我: 2647716549" data-position="top" data-delay="50">
+        <i class="fab fa-qq"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+
+    <a href="https://github.com/wmybigdata/" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="https://github.com/wmybigdata/" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:wmy_2000@163.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="tencent://AddContact/?fromId=50&fromSubId=1&subcmd=all&uin=2647716549" class="tooltipped" target="_blank" data-tooltip="QQ联系我: 2647716549" data-position="top" data-delay="50">
+        <i class="fab fa-qq"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="https://blog.csdn.net/weixin_45098163" class="tooltipped" target="_blank" data-tooltip="关注我的CSDN: https://blog.csdn.net/weixin_45098163" data-position="top" data-delay="50">
+        <i class="fab fa-csdn">C</i>
+    </a>
+
+
+
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+$(function () {
+    var searchFunc = function (path, search_id, content_id) {
+        'use strict';
+        $.ajax({
+            url: path,
+            dataType: "xml",
+            success: function (xmlResponse) {
+                // get the contents from search data
+                var datas = $("entry", xmlResponse).map(function () {
+                    return {
+                        title: $("title", this).text(),
+                        content: $("content", this).text(),
+                        url: $("url", this).text()
+                    };
+                }).get();
+                var $input = document.getElementById(search_id);
+                var $resultContent = document.getElementById(content_id);
+                $input.addEventListener('input', function () {
+                    var str = '<ul class=\"search-result-list\">';
+                    var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                    $resultContent.innerHTML = "";
+                    if (this.value.trim().length <= 0) {
+                        return;
+                    }
+                    // perform local searching
+                    datas.forEach(function (data) {
+                        var isMatch = true;
+                        var data_title = data.title.trim().toLowerCase();
+                        var data_content = data.content.trim().replace(/<[^>]+>/g, "").toLowerCase();
+                        var data_url = data.url;
+                        data_url = data_url.indexOf('/') === 0 ? data.url : '/' + data_url;
+                        var index_title = -1;
+                        var index_content = -1;
+                        var first_occur = -1;
+                        // only match artiles with not empty titles and contents
+                        if (data_title !== '' && data_content !== '') {
+                            keywords.forEach(function (keyword, i) {
+                                index_title = data_title.indexOf(keyword);
+                                index_content = data_content.indexOf(keyword);
+                                if (index_title < 0 && index_content < 0) {
+                                    isMatch = false;
+                                } else {
+                                    if (index_content < 0) {
+                                        index_content = 0;
+                                    }
+                                    if (i === 0) {
+                                        first_occur = index_content;
+                                    }
+                                }
+                            });
+                        }
+                        // show search results
+                        if (isMatch) {
+                            str += "<li><a href='" + data_url + "' class='search-result-title'>" + data_title + "</a>";
+                            var content = data.content.trim().replace(/<[^>]+>/g, "");
+                            if (first_occur >= 0) {
+                                // cut out 100 characters
+                                var start = first_occur - 20;
+                                var end = first_occur + 80;
+                                if (start < 0) {
+                                    start = 0;
+                                }
+                                if (start === 0) {
+                                    end = 100;
+                                }
+                                if (end > content.length) {
+                                    end = content.length;
+                                }
+                                var match_content = content.substr(start, end);
+                                // highlight all keywords
+                                keywords.forEach(function (keyword) {
+                                    var regS = new RegExp(keyword, "gi");
+                                    match_content = match_content.replace(regS, "<em class=\"search-keyword\">" + keyword + "</em>");
+                                });
+
+                                str += "<p class=\"search-result\">" + match_content + "...</p>"
+                            }
+                            str += "</li>";
+                        }
+                    });
+                    str += "</ul>";
+                    $resultContent.innerHTML = str;
+                });
+            }
+        });
+    };
+
+    searchFunc('/search.xml', 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <script src="/libs/others/clicklove.js" async="async"></script>
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+	
+    
+
+    
+
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>
