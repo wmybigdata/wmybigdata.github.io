@@ -944,6 +944,105 @@ lateral <span class="token keyword">view</span> inline<span class="token punctua
 <span class="token keyword">from</span> 01_wmy_struct_user<span class="token punctuation">;</span>
 </code></pre>
 <p>但是在现实当中是没有这样玩的</p>
+<h3 id="用户自定义实现UDTF"><a href="#用户自定义实现UDTF" class="headerlink" title="用户自定义实现UDTF"></a>用户自定义实现UDTF</h3><pre class=" language-java"><code class="language-java"><span class="token keyword">package</span> com<span class="token punctuation">.</span>wmy<span class="token punctuation">.</span>hive<span class="token punctuation">.</span>functions<span class="token punctuation">.</span>udtf<span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>hadoop<span class="token punctuation">.</span>hive<span class="token punctuation">.</span>ql<span class="token punctuation">.</span>exec<span class="token punctuation">.</span>Description<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>hadoop<span class="token punctuation">.</span>hive<span class="token punctuation">.</span>ql<span class="token punctuation">.</span>exec<span class="token punctuation">.</span>UDFArgumentException<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>hadoop<span class="token punctuation">.</span>hive<span class="token punctuation">.</span>ql<span class="token punctuation">.</span>metadata<span class="token punctuation">.</span>HiveException<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>hadoop<span class="token punctuation">.</span>hive<span class="token punctuation">.</span>ql<span class="token punctuation">.</span>udf<span class="token punctuation">.</span>generic<span class="token punctuation">.</span>GenericUDTF<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>hadoop<span class="token punctuation">.</span>hive<span class="token punctuation">.</span>serde2<span class="token punctuation">.</span>objectinspector<span class="token punctuation">.</span>ObjectInspector<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>hadoop<span class="token punctuation">.</span>hive<span class="token punctuation">.</span>serde2<span class="token punctuation">.</span>objectinspector<span class="token punctuation">.</span>ObjectInspectorFactory<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>hadoop<span class="token punctuation">.</span>hive<span class="token punctuation">.</span>serde2<span class="token punctuation">.</span>objectinspector<span class="token punctuation">.</span>StructObjectInspector<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>hadoop<span class="token punctuation">.</span>hive<span class="token punctuation">.</span>serde2<span class="token punctuation">.</span>objectinspector<span class="token punctuation">.</span>primitive<span class="token punctuation">.</span>PrimitiveObjectInspectorFactory<span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>util<span class="token punctuation">.</span>ArrayList<span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true">/**
+ * @project_name: flinkDemo
+ * @package_name: com.wmy.hive.functions.udtf
+ * @Author: wmy
+ * @Date: 2021/9/17
+ * @Major: 数据科学与大数据技术
+ * @Post：大数据实时开发
+ * @Email：wmy_2000@163.com
+ * @Desription: hive 的UDTF的实现
+ * @Version: wmy-version-01
+ */</span>
+<span class="token annotation punctuation">@Description</span><span class="token punctuation">(</span>name <span class="token operator">=</span> <span class="token string">"myudtf_01"</span><span class="token punctuation">,</span> value <span class="token operator">=</span> <span class="token string">"2021-09-17 wmy udtf"</span><span class="token punctuation">,</span>
+        extended <span class="token operator">=</span> <span class="token string">"Example: \n"</span> <span class="token operator">+</span>
+                <span class="token string">"> select hobby1,hobby2 from wmy_udtf lateral view myudtf_01(hobby)  my_table as hobby1,hobby2;"</span>
+<span class="token punctuation">)</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">MyUdtfFun</span> <span class="token keyword">extends</span> <span class="token class-name">GenericUDTF</span> <span class="token punctuation">{</span>
+
+
+    <span class="token comment" spellcheck="true">/**
+     * initialize：主要是初始化返回的列和返回的列类型
+     * @param argOIs
+     * @return
+     * @throws UDFArgumentException
+     */</span>
+    <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">public</span> StructObjectInspector <span class="token function">initialize</span><span class="token punctuation">(</span>StructObjectInspector argOIs<span class="token punctuation">)</span> <span class="token keyword">throws</span> UDFArgumentException <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// 设置新的列名</span>
+        ArrayList<span class="token operator">&lt;</span>String<span class="token operator">></span> columns <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ArrayList</span><span class="token operator">&lt;</span><span class="token operator">></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//有几列，添加几列</span>
+        columns<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"column1"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        columns<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"column2"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment" spellcheck="true">// 设置每列类型，有几列就设置几列的类型</span>
+        ArrayList<span class="token operator">&lt;</span>ObjectInspector<span class="token operator">></span> columnType <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ArrayList</span><span class="token operator">&lt;</span><span class="token operator">></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        columnType<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span>PrimitiveObjectInspectorFactory<span class="token punctuation">.</span>javaStringObjectInspector<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        columnType<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span>PrimitiveObjectInspectorFactory<span class="token punctuation">.</span>javaStringObjectInspector<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment" spellcheck="true">// 返回所需要的列名和列的类型</span>
+        <span class="token keyword">return</span> ObjectInspectorFactory<span class="token punctuation">.</span><span class="token function">getStandardStructObjectInspector</span><span class="token punctuation">(</span>columns<span class="token punctuation">,</span>columnType<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment" spellcheck="true">/**
+     * process：方法对输入的每一行进行操作，他通过调用forward()返回一行或者多行数据
+     * @param objects
+     * @throws HiveException
+     */</span>
+    <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">process</span><span class="token punctuation">(</span>Object<span class="token punctuation">[</span><span class="token punctuation">]</span> objects<span class="token punctuation">)</span> <span class="token keyword">throws</span> HiveException <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// 从一列变成一行输出，得到的是一个数组，所以有多行数据遍历</span>
+        String<span class="token punctuation">[</span><span class="token punctuation">]</span> fields <span class="token operator">=</span> objects<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">split</span><span class="token punctuation">(</span><span class="token string">","</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> fields<span class="token punctuation">.</span>length<span class="token punctuation">;</span> i <span class="token operator">+=</span> <span class="token number">2</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token function">forward</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">Object</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span>fields<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> fields<span class="token punctuation">[</span>i <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment" spellcheck="true">/**
+     * close：在process方法结束后调用，用于进行一些其他的操作，只执行一次
+     * @throws HiveException
+     */</span>
+    <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">close</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">throws</span> HiveException <span class="token punctuation">{</span>
+
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<pre class=" language-shell"><code class="language-shell">create function myudtf
+as 'com.wmy.hive.functions.udtf.MyUdtfFun'
+using jar 'hdfs://flink01:9820/user/hive/jars/flinkDemo-version-01.jar';
+
+describe function extended myudtf_01;
+</code></pre>
+<p>创建表</p>
+<pre class=" language-tex"><code class="language-tex">drop table if exists wmy_udtf;
+create table wmy_udtf(
+ name string,
+ hobby string
+)
+row format delimited fields terminated by ':';
+
+load data local inpath '/opt/bigdata/wmy/hive/data/udtf.txt' into table wmy_udtf;
+
+select myudtf(hobby) from wmy_udtf;
+
+
+select hobby1,hobby2 from wmy_udtf lateral view myudtf(hobby)  my_table as hobby1,hobby2;
+</code></pre>
 <h2 id="7、分组和排序"><a href="#7、分组和排序" class="headerlink" title="7、分组和排序"></a>7、分组和排序</h2><h2 id="8、UDF内部结构"><a href="#8、UDF内部结构" class="headerlink" title="8、UDF内部结构"></a>8、UDF内部结构</h2><h2 id="9、创建自定义的UDF"><a href="#9、创建自定义的UDF" class="headerlink" title="9、创建自定义的UDF"></a>9、创建自定义的UDF</h2>
                 
             </div>
