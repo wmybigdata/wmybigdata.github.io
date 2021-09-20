@@ -645,7 +645,7 @@ from_unixtime(int/bigint timestamp, string format) 返回 timestamp 时间戳对
     <span class="token punctuation">`</span>symbol<span class="token punctuation">`</span> string<span class="token punctuation">,</span>
     <span class="token punctuation">`</span>tickSequence<span class="token punctuation">`</span> string<span class="token punctuation">,</span>
     <span class="token punctuation">`</span><span class="token keyword">timestamp</span><span class="token punctuation">`</span> string<span class="token punctuation">,</span>
-    <span class="token punctuation">`</span>tickdata<span class="token punctuation">`</span> MAP<span class="token operator">&lt;</span>String<span class="token punctuation">,</span> string<span class="token operator">&gt;</span>
+    <span class="token punctuation">`</span>tickdata<span class="token punctuation">`</span> MAP<span class="token operator">&lt;</span>String<span class="token punctuation">,</span> string<span class="token operator">></span>
 <span class="token punctuation">)</span>
 <span class="token keyword">ROW</span> FORMAT DELIMITED <span class="token keyword">FIELDS</span> <span class="token keyword">TERMINATED BY</span> <span class="token string">','</span>
 COLLECTION ITEMS <span class="token keyword">TERMINATED BY</span> <span class="token string">'|'</span>
@@ -669,8 +669,8 @@ LOCATION <span class="token string">'/user/hive/warehouse/flink.db/01_wmy_map'</
 </code></pre>
 <p>建表</p>
 <pre class=" language-sql"><code class="language-sql"><span class="token keyword">create</span> external <span class="token keyword">table</span> <span class="token keyword">if</span> <span class="token operator">not</span> <span class="token keyword">exists</span> 02_stu_score <span class="token punctuation">(</span>
- <span class="token punctuation">`</span>student<span class="token punctuation">`</span> map<span class="token operator">&lt;</span>string<span class="token punctuation">,</span>string<span class="token operator">&gt;</span> <span class="token keyword">comment</span> <span class="token string">'学生信息表'</span><span class="token punctuation">,</span>
- <span class="token punctuation">`</span>sub_score<span class="token punctuation">`</span> array<span class="token operator">&lt;</span>map<span class="token operator">&lt;</span>string<span class="token punctuation">,</span>string<span class="token operator">&gt;&gt;</span> <span class="token keyword">comment</span> <span class="token string">'成绩表'</span>
+ <span class="token punctuation">`</span>student<span class="token punctuation">`</span> map<span class="token operator">&lt;</span>string<span class="token punctuation">,</span>string<span class="token operator">></span> <span class="token keyword">comment</span> <span class="token string">'学生信息表'</span><span class="token punctuation">,</span>
+ <span class="token punctuation">`</span>sub_score<span class="token punctuation">`</span> array<span class="token operator">&lt;</span>map<span class="token operator">&lt;</span>string<span class="token punctuation">,</span>string<span class="token operator">>></span> <span class="token keyword">comment</span> <span class="token string">'成绩表'</span>
 <span class="token punctuation">)</span> <span class="token keyword">comment</span> <span class="token string">'学生成绩表'</span>
 <span class="token keyword">row</span> format serde <span class="token string">'org.apache.hive.hcatalog.data.JsonSerDe'</span> 
 stored <span class="token keyword">as</span> textfile<span class="token punctuation">;</span>
@@ -705,7 +705,7 @@ lateral <span class="token keyword">view</span> explode<span class="token punctu
 <span class="token keyword">create</span> <span class="token keyword">table</span> 01_wmy_struct_user<span class="token punctuation">(</span>
  <span class="token punctuation">`</span>id<span class="token punctuation">`</span> <span class="token keyword">int</span> <span class="token keyword">COMMENT</span> <span class="token string">'用户ID'</span><span class="token punctuation">,</span>
  <span class="token punctuation">`</span>name<span class="token punctuation">`</span> string <span class="token keyword">COMMENT</span> <span class="token string">'姓名'</span><span class="token punctuation">,</span>
- <span class="token punctuation">`</span>info<span class="token punctuation">`</span> struct<span class="token operator">&lt;</span>age:<span class="token keyword">int</span><span class="token punctuation">,</span>sex:string<span class="token punctuation">,</span>addr:string<span class="token operator">&gt;</span> <span class="token keyword">COMMENT</span> <span class="token string">'用户信息，使用struct结构体'</span>
+ <span class="token punctuation">`</span>info<span class="token punctuation">`</span> struct<span class="token operator">&lt;</span>age:<span class="token keyword">int</span><span class="token punctuation">,</span>sex:string<span class="token punctuation">,</span>addr:string<span class="token operator">></span> <span class="token keyword">COMMENT</span> <span class="token string">'用户信息，使用struct结构体'</span>
 <span class="token punctuation">)</span>
 <span class="token keyword">row</span> format delimited <span class="token keyword">fields</span> <span class="token keyword">terminated by</span> <span class="token string">','</span>
 collection items <span class="token keyword">terminated by</span> <span class="token string">':'</span><span class="token punctuation">;</span>
@@ -755,7 +755,7 @@ named_struct<span class="token punctuation">(</span>
 <pre class=" language-sql"><code class="language-sql"><span class="token keyword">drop</span> <span class="token keyword">table</span> <span class="token keyword">if</span> <span class="token operator">not</span> <span class="token keyword">exists</span> 03_wmy_array_course<span class="token punctuation">;</span>
 <span class="token keyword">create</span> <span class="token keyword">table</span> 02_wmy_array_course<span class="token punctuation">(</span>
  <span class="token punctuation">`</span>id<span class="token punctuation">`</span> string <span class="token keyword">COMMENT</span> <span class="token string">'学生的编号'</span><span class="token punctuation">,</span>
- <span class="token punctuation">`</span>choose_course<span class="token punctuation">`</span> array<span class="token operator">&lt;</span>string<span class="token operator">&gt;</span> <span class="token keyword">COMMENT</span> <span class="token string">'选课名称'</span>
+ <span class="token punctuation">`</span>choose_course<span class="token punctuation">`</span> array<span class="token operator">&lt;</span>string<span class="token operator">></span> <span class="token keyword">COMMENT</span> <span class="token string">'选课名称'</span>
 <span class="token punctuation">)</span>
 <span class="token keyword">row</span> format delimited <span class="token keyword">fields</span> <span class="token keyword">terminated by</span> <span class="token string">':'</span>
 collection items <span class="token keyword">terminated by</span> <span class="token string">','</span><span class="token punctuation">;</span>
@@ -764,7 +764,7 @@ collection items <span class="token keyword">terminated by</span> <span class="t
 <pre class=" language-sql"><code class="language-sql"><span class="token keyword">drop</span> <span class="token keyword">table</span> <span class="token keyword">if</span> <span class="token operator">not</span> <span class="token keyword">exists</span> 03_wmy_array_course<span class="token punctuation">;</span>
 <span class="token keyword">create</span> <span class="token keyword">table</span> 03_wmy_array_course<span class="token punctuation">(</span>
  <span class="token punctuation">`</span>id<span class="token punctuation">`</span> string <span class="token keyword">COMMENT</span> <span class="token string">'学生的编号'</span><span class="token punctuation">,</span>
- <span class="token punctuation">`</span>choose_course<span class="token punctuation">`</span> array<span class="token operator">&lt;</span>string<span class="token operator">&gt;</span> <span class="token keyword">COMMENT</span> <span class="token string">'选课名称'</span>
+ <span class="token punctuation">`</span>choose_course<span class="token punctuation">`</span> array<span class="token operator">&lt;</span>string<span class="token operator">></span> <span class="token keyword">COMMENT</span> <span class="token string">'选课名称'</span>
 <span class="token punctuation">)</span>
 <span class="token keyword">row</span> format delimited <span class="token keyword">fields</span> <span class="token keyword">terminated by</span> <span class="token string">','</span>
 collection items <span class="token keyword">terminated by</span> <span class="token string">':'</span><span class="token punctuation">;</span>
@@ -849,7 +849,7 @@ to_date
 </code></pre>
 <p>assert_true</p>
 <pre class=" language-sql"><code class="language-sql">如果条件成立，返回<span class="token boolean">null</span>，否则抛出异常
-<span class="token keyword">select</span> assert_true <span class="token punctuation">(</span><span class="token number">2</span><span class="token operator">&gt;</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">select</span> assert_true <span class="token punctuation">(</span><span class="token number">2</span><span class="token operator">></span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 </code></pre>
 <h3 id="4、md5"><a href="#4、md5" class="headerlink" title="4、md5"></a>4、md5</h3><pre class=" language-sql"><code class="language-sql"><span class="token keyword">select</span> md5<span class="token punctuation">(</span>concat<span class="token punctuation">(</span><span class="token keyword">current_date</span><span class="token punctuation">,</span><span class="token string">'xixihhaha'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 </code></pre>
@@ -970,7 +970,7 @@ lateral <span class="token keyword">view</span> inline<span class="token punctua
  */</span>
 <span class="token annotation punctuation">@Description</span><span class="token punctuation">(</span>name <span class="token operator">=</span> <span class="token string">"myudtf_01"</span><span class="token punctuation">,</span> value <span class="token operator">=</span> <span class="token string">"2021-09-17 wmy udtf"</span><span class="token punctuation">,</span>
         extended <span class="token operator">=</span> <span class="token string">"Example: \n"</span> <span class="token operator">+</span>
-                <span class="token string">"&gt; select hobby1,hobby2 from wmy_udtf lateral view myudtf_01(hobby)  my_table as hobby1,hobby2;"</span>
+                <span class="token string">"> select hobby1,hobby2 from wmy_udtf lateral view myudtf_01(hobby)  my_table as hobby1,hobby2;"</span>
 <span class="token punctuation">)</span>
 <span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">MyUdtfFun</span> <span class="token keyword">extends</span> <span class="token class-name">GenericUDTF</span> <span class="token punctuation">{</span>
 
@@ -984,13 +984,13 @@ lateral <span class="token keyword">view</span> inline<span class="token punctua
     <span class="token annotation punctuation">@Override</span>
     <span class="token keyword">public</span> StructObjectInspector <span class="token function">initialize</span><span class="token punctuation">(</span>StructObjectInspector argOIs<span class="token punctuation">)</span> <span class="token keyword">throws</span> UDFArgumentException <span class="token punctuation">{</span>
         <span class="token comment" spellcheck="true">// 设置新的列名</span>
-        ArrayList<span class="token operator">&lt;</span>String<span class="token operator">&gt;</span> columns <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ArrayList</span><span class="token operator">&lt;</span><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        ArrayList<span class="token operator">&lt;</span>String<span class="token operator">></span> columns <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ArrayList</span><span class="token operator">&lt;</span><span class="token operator">></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
         <span class="token comment" spellcheck="true">//有几列，添加几列</span>
         columns<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"column1"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
         columns<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"column2"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
         <span class="token comment" spellcheck="true">// 设置每列类型，有几列就设置几列的类型</span>
-        ArrayList<span class="token operator">&lt;</span>ObjectInspector<span class="token operator">&gt;</span> columnType <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ArrayList</span><span class="token operator">&lt;</span><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        ArrayList<span class="token operator">&lt;</span>ObjectInspector<span class="token operator">></span> columnType <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ArrayList</span><span class="token operator">&lt;</span><span class="token operator">></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
         columnType<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span>PrimitiveObjectInspectorFactory<span class="token punctuation">.</span>javaStringObjectInspector<span class="token punctuation">)</span><span class="token punctuation">;</span>
         columnType<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span>PrimitiveObjectInspectorFactory<span class="token punctuation">.</span>javaStringObjectInspector<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
@@ -1471,7 +1471,7 @@ substr<span class="token punctuation">(</span>load_dt<span class="token punctuat
     <span class="token function">count</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token keyword">as</span> load_times
     <span class="token keyword">from</span> td_load_rcd
     <span class="token keyword">group</span> <span class="token keyword">by</span> usr_id<span class="token punctuation">,</span>load_dt
-    <span class="token keyword">having</span> load_times <span class="token operator">&gt;=</span> <span class="token number">5</span>
+    <span class="token keyword">having</span> load_times <span class="token operator">>=</span> <span class="token number">5</span>
 <span class="token punctuation">)</span>t1<span class="token punctuation">;</span>
 </code></pre>
 <h4 id="4、6月12日的留存率"><a href="#4、6月12日的留存率" class="headerlink" title="4、6月12日的留存率"></a>4、6月12日的留存率</h4><p>T+1日留存、6月15日的T+3日留存、6月20日的T+7日留存分别为</p>
@@ -1523,7 +1523,7 @@ substr<span class="token punctuation">(</span>load_dt<span class="token punctuat
         <span class="token punctuation">)</span> t1
     <span class="token punctuation">)</span> t2
     <span class="token keyword">GROUP</span> <span class="token keyword">BY</span> usr_id<span class="token punctuation">,</span> base_dt
-    <span class="token keyword">HAVING</span> cnt <span class="token operator">&gt;=</span> <span class="token number">7</span>
+    <span class="token keyword">HAVING</span> cnt <span class="token operator">>=</span> <span class="token number">7</span>
 <span class="token punctuation">)</span> t3
 </code></pre>
 <h3 id="2、用户留存率"><a href="#2、用户留存率" class="headerlink" title="2、用户留存率"></a>2、用户留存率</h3><pre class=" language-sql"><code class="language-sql">dt<span class="token punctuation">,</span>id 
@@ -1554,6 +1554,139 @@ substr<span class="token punctuation">(</span>load_dt<span class="token punctuat
 <span class="token number">2020</span><span class="token operator">-</span><span class="token number">08</span><span class="token operator">-</span><span class="token number">10</span><span class="token punctuation">,</span><span class="token number">3</span>
 <span class="token number">2020</span><span class="token operator">-</span><span class="token number">08</span><span class="token operator">-</span><span class="token number">12</span><span class="token punctuation">,</span><span class="token number">3</span>
 </code></pre>
+<h3 id="3、小红书hive用户行为分析join"><a href="#3、小红书hive用户行为分析join" class="headerlink" title="3、小红书hive用户行为分析join"></a>3、小红书hive用户行为分析join</h3><p>参考连接：<a href="https://blog.csdn.net/CLKTOY/article/details/119992781?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_title~default-0.no_search_link&amp;spm=1001.2101.3001.4242" target="_blank" rel="noopener">https://blog.csdn.net/CLKTOY/article/details/119992781?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_title~default-0.no_search_link&amp;spm=1001.2101.3001.4242</a></p>
+<h4 id="3-1-需求分析"><a href="#3-1-需求分析" class="headerlink" title="3.1 需求分析"></a>3.1 需求分析</h4><p>小红书月活跃用户数已经过亿，用户在小红书上通过文字、图片、视频笔记分享生活，并创建相关商品链接，吸引相同爱好的用户进行收藏购买，用户的消费有什么行为特征呢？</p>
+<p>现有用户订单表、用户收藏表。</p>
+<h4 id="3-2-用户订单表"><a href="#3-2-用户订单表" class="headerlink" title="3.2 用户订单表"></a>3.2 用户订单表</h4><p>用户订单表：流水号,记录用户id、购买的商品id、用户下单的时间及商品的种类。</p>
+<pre class=" language-tex"><code class="language-tex">1,1,201,2020/11/14 10:00,1
+2,2,203,2020/11/15 12:002
+3,3,203,2020/11/16 10:00,1
+4,4,203,2020/11/17 10:00,1
+5,5,203,2020/11/18 10:00,1
+6,6,203,2020/11/18 11:00,1
+7,7,204,2020/11/18 12:00,1
+8,8,205,2020/11/18 11:30,1
+9,9,206,2020/12/1 10:00,1
+10,4,207,2020/12/2 10:00,3
+11,5,208,2020/12/3 10:00,1
+12,6,209,2020/12/4 8:00,2
+13,7,203,2020/12/5 10:00,2
+14,8,203,2020/12/6 10:00,3
+15,9,203,2020/12/7 15:00,4
+16,1,204,2020/12/8 10:00,5
+17,2,204,2020/12/9 10:00,5
+18,3,206,2020/12/10 10:00,5
+19,4,208,2020/12/11 10:00,5
+20,5,209,2020/12/12 19:00,5
+</code></pre>
+<p>创建表</p>
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">drop</span> <span class="token keyword">table</span> userorder<span class="token punctuation">;</span>
+
+<span class="token keyword">create</span> <span class="token keyword">table</span> userorder<span class="token punctuation">(</span>
+serial_num string<span class="token punctuation">,</span>
+user_id string<span class="token punctuation">,</span>
+goods_id string<span class="token punctuation">,</span>
+order_time string<span class="token punctuation">,</span>
+goods_type string
+<span class="token punctuation">)</span>
+<span class="token keyword">row</span> format delimited <span class="token keyword">fields</span> <span class="token keyword">terminated by</span> <span class="token string">','</span><span class="token punctuation">;</span>
+
+<span class="token keyword">load</span> <span class="token keyword">data</span> <span class="token keyword">local</span> inpath <span class="token string">'/opt/bigdata/wmy/hive/data/userorder.txt'</span> <span class="token keyword">into</span> <span class="token keyword">table</span> userorder<span class="token punctuation">;</span>
+</code></pre>
+<h4 id="3-3-用户收藏表"><a href="#3-3-用户收藏表" class="headerlink" title="3.3 用户收藏表"></a>3.3 用户收藏表</h4><p>用户收藏商品表：记录用户id、用户收藏的商品id及收藏时间。</p>
+<pre class=" language-text"><code class="language-text">1,1,203,2020/11/14 12:00
+2,9,203,2020/11/15 10:00
+3,4,203,2020/11/16 10:00
+4,5,203,2020/11/17 10:00
+5,6,203,2020/11/17 11:00
+6,7,204,2020/11/17 12:00
+7,8,205,2020/11/18 11:30
+8,9,212,2020/12/1 10:00
+9,4,207,2020/12/2 10:00
+10,5,213,2020/12/3 10:00
+11,6,209,2020/12/4 8:00
+12,7,203,2020/12/5 10:00
+13,8,203,2020/12/6 10:00
+14,9,203,2020/12/7 15:00
+15,1,203,2020/12/8 10:00
+16,2,204,2020/12/9 10:00
+17,3,205,2020/12/10 8:00
+18,4,208,2020/12/11 10:00
+19,5,209,2020/12/10 19:00
+20,7,201,2020/12/11 19:00
+</code></pre>
+<p>创建表</p>
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">drop</span> <span class="token keyword">table</span> usercollect<span class="token punctuation">;</span>
+
+<span class="token keyword">create</span> <span class="token keyword">table</span> usercollect<span class="token punctuation">(</span>
+serial_num string<span class="token punctuation">,</span>
+user_id string<span class="token punctuation">,</span>
+goods_id string<span class="token punctuation">,</span>
+collect_time string
+<span class="token punctuation">)</span>
+<span class="token keyword">row</span> format delimited <span class="token keyword">fields</span> <span class="token keyword">terminated by</span> <span class="token string">','</span><span class="token punctuation">;</span>
+
+<span class="token keyword">load</span> <span class="token keyword">data</span> <span class="token keyword">local</span> inpath <span class="token string">'/opt/bigdata/wmy/hive/data/usercollect.txt'</span> <span class="token keyword">into</span> <span class="token keyword">table</span> usercollect<span class="token punctuation">;</span>
+</code></pre>
+<h4 id="4、订单表和收藏表的实现"><a href="#4、订单表和收藏表的实现" class="headerlink" title="4、订单表和收藏表的实现"></a>4、订单表和收藏表的实现</h4><p>订单表、收藏表<br>1、买了没有收藏<br>2、买了且收藏了<br>3、收藏了没有买<br>4、收藏了且买了</p>
+<p>用户ID    商品ID    已购买    购买未收藏    收藏未购买    收藏且购买</p>
+<p>1、已购买 —&gt; 是在订单表中出现了订单ID就说明已经购买了<br>2、购买未收藏 —&gt; 在订单表中又，且在收藏表中也有<br>3、收藏未购买 —&gt; 订单表中没有，且在收藏表中有<br>4、收藏且购买 —&gt; 收藏表和订单表都有</p>
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">SELECT</span> nvl<span class="token punctuation">(</span>uo<span class="token punctuation">.</span>user_id<span class="token punctuation">,</span> uc<span class="token punctuation">.</span>user_id<span class="token punctuation">)</span> <span class="token keyword">AS</span> user_id
+ <span class="token punctuation">,</span>nvl<span class="token punctuation">(</span>uo<span class="token punctuation">.</span>goods_id<span class="token punctuation">,</span> uc<span class="token punctuation">.</span>goods_id<span class="token punctuation">)</span> <span class="token keyword">AS</span> goods_id
+ <span class="token punctuation">,</span><span class="token keyword">CASE</span> 
+  <span class="token keyword">WHEN</span> uo<span class="token punctuation">.</span>goods_id <span class="token operator">IS</span> <span class="token operator">NOT</span> <span class="token boolean">NULL</span> <span class="token keyword">THEN</span> <span class="token number">1</span>
+  <span class="token keyword">ELSE</span> <span class="token number">0</span>
+ <span class="token keyword">END</span> <span class="token keyword">AS</span> purchased
+ <span class="token punctuation">,</span> <span class="token keyword">CASE</span> 
+  <span class="token keyword">WHEN</span> uo<span class="token punctuation">.</span>goods_id <span class="token operator">IS</span> <span class="token operator">NOT</span> <span class="token boolean">NULL</span>
+  <span class="token operator">AND</span> uc<span class="token punctuation">.</span>goods_id <span class="token operator">IS</span> <span class="token boolean">NULL</span> <span class="token keyword">THEN</span> <span class="token number">1</span>
+  <span class="token keyword">ELSE</span> <span class="token number">0</span>
+ <span class="token keyword">END</span> <span class="token keyword">AS</span> purchasedNotCart
+ <span class="token punctuation">,</span> <span class="token keyword">CASE</span> 
+  <span class="token keyword">WHEN</span> uo<span class="token punctuation">.</span>goods_id <span class="token operator">IS</span> <span class="token boolean">NULL</span>
+  <span class="token operator">AND</span> uc<span class="token punctuation">.</span>goods_id <span class="token operator">IS</span> <span class="token operator">NOT</span> <span class="token boolean">NULL</span> <span class="token keyword">THEN</span> <span class="token number">1</span>
+  <span class="token keyword">ELSE</span> <span class="token number">0</span>
+ <span class="token keyword">END</span> <span class="token keyword">AS</span> CartNotPurchase
+ <span class="token punctuation">,</span> <span class="token keyword">CASE</span> 
+  <span class="token keyword">WHEN</span> uo<span class="token punctuation">.</span>goods_id <span class="token operator">IS</span> <span class="token operator">NOT</span> <span class="token boolean">NULL</span>
+  <span class="token operator">AND</span> uc<span class="token punctuation">.</span>goods_id <span class="token operator">IS</span> <span class="token operator">NOT</span> <span class="token boolean">NULL</span> <span class="token keyword">THEN</span> <span class="token number">1</span>
+  <span class="token keyword">ELSE</span> <span class="token number">0</span>
+ <span class="token keyword">END</span> <span class="token keyword">AS</span> CartAndPurchase
+<span class="token keyword">FROM</span> userorder uo
+ <span class="token keyword">FULL</span> <span class="token keyword">JOIN</span> usercollect uc
+ <span class="token keyword">ON</span> uo<span class="token punctuation">.</span>user_id <span class="token operator">=</span> uc<span class="token punctuation">.</span>user_id
+  <span class="token operator">AND</span> uo<span class="token punctuation">.</span>goods_id <span class="token operator">=</span> uc<span class="token punctuation">.</span>goods_id<span class="token punctuation">;</span>
+</code></pre>
+<pre class=" language-sql"><code class="language-sql">user_id goods_id        purchased       purchasednotcart        cartnotpurchase     cartandpurchase
+<span class="token number">1</span>          <span class="token number">201</span>                 <span class="token number">1</span>                       <span class="token number">1</span>               <span class="token number">0</span>                      <span class="token number">0</span>
+<span class="token number">1</span>          <span class="token number">203</span>                 <span class="token number">0</span>                       <span class="token number">0</span>               <span class="token number">1</span>                      <span class="token number">0</span>
+<span class="token number">1</span>          <span class="token number">203</span>                 <span class="token number">0</span>                       <span class="token number">0</span>               <span class="token number">1</span>                      <span class="token number">0</span>
+<span class="token number">1</span>          <span class="token number">204</span>                 <span class="token number">1</span>                       <span class="token number">1</span>               <span class="token number">0</span>                      <span class="token number">0</span>
+<span class="token number">2</span>          <span class="token number">203</span>                 <span class="token number">1</span>                       <span class="token number">1</span>               <span class="token number">0</span>                      <span class="token number">0</span>
+<span class="token number">2</span>          <span class="token number">204</span>                 <span class="token number">1</span>                       <span class="token number">0</span>               <span class="token number">0</span>                      <span class="token number">1</span>
+<span class="token number">3</span>          <span class="token number">203</span>                 <span class="token number">1</span>                       <span class="token number">1</span>               <span class="token number">0</span>                      <span class="token number">0</span>
+<span class="token number">3</span>          <span class="token number">205</span>                 <span class="token number">0</span>                       <span class="token number">0</span>               <span class="token number">1</span>                      <span class="token number">0</span>
+<span class="token number">3</span>          <span class="token number">206</span>                 <span class="token number">1</span>                       <span class="token number">1</span>               <span class="token number">0</span>                      <span class="token number">0</span>
+<span class="token number">4</span>          <span class="token number">203</span>                 <span class="token number">1</span>                       <span class="token number">0</span>               <span class="token number">0</span>                      <span class="token number">1</span>
+<span class="token number">4</span>          <span class="token number">208</span>                 <span class="token number">1</span>                       <span class="token number">0</span>               <span class="token number">0</span>                      <span class="token number">1</span>
+<span class="token number">4</span>          <span class="token number">207</span>                 <span class="token number">1</span>                       <span class="token number">0</span>               <span class="token number">0</span>                      <span class="token number">1</span>
+<span class="token number">5</span>          <span class="token number">208</span>                 <span class="token number">1</span>                       <span class="token number">1</span>               <span class="token number">0</span>                      <span class="token number">0</span>
+<span class="token number">5</span>          <span class="token number">213</span>                 <span class="token number">0</span>                       <span class="token number">0</span>               <span class="token number">1</span>                      <span class="token number">0</span>
+<span class="token number">5</span>          <span class="token number">203</span>                 <span class="token number">1</span>                       <span class="token number">0</span>               <span class="token number">0</span>                      <span class="token number">1</span>
+<span class="token number">5</span>          <span class="token number">209</span>                 <span class="token number">1</span>                       <span class="token number">0</span>               <span class="token number">0</span>                      <span class="token number">1</span>
+<span class="token number">6</span>          <span class="token number">203</span>                 <span class="token number">1</span>                       <span class="token number">0</span>               <span class="token number">0</span>                      <span class="token number">1</span>
+<span class="token number">6</span>          <span class="token number">209</span>                 <span class="token number">1</span>                       <span class="token number">0</span>               <span class="token number">0</span>                      <span class="token number">1</span>
+<span class="token number">7</span>          <span class="token number">201</span>                 <span class="token number">0</span>                       <span class="token number">0</span>               <span class="token number">1</span>                      <span class="token number">0</span>
+<span class="token number">7</span>          <span class="token number">203</span>                 <span class="token number">1</span>                       <span class="token number">0</span>               <span class="token number">0</span>                      <span class="token number">1</span>
+<span class="token number">7</span>          <span class="token number">204</span>                 <span class="token number">1</span>                       <span class="token number">0</span>               <span class="token number">0</span>                      <span class="token number">1</span>
+<span class="token number">8</span>          <span class="token number">203</span>                 <span class="token number">1</span>                       <span class="token number">0</span>               <span class="token number">0</span>                      <span class="token number">1</span>
+<span class="token number">8</span>          <span class="token number">205</span>                 <span class="token number">1</span>                       <span class="token number">0</span>               <span class="token number">0</span>                      <span class="token number">1</span>
+<span class="token number">9</span>          <span class="token number">206</span>                 <span class="token number">1</span>                       <span class="token number">1</span>               <span class="token number">0</span>                      <span class="token number">0</span>
+<span class="token number">9</span>          <span class="token number">203</span>                 <span class="token number">1</span>                       <span class="token number">0</span>               <span class="token number">0</span>                      <span class="token number">1</span>
+<span class="token number">9</span>          <span class="token number">203</span>                 <span class="token number">1</span>                       <span class="token number">0</span>               <span class="token number">0</span>                      <span class="token number">1</span>
+<span class="token number">9</span>          <span class="token number">212</span>                 <span class="token number">0</span>                       <span class="token number">0</span>               <span class="token number">1</span>                      <span class="token number">0</span>
+</code></pre>
+<p><a href="https://blog.csdn.net/SXY16044314/article/details/94046999" target="_blank" rel="noopener">https://blog.csdn.net/SXY16044314/article/details/94046999</a></p>
 
                 
             </div>
