@@ -4,6 +4,31 @@
   
     
     <entry>
+      <title>数据仓库工具箱-01-Kimball维度建模技术</title>
+      <link href="/2021/09/21/%E6%95%B0%E6%8D%AE%E4%BB%93%E5%BA%93%E5%B7%A5%E5%85%B7%E7%AE%B1-01-Kimball%E7%BB%B4%E5%BA%A6%E5%BB%BA%E6%A8%A1%E6%8A%80%E6%9C%AF/"/>
+      <url>/2021/09/21/%E6%95%B0%E6%8D%AE%E4%BB%93%E5%BA%93%E5%B7%A5%E5%85%B7%E7%AE%B1-01-Kimball%E7%BB%B4%E5%BA%A6%E5%BB%BA%E6%A8%A1%E6%8A%80%E6%9C%AF/</url>
+      
+        <content type="html"><![CDATA[<h1 id="Kimball维度建模技术"><a href="#Kimball维度建模技术" class="headerlink" title="Kimball维度建模技术"></a>Kimball维度建模技术</h1>]]></content>
+      
+      
+      <categories>
+          
+          <category> 数据仓库工具箱 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 数据仓库工具箱 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>hive-推荐类SQL解法</title>
       <link href="/2021/09/21/hive-%E6%8E%A8%E8%8D%90%E7%B1%BBSQL%E8%A7%A3%E6%B3%95/"/>
       <url>/2021/09/21/hive-%E6%8E%A8%E8%8D%90%E7%B1%BBSQL%E8%A7%A3%E6%B3%95/</url>
