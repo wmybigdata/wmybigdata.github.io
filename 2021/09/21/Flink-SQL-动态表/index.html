@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="RowKey设计原则, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
+    <meta name="keywords" content="Flink-SQL-动态表, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
     <meta name="description" content="本网站是个人兴趣爱好，总结分享经验，记录生活点滴的平台，希望在以后的学习旅途中，走出自己的风景。">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -16,7 +16,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>RowKey设计原则 | 情深骚明大数据之旅</title>
+    <title>Flink-SQL-动态表 | 情深骚明大数据之旅</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -314,12 +314,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/10.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/3.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">RowKey设计原则</h1>
+                    <h1 class="description center-align post-title">Flink-SQL-动态表</h1>
                 </div>
             </div>
         </div>
@@ -433,12 +433,25 @@
             <div class="row tag-cate">
                 <div class="col s7">
                     
-                          <div class="article-tag">
-                            <span class="chip bg-color">无标签</span>
-                          </div>
+                    <div class="article-tag">
+                        
+                            <a href="/tags/Flink%E6%B5%81%E5%BC%8F%E5%BC%95%E6%93%8E/">
+                                <span class="chip bg-color">Flink流式引擎</span>
+                            </a>
+                        
+                    </div>
                     
                 </div>
                 <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/Flink%E6%B5%81%E5%BC%8F%E5%BC%95%E6%93%8E/" class="post-category">
+                                Flink流式引擎
+                            </a>
+                        
+                    </div>
                     
                 </div>
             </div>
@@ -447,7 +460,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2021-08-30
+                    2021-09-21
                 </div>
                 
 
@@ -468,7 +481,66 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                
+                <h1 id="Flink-SQL-动态表"><a href="#Flink-SQL-动态表" class="headerlink" title="Flink-SQL-动态表"></a>Flink-SQL-动态表</h1><h2 id="1、动态表与连续查询"><a href="#1、动态表与连续查询" class="headerlink" title="1、动态表与连续查询"></a>1、动态表与连续查询</h2><p>和动态表对应的是静态表——常规的数据库中的表或批处理中的表等，其在查询时数据不再变化。动态表是随时间变化的，即使是在查询的时候。怎么理解了？流上的数据是源源不断的，一条数据的到来会触发一次查询，这次查询在执行时还有下一条数据到来，对表本身数据是在变化的。</p>
+<p>　　对动态表的查询是连续的，即连续查询（Continuous Query）。实质上， 动态表上的连续查询与定义物理视图（Materialized View）的查询很相似。物理视图定义为SQL查询，就像常规的虚拟视图一样，不同的是物理视图会缓存查询结果，这样在访问时不需要重新计算，而缓存带来的挑战是有可能提供过时的结果，Eager View Maintenance则是用于及时跟新物理视图的技术，这里就不展开了。</p>
+<p>　　流、动态表、连续查询三者的关系如下图所示：</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210921180143777.png" alt="流表转换"></p>
+<p>用一句话概括是：流被转换为动态表，对动态表的连续查询生成新的动态表（结果表），然后结果表被转换为流。</p>
+<h2 id="2、流上定义表"><a href="#2、流上定义表" class="headerlink" title="2、流上定义表"></a>2、流上定义表</h2><h3 id="2-1-定义表"><a href="#2-1-定义表" class="headerlink" title="2.1 定义表"></a>2.1 定义表</h3><p>为了在流上使用关系型查询，需要将流转换成表。下面的分析过程均采用官网中的例子进行说明。</p>
+<p>1）点击事件流的schema如下：</p>
+<pre class=" language-sql"><code class="language-sql"><span class="token punctuation">[</span>
+  <span class="token keyword">user</span>:  <span class="token keyword">VARCHAR</span><span class="token punctuation">,</span>   <span class="token comment" spellcheck="true">// the name of the user</span>
+  cTime: <span class="token keyword">TIMESTAMP</span><span class="token punctuation">,</span> <span class="token comment" spellcheck="true">// the time when the URL was accessed</span>
+  url:   <span class="token keyword">VARCHAR</span>    <span class="token comment" spellcheck="true">// the URL that was accessed by the user</span>
+<span class="token punctuation">]</span>    
+</code></pre>
+<p>2）从概念上来说，流上的每天记录都是动态表进行INSERT修改。从本质上讲，是从一个INSERT-Only（仅插入）的ChangeLog流上构建一个表。点击事件流上构建表如下图所示，且随着更多点击流记录的插入，生成的表不断增长：</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210921180452009.png" alt="流表转换"></p>
+<p><strong>Note</strong>：定义在流上的表在内部是没有实现的。</p>
+<h3 id="2-2-连续查询"><a href="#2-2-连续查询" class="headerlink" title="2.2 连续查询"></a>2.2 连续查询</h3><p>连续查询不会中止，会根据输入表来更新结果表，下面介绍两种查询的例子。</p>
+<p>​    1）简单的GROUP-BY Count聚合查询</p>
+<p>​    下图中，左边是输入表click，是随着时间updata增加的，右边是查询的结果表。开始clicks表中只有一条数据[Mary, ./home]时其结果表是表-1，当clicks表中新增一条数据[Bob, ./cart]时，其结果表是表-2，依次下推。每一条新数据的到来会对之前表行进update或INSERT操作，SQL语句就会根据现有数据更新的结果表。</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210921180628492.png" alt="聚合查询"></p>
+<p>​    2）带有窗口（window）的聚合查询</p>
+<p>　窗口的时间间隔是1个小时，窗口-1对应的时表-1，窗口-2对应的时表-2，依次类推。和第一种查询不一样的是，每一张时表只是统计对应窗口的数据，之前窗口的数据对其没有影响，对不同窗口的查询结果是以追加的形式写入result表中的。</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210921180802319.png" alt="窗口的聚合查询"></p>
+<h3 id="2-3-Update和Append查询"><a href="#2-3-Update和Append查询" class="headerlink" title="2.3 Update和Append查询"></a>2.3 Update和Append查询</h3><p>　　2.2中的两种例子分别对应的两种查询方式，</p>
+<p>　　1）例子1对应着Update查询，这种方式需要更新之前已经发出的结果，包括INSERT和UPDATE两种改变。改变之前已经发出的结果意味着，这种查询需要维护更多的状态（state）数据；</p>
+<p>　　2）例子2对应着Append查询，这种方式查询的结果都是以追加的形式加入到result表中，仅包含INSERT操作。这种方式生成的表和update生成的表转换成流的方式不一样（见下文）。</p>
+<h3 id="2-4-Restrictions查询"><a href="#2-4-Restrictions查询" class="headerlink" title="2.4 Restrictions查询"></a>2.4 Restrictions查询</h3><p>　　对于有些SQL查询会因需要保留的state多大或重新计算已发出的记录用来更新的代价太大而得不偿失。</p>
+<p>　　1）state size：例如下面的SQL，在连续查询中，当一条新的消息到来时，为了更新之前已发出的结果（联想2.2中例1），需要保存之前的计算结果即state。当时当连续查询持续很长时间时，需要保存的state的容量会很大，且随着时间的递增会越来越大，更糟糕的是若不断有新用户（分配不同的username）加入，其要保存的count会随着时间更加恐怖，最后有可能导致任务失败。</p>
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">SELECT</span> <span class="token keyword">user</span><span class="token punctuation">,</span> <span class="token function">COUNT</span><span class="token punctuation">(</span>url<span class="token punctuation">)</span> <span class="token keyword">FROM</span> clicks <span class="token keyword">GROUP</span> <span class="token keyword">BY</span> <span class="token keyword">user</span><span class="token punctuation">;</span>
+</code></pre>
+<p>　　2）computing updates：例如下面的SQL，当clicks表新增一条记录，为计算rank，需要对之前所有的重新计算和更新已发出结果的中很大一部分，一条记录的的增加，有可能导致很多user的rank变化。</p>
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">SELECT</span> <span class="token keyword">user</span><span class="token punctuation">,</span>
+         RANK<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">OVER</span> <span class="token punctuation">(</span><span class="token keyword">ORDER</span> <span class="token keyword">BY</span> lastLogin<span class="token punctuation">)</span>
+<span class="token keyword">FROM</span> 
+    <span class="token punctuation">(</span><span class="token keyword">SELECT</span> <span class="token keyword">user</span><span class="token punctuation">,</span>
+         <span class="token function">MAX</span><span class="token punctuation">(</span>cTime<span class="token punctuation">)</span> <span class="token keyword">AS</span> lastAction
+    <span class="token keyword">FROM</span> clicks
+    <span class="token keyword">GROUP</span> <span class="token keyword">BY</span>  <span class="token keyword">user</span> <span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>​        3）查询配置</p>
+<p>　　在常见的场景中，对长期的运行的job做连续查询，为了防止保存的state过大超出存储而任务失败，可能会对state的大小做一定限制即删除state。但这种方式可能引发另一个问题——查询出来的结果可能不准确。Flink Table API和SQL中提供查询参数试图在准确性和资源消耗中找到一个平衡点。</p>
+<p>　　 Idle State Retention Time含义是state的key在被删除之前多长时间没有被更新，即没有被更新state的保存时间。使用方式如下：</p>
+<pre class=" language-java"><code class="language-java">StreamQueryConfig qConfig <span class="token operator">=</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+
+<span class="token comment" spellcheck="true">// set idle state retention time: min = 12 hours, max = 24 hours</span>
+qConfig<span class="token punctuation">.</span><span class="token function">withIdleStateRetentionTime</span><span class="token punctuation">(</span>Time<span class="token punctuation">.</span><span class="token function">hours</span><span class="token punctuation">(</span><span class="token number">12</span><span class="token punctuation">)</span><span class="token punctuation">,</span> Time<span class="token punctuation">.</span><span class="token function">hours</span><span class="token punctuation">(</span><span class="token number">24</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h2 id="3、Table到流的转换"><a href="#3、Table到流的转换" class="headerlink" title="3、Table到流的转换"></a>3、Table到流的转换</h2><p>　可以通过INSERT、UPDATE、DELETE像修改常规表一样去改变动态表。将动态表转换为流或将其写入外部系统时，需要对这些更改进行encode。 Flink的Table API和SQL支持三种encode改变动态表的方法：</p>
+<p>　　1）Append-only Stream（仅追加流）：仅通过INSERT操作得到的动态表可以发射插入行来转换为流（联想2.2中例2），这种方式转换的流中数据都是片段性的，一个片段代表一个窗口；</p>
+<p>　　2）Retract Stream（回溯流）：restract stream有两种消息：添加（add）消息和回溯（retract）消息。将动态表转换为回溯（retract）流，通过将INSERT更改encode为添加消息，将DELETE更改encode为回溯消息，将UPDATE更改endcode为更新（上一个）行的回溯消息以及添加消息更新新的行 。 下图显示了动态表到回溯流的转换。</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210921181336552.png" alt="动态表的回溯"></p>
+<p>流上每条消息都有一个标识位，其中+标识INSERT操作，-标识DELETE操作。在clicks表中第一、二行消息[Mary, ./home]和[Bob, ./cat]被转换为流中1第、2条消息，当clicks表中第三行[Mary, ./prod?id=1]转换时，会先将已发出的第1条信息标记为DELETE告诉下游，然后第4条消息重新插入user为Mary的消息，依次类推，这样可以保证输出结果的正确性。</p>
+<p>　　3）Upsert Stream（上插流）：Upsert流包括upsert消息和删除消息。 动态表要转换为upsert流需要（可能是复合的）唯一键。 通过将INSERT和UPDATE 操作encode为upsert消息，并将DELETE更改encode为删除消息，可以是具有唯一键的动态表转换为流。 流运算需要知道唯一键属性才能正确应用消息。 与回溯流的主要区别在于UPDATE使用单个消息（(主键)）进行编码，因此更有效。</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210921181833849.png" alt="Upsert Stream &amp; 回溯"></p>
+<p>（<strong>个人理解待验证</strong>）Upsert流和Retract流的区别在于数据存在第三方系统中时，前者可能存在重复数据，后者没有。</p>
+<p> 　**NOTE：在将动态表（dynamic table）转换为数据流（Data Stream）时，**仅支持append和retract两种方式****。</p>
+<p><a href="https://nightlies.apache.org/flink/flink-docs-release-1.13/docs/dev/table/concepts/dynamic_tables/" target="_blank" rel="noopener">Flink 1.13.2 动态表的连接</a></p>
+<p><a href="https://www.itdks.com/Home/Course/detail?id=13213" target="_blank" rel="noopener">阿里巴巴-Blink SQL关键技术以及原理实现</a></p>
+
                 
             </div>
             <hr/>
@@ -494,7 +566,7 @@
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://github.com/wmybigdata/2021/08/30/RowKey%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99/">https://github.com/wmybigdata/2021/08/30/RowKey%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99/</a>
+                    <a href="https://github.com/wmybigdata/2021/09/21/Flink-SQL-%E5%8A%A8%E6%80%81%E8%A1%A8/">https://github.com/wmybigdata/2021/09/21/Flink-SQL-%E5%8A%A8%E6%80%81%E8%A1%A8/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -531,7 +603,11 @@
                 <div class="post-meta__tag-list" style="display: inline-block;">
                     
                         <div class="article-tag">
-                            <span class="chip bg-color">无标签</span>
+                            
+                                <a href="/tags/Flink%E6%B5%81%E5%BC%8F%E5%BC%95%E6%93%8E/">
+                                    <span class="chip bg-color">Flink流式引擎</span>
+                                </a>
+                            
                         </div>
                     
                 </div>
@@ -699,17 +775,18 @@
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+                <i class="far fa-dot-circle"></i>&nbsp;本篇
+            </div>
             <div class="card">
-                <a href="/2021/08/30/Rowkey%E5%A6%82%E4%BD%95%E8%AE%BE%E8%AE%A1/">
+                <a href="/2021/09/21/Flink-SQL-%E5%8A%A8%E6%80%81%E8%A1%A8/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/21.jpg" class="responsive-img" alt="Rowkey如何设计">
+                        <img src="/medias/featureimages/3.jpg" class="responsive-img" alt="Flink-SQL-动态表">
                         
-                        <span class="card-title">Rowkey如何设计</span>
+                        <span class="card-title">Flink-SQL-动态表</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -719,16 +796,29 @@
                         
                     </div>
                     <div class="publish-info">
-                        <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2021-08-30
-                        </span>
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-09-21
+                            </span>
                         <span class="publish-author">
                             
-                            <i class="fas fa-user fa-fw"></i>
-                            情深骚明
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/Flink%E6%B5%81%E5%BC%8F%E5%BC%95%E6%93%8E/" class="post-category">
+                                    Flink流式引擎
+                                </a>
+                            
                             
                         </span>
                     </div>
+                </div>
+
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Flink%E6%B5%81%E5%BC%8F%E5%BC%95%E6%93%8E/">
+                        <span class="chip bg-color">Flink流式引擎</span>
+                    </a>
+                    
                 </div>
                 
             </div>
@@ -740,13 +830,13 @@
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2021/08/30/hbase%E6%95%B0%E6%8D%AE%E5%86%99%E6%B5%81%E7%A8%8B/">
+                <a href="/2021/09/21/%E6%95%B0%E6%8D%AE%E4%BB%93%E5%BA%93%E5%B7%A5%E5%85%B7%E7%AE%B1-01-Kimball%E7%BB%B4%E5%BA%A6%E5%BB%BA%E6%A8%A1%E6%8A%80%E6%9C%AF/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/12.jpg" class="responsive-img" alt="hbase数据写流程">
+                        <img src="/medias/featureimages/22.jpg" class="responsive-img" alt="数据仓库工具箱-01-Kimball维度建模技术">
                         
-                        <span class="card-title">hbase数据写流程</span>
+                        <span class="card-title">数据仓库工具箱-01-Kimball维度建模技术</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -757,14 +847,14 @@
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2021-08-30
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-09-21
                             </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/hbase/" class="post-category">
-                                    hbase
+                            <a href="/categories/%E6%95%B0%E6%8D%AE%E4%BB%93%E5%BA%93%E5%B7%A5%E5%85%B7%E7%AE%B1/" class="post-category">
+                                    数据仓库工具箱
                                 </a>
                             
                             
@@ -774,8 +864,8 @@
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/hbase/">
-                        <span class="chip bg-color">hbase</span>
+                    <a href="/tags/%E6%95%B0%E6%8D%AE%E4%BB%93%E5%BA%93%E5%B7%A5%E5%85%B7%E7%AE%B1/">
+                        <span class="chip bg-color">数据仓库工具箱</span>
                     </a>
                     
                 </div>
