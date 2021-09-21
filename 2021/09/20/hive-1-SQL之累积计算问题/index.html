@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="SQL窗口函数宇宙最强详细讲解, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
+    <meta name="keywords" content="1__SQL之累积计算问题, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
     <meta name="description" content="本网站是个人兴趣爱好，总结分享经验，记录生活点滴的平台，希望在以后的学习旅途中，走出自己的风景。">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -16,7 +16,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>SQL窗口函数宇宙最强详细讲解 | 情深骚明大数据之旅</title>
+    <title>1__SQL之累积计算问题 | 情深骚明大数据之旅</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -314,12 +314,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/22.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/10.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">SQL窗口函数宇宙最强详细讲解</h1>
+                    <h1 class="description center-align post-title">1__SQL之累积计算问题</h1>
                 </div>
             </div>
         </div>
@@ -481,7 +481,86 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h1 id="SQL窗口函数宇宙最强详细讲解"><a href="#SQL窗口函数宇宙最强详细讲解" class="headerlink" title="SQL窗口函数宇宙最强详细讲解"></a>SQL窗口函数宇宙最强详细讲解</h1>
+                <h1 id="1-SQL之累积计算问题"><a href="#1-SQL之累积计算问题" class="headerlink" title="1__SQL之累积计算问题"></a>1__SQL之累积计算问题</h1><p>参考连接：<a href="https://blog.csdn.net/CLKTOY/article/details/119879873" target="_blank" rel="noopener">https://blog.csdn.net/CLKTOY/article/details/119879873</a></p>
+<h2 id="1、需求"><a href="#1、需求" class="headerlink" title="1、需求"></a>1、需求</h2><pre class=" language-text"><code class="language-text"> 我们有如下的用户访问数据
+    userId  visitDate   visitCount
+    u01     2017/1/21        5
+    u02     2017/1/23        6
+    u03     2017/1/22        8
+    u04     2017/1/20        3
+    u01     2017/1/23        6
+    u01     2017/2/21        8
+    U02     2017/1/23        6
+    U01     2017/2/22        4
+ 
+要求使用SQL统计出每个用户的累积访问次数，如下表所示：
+   
+   用户id    月份    小计  累积
+    u01     2017-01  11    11
+    u01     2017-02  12    23
+    u02     2017-01  12    12
+    u03     2017-01  8     8
+    u04     2017-01  3     3
+</code></pre>
+<p>窗口函数典型案例</p>
+<h2 id="2、数据准备"><a href="#2、数据准备" class="headerlink" title="2、数据准备"></a>2、数据准备</h2><pre class=" language-text"><code class="language-text">u01,2017/1/21,5 
+u02,2017/1/23,6 
+u03,2017/1/22,8 
+u04,2017/1/20,3 
+u01,2017/1/23,6 
+u01,2017/2/21,8 
+u02,2017/1/23,6 
+u01,2017/2/22,4 
+</code></pre>
+<h2 id="3、-创建hive表"><a href="#3、-创建hive表" class="headerlink" title="3、 创建hive表"></a>3、 创建hive表</h2><p>此处博主是在自己电脑上搭建的hive集群进行实现，有兴趣的同学可以自行搭建，也可自费选择阿里云的maxcomputer。</p>
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">CREATE</span> <span class="token keyword">TABLE</span> sqltest1 <span class="token punctuation">(</span> 
+        userId string<span class="token punctuation">,</span> 
+        visitDate string<span class="token punctuation">,</span>
+        visitCount string <span class="token punctuation">)</span>
+<span class="token keyword">ROW</span> format delimited <span class="token keyword">FIELDS</span> <span class="token keyword">TERMINATED BY</span> <span class="token string">","</span><span class="token punctuation">;</span>
+ 
+<span class="token keyword">load</span> <span class="token keyword">data</span> <span class="token keyword">local</span> inpath <span class="token string">"/opt/bigdata/wmy/hive/data/sqltest1.txt"</span> <span class="token keyword">into</span> <span class="token keyword">table</span> sqltest1<span class="token punctuation">;</span>
+</code></pre>
+<h2 id="4、求每个用户每个月的访问数量并且求出它的累计访问量"><a href="#4、求每个用户每个月的访问数量并且求出它的累计访问量" class="headerlink" title="4、求每个用户每个月的访问数量并且求出它的累计访问量"></a>4、求每个用户每个月的访问数量并且求出它的累计访问量</h2><pre class=" language-sql"><code class="language-sql"><span class="token keyword">SELECT</span> userId<span class="token punctuation">,</span>
+         visitDate<span class="token punctuation">,</span>
+         counts<span class="token punctuation">,</span>
+         <span class="token function">sum</span><span class="token punctuation">(</span>counts<span class="token punctuation">)</span> <span class="token keyword">over</span><span class="token punctuation">(</span><span class="token keyword">partition</span> <span class="token keyword">by</span> userId<span class="token punctuation">)</span> sum_per_month
+<span class="token keyword">FROM</span> 
+    <span class="token punctuation">(</span><span class="token keyword">SELECT</span> userId<span class="token punctuation">,</span>
+         visitDate<span class="token punctuation">,</span>
+         <span class="token function">sum</span><span class="token punctuation">(</span>visitCount<span class="token punctuation">)</span> counts
+    <span class="token keyword">FROM</span> 
+        <span class="token punctuation">(</span><span class="token keyword">SELECT</span> userId<span class="token punctuation">,</span>
+         date_format<span class="token punctuation">(</span>regexp_replace<span class="token punctuation">(</span>visitDate<span class="token punctuation">,</span>
+        <span class="token string">'/'</span><span class="token punctuation">,</span><span class="token string">'-'</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token string">'yyyy-MM'</span><span class="token punctuation">)</span> visitDate<span class="token punctuation">,</span> visitCount
+        <span class="token keyword">FROM</span> sqltest1 <span class="token punctuation">)</span> t1
+        <span class="token keyword">GROUP</span> <span class="token keyword">BY</span>  userId<span class="token punctuation">,</span>visitDate
+        <span class="token keyword">ORDER</span> <span class="token keyword">BY</span>  userId <span class="token punctuation">)</span>t2
+    <span class="token keyword">ORDER</span> <span class="token keyword">BY</span>  userId<span class="token punctuation">;</span>
+</code></pre>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210920205152811.png" alt="累计访问量"></p>
+<h2 id="5、总结"><a href="#5、总结" class="headerlink" title="5、总结"></a>5、总结</h2><ol>
+<li>regexp_replace函数的使用。</li>
+<li>date_format函数的使用。</li>
+<li>窗口函数与分析函数的结合使用。当然本题也可以不用窗口函数分析，也可以使用group by完成，读者自行尝试。。</li>
+</ol>
+<h2 id="6、regexp-replace函数的使用"><a href="#6、regexp-replace函数的使用" class="headerlink" title="6、regexp_replace函数的使用"></a>6、regexp_replace函数的使用</h2><p>语法: regexp_replace(string A, string B, string C)<br>操作类型: strings<br>返回值: string<br>说明: 将字符串A中的符合java正则表达式B的部分替换为C。</p>
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">select</span> regexp_replace<span class="token punctuation">(</span><span class="token string">'wmy/love/bigdata'</span><span class="token punctuation">,</span><span class="token string">'/'</span><span class="token punctuation">,</span><span class="token string">'-'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h2 id="7、like"><a href="#7、like" class="headerlink" title="7、like"></a>7、like</h2><pre class=" language-sql"><code class="language-sql"><span class="token keyword">select</span> <span class="token string">"wmy"</span> <span class="token operator">like</span> <span class="token string">'_my'</span><span class="token punctuation">;</span>
+</code></pre>
+<h2 id="8、rlike"><a href="#8、rlike" class="headerlink" title="8、rlike"></a>8、rlike</h2><p>“.” 任意单个字符<br>“*” 匹配前面的字符0次或多次<br>“+” 匹配前面的字符1次或多次<br>“?” 匹配前面的字符0次或1次<br>“\d” 等于 [0-9]，使用的时候写成’\d’<br>“\D” 等于 [^0-9]，使用的时候写成’\D’</p>
+<hr>
+<p>语法1: A RLIKE B<br>语法2: RLIKE(A, B)<br>操作类型: strings<br>返回类型: boolean或null<br>描述: 如果字符串A或者字符串B为NULL，则返回NULL；如果字符串A符合JAVA正则表达式B的正则语法，则为TRUE；否则为FALSE。</p>
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">select</span> <span class="token string">'wmy'</span> <span class="token operator">rlike</span> <span class="token string">'^w'</span><span class="token punctuation">;</span>
+</code></pre>
+<h2 id="9、regexp"><a href="#9、regexp" class="headerlink" title="9、regexp"></a>9、regexp</h2><p>语法1: A regexp B<br>语法2: regexp(A, B)<br>操作类型: strings<br>返回类型: boolean或null<br>描述: 功能与RLIKE相同</p>
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">select</span> <span class="token string">'wmy'</span> <span class="token operator">regexp</span> <span class="token string">'^w'</span><span class="token punctuation">;</span>
+</code></pre>
+<h2 id="10、regexp-extract"><a href="#10、regexp-extract" class="headerlink" title="10、regexp_extract"></a>10、regexp_extract</h2><p>语法: regexp_extract(string A, string pattern, int index)<br>返回值: string<br>说明：将字符串A按照pattern正则表达式的规则拆分，返回index指定的字符，index从1开始计。</p>
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">select</span> regexp_extract<span class="token punctuation">(</span><span class="token string">'wmy123456wmy'</span><span class="token punctuation">,</span><span class="token string">'wmy(.*?)(wmy)'</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+
                 
             </div>
             <hr/>
@@ -507,7 +586,7 @@
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://github.com/wmybigdata/2021/09/20/SQL%E7%AA%97%E5%8F%A3%E5%87%BD%E6%95%B0%E5%AE%87%E5%AE%99%E6%9C%80%E5%BC%BA%E8%AF%A6%E7%BB%86%E8%AE%B2%E8%A7%A3/">https://github.com/wmybigdata/2021/09/20/SQL%E7%AA%97%E5%8F%A3%E5%87%BD%E6%95%B0%E5%AE%87%E5%AE%99%E6%9C%80%E5%BC%BA%E8%AF%A6%E7%BB%86%E8%AE%B2%E8%A7%A3/</a>
+                    <a href="https://github.com/wmybigdata/2021/09/20/hive-1-SQL%E4%B9%8B%E7%B4%AF%E7%A7%AF%E8%AE%A1%E7%AE%97%E9%97%AE%E9%A2%98/">https://github.com/wmybigdata/2021/09/20/hive-1-SQL%E4%B9%8B%E7%B4%AF%E7%A7%AF%E8%AE%A1%E7%AE%97%E9%97%AE%E9%A2%98/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -716,12 +795,11 @@
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="far fa-dot-circle"></i>&nbsp;本篇
-            </div>
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2021/09/20/SQL%E7%AA%97%E5%8F%A3%E5%87%BD%E6%95%B0%E5%AE%87%E5%AE%99%E6%9C%80%E5%BC%BA%E8%AF%A6%E7%BB%86%E8%AE%B2%E8%A7%A3/">
+                <a href="/2021/09/20/hive-2-SQL%E7%AA%97%E5%8F%A3%E5%87%BD%E6%95%B0%E5%AE%87%E5%AE%99%E6%9C%80%E5%BC%BA%E8%AF%A6%E7%BB%86%E8%AE%B2%E8%A7%A3/">
                     <div class="card-image">
                         
                         
@@ -737,9 +815,9 @@
                         
                     </div>
                     <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2021-09-20
-                            </span>
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2021-09-20
+                        </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
@@ -752,7 +830,6 @@
                         </span>
                     </div>
                 </div>
-
                 
                 <div class="card-action article-tags">
                     
@@ -771,13 +848,13 @@
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2021/09/20/1-SQL%E4%B9%8B%E7%B4%AF%E7%A7%AF%E8%AE%A1%E7%AE%97%E9%97%AE%E9%A2%98/">
+                <a href="/2021/09/20/Spark-%E5%BF%AB%E9%80%9F%E4%B8%8A%E6%89%8B/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/10.jpg" class="responsive-img" alt="1__SQL之累积计算问题">
+                        <img src="/medias/featureimages/19.jpg" class="responsive-img" alt="Spark-快速上手">
                         
-                        <span class="card-title">1__SQL之累积计算问题</span>
+                        <span class="card-title">Spark-快速上手</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -794,8 +871,8 @@
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/hive/" class="post-category">
-                                    hive
+                            <a href="/categories/spark/" class="post-category">
+                                    spark
                                 </a>
                             
                             
@@ -805,8 +882,8 @@
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/hive/">
-                        <span class="chip bg-color">hive</span>
+                    <a href="/tags/spark/">
+                        <span class="chip bg-color">spark</span>
                     </a>
                     
                 </div>
