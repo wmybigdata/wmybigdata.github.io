@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="SQL窗口函数宇宙最强详细讲解, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
+    <meta name="keywords" content="hive-推荐类SQL解法, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
     <meta name="description" content="本网站是个人兴趣爱好，总结分享经验，记录生活点滴的平台，希望在以后的学习旅途中，走出自己的风景。">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -16,7 +16,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>SQL窗口函数宇宙最强详细讲解 | 情深骚明大数据之旅</title>
+    <title>hive-推荐类SQL解法 | 情深骚明大数据之旅</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -314,12 +314,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/22.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/10.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">SQL窗口函数宇宙最强详细讲解</h1>
+                    <h1 class="description center-align post-title">hive-推荐类SQL解法</h1>
                 </div>
             </div>
         </div>
@@ -460,7 +460,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2021-09-20
+                    2021-09-21
                 </div>
                 
 
@@ -481,123 +481,177 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h1 id="SQL窗口函数宇宙"><a href="#SQL窗口函数宇宙" class="headerlink" title="SQL窗口函数宇宙"></a>SQL窗口函数宇宙</h1><p>格式化工具：<a href="http://www.ab173.com/format/sql.php" target="_blank" rel="noopener">http://www.ab173.com/format/sql.php</a></p>
-<h2 id="0-需求描述"><a href="#0-需求描述" class="headerlink" title="0-需求描述"></a>0-需求描述</h2><p>如下为测试数据列表：user,month,visits</p>
-<pre class=" language-tex"><code class="language-tex">A,2015-01,5
-A,2015-01,15
-B,2015-01,5
-A,2015-01,8
-B,2015-01,25
-A,2015-01,5
-A,2015-02,4
-A,2015-02,6
-B,2015-02,10
-B,2015-02,5
-A,2015-03,16
-A,2015-03,22
-B,2015-03,23
-B,2015-03,10
-B,2015-03,11
+                <h1 id="hive-推荐类SQL解法"><a href="#hive-推荐类SQL解法" class="headerlink" title="hive-推荐类SQL解法"></a>hive-推荐类SQL解法</h1><h2 id="1、问题描述"><a href="#1、问题描述" class="headerlink" title="1、问题描述"></a>1、问题描述</h2><p><strong>问题描述</strong>：向用户 user_id = 1 推荐其关注的人喜欢的音乐</p>
+<p>表：关注表、喜欢表、音乐表</p>
+<h3 id="1-1-用户关注表-follow"><a href="#1-1-用户关注表-follow" class="headerlink" title="1.1 用户关注表 follow"></a>1.1 用户关注表 follow</h3><table>
+<thead>
+<tr>
+<th>user_id</th>
+<th align="right">follower_id</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td align="right">2</td>
+</tr>
+<tr>
+<td>1</td>
+<td align="right">4</td>
+</tr>
+<tr>
+<td>1</td>
+<td align="right">5</td>
+</tr>
+</tbody></table>
+<h3 id="1-2-用户喜欢的音乐-music-likes"><a href="#1-2-用户喜欢的音乐-music-likes" class="headerlink" title="1.2 用户喜欢的音乐 music_likes"></a>1.2 用户喜欢的音乐 music_likes</h3><table>
+<thead>
+<tr>
+<th align="left">user_id</th>
+<th align="right">music_id</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">1</td>
+<td align="right">20</td>
+</tr>
+<tr>
+<td align="left">1</td>
+<td align="right">30</td>
+</tr>
+<tr>
+<td align="left">1</td>
+<td align="right">40</td>
+</tr>
+<tr>
+<td align="left">2</td>
+<td align="right">10</td>
+</tr>
+<tr>
+<td align="left">2</td>
+<td align="right">20</td>
+</tr>
+<tr>
+<td align="left">2</td>
+<td align="right">30</td>
+</tr>
+<tr>
+<td align="left">4</td>
+<td align="right">10</td>
+</tr>
+<tr>
+<td align="left">4</td>
+<td align="right">20</td>
+</tr>
+<tr>
+<td align="left">4</td>
+<td align="right">30</td>
+</tr>
+<tr>
+<td align="left">4</td>
+<td align="right">60</td>
+</tr>
+</tbody></table>
+<h3 id="1-3-音乐表"><a href="#1-3-音乐表" class="headerlink" title="1.3 音乐表"></a>1.3 音乐表</h3><table>
+<thead>
+<tr>
+<th>id</th>
+<th align="right">music_name</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>10</td>
+<td align="right">a</td>
+</tr>
+<tr>
+<td>20</td>
+<td align="right">b</td>
+</tr>
+<tr>
+<td>30</td>
+<td align="right">c</td>
+</tr>
+<tr>
+<td>40</td>
+<td align="right">d</td>
+</tr>
+<tr>
+<td>50</td>
+<td align="right">e</td>
+</tr>
+<tr>
+<td>60</td>
+<td align="right">f</td>
+</tr>
+</tbody></table>
+<h2 id="2、创建表"><a href="#2、创建表" class="headerlink" title="2、创建表"></a>2、创建表</h2><pre class=" language-sql"><code class="language-sql"><span class="token keyword">create</span> <span class="token keyword">table</span> follow
+<span class="token punctuation">(</span>
+  user_id <span class="token keyword">int</span><span class="token punctuation">,</span>
+  follower_id <span class="token keyword">int</span>
+<span class="token punctuation">)</span><span class="token keyword">row</span> format delimited
+<span class="token keyword">fields</span> <span class="token keyword">terminated by</span> <span class="token string">'\t'</span><span class="token punctuation">;</span>
+ 
+<span class="token keyword">insert</span> <span class="token keyword">into</span> follow <span class="token keyword">values</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">insert</span> <span class="token keyword">into</span> follow <span class="token keyword">values</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">4</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">insert</span> <span class="token keyword">into</span> follow <span class="token keyword">values</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+ 
+<span class="token keyword">create</span> <span class="token keyword">table</span> music_likes
+<span class="token punctuation">(</span>
+  user_id <span class="token keyword">int</span><span class="token punctuation">,</span>
+  music_id <span class="token keyword">int</span>
+<span class="token punctuation">)</span><span class="token keyword">row</span> format delimited
+<span class="token keyword">fields</span> <span class="token keyword">terminated by</span> <span class="token string">'\t'</span><span class="token punctuation">;</span>
+ 
+<span class="token keyword">insert</span> <span class="token keyword">into</span> music_likes <span class="token keyword">values</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">20</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">insert</span> <span class="token keyword">into</span> music_likes <span class="token keyword">values</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">30</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">insert</span> <span class="token keyword">into</span> music_likes <span class="token keyword">values</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">40</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">insert</span> <span class="token keyword">into</span> music_likes <span class="token keyword">values</span> <span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">insert</span> <span class="token keyword">into</span> music_likes <span class="token keyword">values</span> <span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">20</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">insert</span> <span class="token keyword">into</span> music_likes <span class="token keyword">values</span> <span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">30</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">insert</span> <span class="token keyword">into</span> music_likes <span class="token keyword">values</span> <span class="token punctuation">(</span><span class="token number">4</span><span class="token punctuation">,</span><span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">insert</span> <span class="token keyword">into</span> music_likes <span class="token keyword">values</span> <span class="token punctuation">(</span><span class="token number">4</span><span class="token punctuation">,</span><span class="token number">20</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">insert</span> <span class="token keyword">into</span> music_likes <span class="token keyword">values</span> <span class="token punctuation">(</span><span class="token number">4</span><span class="token punctuation">,</span><span class="token number">30</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">insert</span> <span class="token keyword">into</span> music_likes <span class="token keyword">values</span> <span class="token punctuation">(</span><span class="token number">4</span><span class="token punctuation">,</span><span class="token number">60</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+ 
+<span class="token keyword">create</span> <span class="token keyword">table</span> music
+<span class="token punctuation">(</span>
+  id <span class="token keyword">int</span><span class="token punctuation">,</span>
+  music_name char<span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span>
+<span class="token punctuation">)</span><span class="token keyword">row</span> format delimited
+<span class="token keyword">fields</span> <span class="token keyword">terminated by</span> <span class="token string">'\t'</span><span class="token punctuation">;</span>
+ 
+<span class="token keyword">insert</span> <span class="token keyword">into</span> music <span class="token keyword">values</span> <span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">,</span><span class="token string">'a'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">insert</span> <span class="token keyword">into</span> music <span class="token keyword">values</span> <span class="token punctuation">(</span><span class="token number">20</span><span class="token punctuation">,</span><span class="token string">'b'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">insert</span> <span class="token keyword">into</span> music <span class="token keyword">values</span> <span class="token punctuation">(</span><span class="token number">30</span><span class="token punctuation">,</span><span class="token string">'c'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">insert</span> <span class="token keyword">into</span> music <span class="token keyword">values</span> <span class="token punctuation">(</span><span class="token number">40</span><span class="token punctuation">,</span><span class="token string">'d'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">insert</span> <span class="token keyword">into</span> music <span class="token keyword">values</span> <span class="token punctuation">(</span><span class="token number">50</span><span class="token punctuation">,</span><span class="token string">'e'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">insert</span> <span class="token keyword">into</span> music <span class="token keyword">values</span> <span class="token punctuation">(</span><span class="token number">60</span><span class="token punctuation">,</span><span class="token string">'f'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 </code></pre>
-<p>结果如下：</p>
-<pre class=" language-text"><code class="language-text">用户        月份        当月访问次数    最大访问次数    总访问次数        
-A       2015-01        33        33        33
-A       2015-02        10        33        43
-A       2015-03        38        38        81
-B       2015-01        30        30        30
-B       2015-02        15        30        45
-B       2015-03        44        44        89
-</code></pre>
-<h2 id="1-创建表"><a href="#1-创建表" class="headerlink" title="1-创建表"></a>1-创建表</h2><pre class=" language-sql"><code class="language-sql"><span class="token keyword">drop</span> <span class="token keyword">table</span> <span class="token keyword">if</span> <span class="token keyword">exists</span> pview<span class="token punctuation">;</span>
-<span class="token keyword">CREATE</span> <span class="token keyword">TABLE</span> pview <span class="token punctuation">(</span> user_id string<span class="token punctuation">,</span> month string<span class="token punctuation">,</span> pv string <span class="token punctuation">)</span> <span class="token keyword">ROW</span> format delimited <span class="token keyword">FIELDS</span> <span class="token keyword">TERMINATED BY</span> <span class="token string">","</span><span class="token punctuation">;</span>
-<span class="token keyword">load</span> <span class="token keyword">data</span> <span class="token keyword">local</span> inpath <span class="token string">"/opt/bigdata/wmy/hive/data/pview.txt"</span> <span class="token keyword">into</span> <span class="token keyword">table</span> pview<span class="token punctuation">;</span>
-</code></pre>
-<h2 id="2-需求实现"><a href="#2-需求实现" class="headerlink" title="2-需求实现"></a>2-需求实现</h2><p>从最终的需求可以看出，我们计算的结果是随着行的变化而变化，我们把这类问题称为移动计算。在hivesql中其实解决此类问题我们是通过移动窗口来解决的，类似于spark中的滑动窗口。那么控制此类行的变化范围hive中给出了具体的方法–窗口子句。</p>
-<pre class=" language-sql"><code class="language-sql"><span class="token keyword">SELECT</span> t1<span class="token punctuation">.</span>user_id<span class="token punctuation">,</span>
-         t1<span class="token punctuation">.</span>month<span class="token punctuation">,</span>
-         sum_pv<span class="token punctuation">,</span>
-         <span class="token function">max</span><span class="token punctuation">(</span>t1<span class="token punctuation">.</span>sum_pv<span class="token punctuation">)</span> <span class="token keyword">over</span><span class="token punctuation">(</span><span class="token keyword">partition</span> <span class="token keyword">by</span> t1<span class="token punctuation">.</span>user_id <span class="token keyword">order</span> <span class="token keyword">by</span> t1<span class="token punctuation">.</span>month<span class="token punctuation">)</span> max_pv<span class="token punctuation">,</span>
-         sum_pv_counts
+<h2 id="3、思路分析"><a href="#3、思路分析" class="headerlink" title="3、思路分析"></a>3、思路分析</h2><pre class=" language-sql"><code class="language-sql"><span class="token keyword">select</span> 
+user_id<span class="token punctuation">,</span>size<span class="token punctuation">(</span><span class="token number">aa</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token number">aa</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">,</span><span class="token number">aa</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">,</span><span class="token number">aa</span><span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">,</span><span class="token number">aa</span><span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">]</span>
+<span class="token keyword">from</span> 
+<span class="token punctuation">(</span>
+<span class="token keyword">SELECT</span> user_id<span class="token punctuation">,</span>
+         collect_set<span class="token punctuation">(</span>music_name<span class="token punctuation">)</span> <span class="token keyword">as</span> <span class="token number">aa</span>
 <span class="token keyword">FROM</span> 
-    <span class="token punctuation">(</span><span class="token keyword">SELECT</span> user_id<span class="token punctuation">,</span>
-         month<span class="token punctuation">,</span>
-         <span class="token function">sum</span><span class="token punctuation">(</span>pv<span class="token punctuation">)</span> sum_pv
-    <span class="token keyword">FROM</span> pview
-    <span class="token keyword">GROUP</span> <span class="token keyword">BY</span>  user_id<span class="token punctuation">,</span>month<span class="token punctuation">)</span>t1
-<span class="token keyword">LEFT</span> <span class="token keyword">JOIN</span> 
-    <span class="token punctuation">(</span><span class="token keyword">SELECT</span> user_id<span class="token punctuation">,</span>
-         month<span class="token punctuation">,</span>
-         sum_pv_counts
+    <span class="token punctuation">(</span><span class="token keyword">SELECT</span> <span class="token number">f</span><span class="token punctuation">.</span>user_id<span class="token punctuation">,</span>
+         music_name
     <span class="token keyword">FROM</span> 
         <span class="token punctuation">(</span><span class="token keyword">SELECT</span> user_id<span class="token punctuation">,</span>
-         month<span class="token punctuation">,</span>
-         <span class="token function">sum</span><span class="token punctuation">(</span>pv<span class="token punctuation">)</span> <span class="token keyword">over</span><span class="token punctuation">(</span><span class="token keyword">partition</span> <span class="token keyword">by</span> user_id
-        <span class="token keyword">ORDER</span> <span class="token keyword">BY</span>  month<span class="token punctuation">)</span> sum_pv_counts
-        <span class="token keyword">FROM</span> pview <span class="token punctuation">)</span>t2
-        <span class="token keyword">GROUP</span> <span class="token keyword">BY</span>  user_id<span class="token punctuation">,</span>month<span class="token punctuation">,</span>sum_pv_counts <span class="token punctuation">)</span>t3
-        <span class="token keyword">ON</span> t1<span class="token punctuation">.</span>user_id <span class="token operator">=</span> t3<span class="token punctuation">.</span>user_id
-        <span class="token operator">AND</span> t1<span class="token punctuation">.</span>month <span class="token operator">=</span> t3<span class="token punctuation">.</span>month
-<span class="token keyword">ORDER</span> <span class="token keyword">BY</span>  user_id<span class="token punctuation">,</span>month<span class="token punctuation">;</span>
+         follower_id
+        <span class="token keyword">FROM</span> follow <span class="token number">f</span>
+         <span class="token keyword">WHERE</span> user_id <span class="token operator">=</span> <span class="token string">'1'</span> <span class="token punctuation">)</span> <span class="token number">f</span>
+        <span class="token keyword">LEFT</span> <span class="token keyword">JOIN</span> 
+            <span class="token punctuation">(</span><span class="token keyword">SELECT</span> cl<span class="token punctuation">.</span>user_id<span class="token punctuation">,</span>
+         cl<span class="token punctuation">.</span>music_id<span class="token punctuation">,</span>
+         <span class="token number">c</span><span class="token punctuation">.</span>music_name
+            <span class="token keyword">FROM</span> music_likes cl
+            <span class="token keyword">LEFT</span> <span class="token keyword">JOIN</span> music <span class="token number">c</span>
+                <span class="token keyword">ON</span> cl<span class="token punctuation">.</span>music_id <span class="token operator">=</span> <span class="token number">c</span><span class="token punctuation">.</span>id <span class="token punctuation">)</span>t1
+                <span class="token keyword">ON</span> <span class="token number">f</span><span class="token punctuation">.</span>follower_id <span class="token operator">=</span> t1<span class="token punctuation">.</span>user_id <span class="token punctuation">)</span>t3
+        <span class="token keyword">GROUP</span> <span class="token keyword">BY</span>  user_id
+<span class="token punctuation">)</span>t4<span class="token punctuation">;</span>
 </code></pre>
-<p>结果展示：</p>
-<pre class=" language-tex"><code class="language-tex">t1.user_id      t1.month        sum_pv  max_pv  sum_pv_counts
-A       2015-01 33.0    8       33.0
-A       2015-02 10.0    6       43.0
-A       2015-03 38.0    22      81.0
-B       2015-01 30.0    5       30.0
-B       2015-02 15.0    5       45.0
-B       2015-03 44.0    23      89.0
-</code></pre>
-<p>sum() over()只能由列和本身组成，所以我采用了left join的方式来进行做</p>
-<pre class=" language-sql"><code class="language-sql"><span class="token keyword">SELECT</span> <span class="token number">b</span><span class="token punctuation">.</span>user_id <span class="token punctuation">,</span>
-        <span class="token number">b</span><span class="token punctuation">.</span>month <span class="token punctuation">,</span>
-        <span class="token number">b</span><span class="token punctuation">.</span>pv <span class="token punctuation">,</span>
-        <span class="token function">max</span><span class="token punctuation">(</span><span class="token number">b</span><span class="token punctuation">.</span>pv<span class="token punctuation">)</span> <span class="token keyword">over</span><span class="token punctuation">(</span><span class="token keyword">partition</span> <span class="token keyword">by</span> <span class="token number">b</span><span class="token punctuation">.</span>user_id
-<span class="token keyword">ORDER</span> <span class="token keyword">BY</span>  <span class="token number">b</span><span class="token punctuation">.</span>month<span class="token punctuation">)</span> <span class="token keyword">AS</span> max_pv <span class="token punctuation">,</span><span class="token function">sum</span><span class="token punctuation">(</span><span class="token number">b</span><span class="token punctuation">.</span>pv<span class="token punctuation">)</span> <span class="token keyword">over</span><span class="token punctuation">(</span><span class="token keyword">partition</span> <span class="token keyword">by</span> <span class="token number">b</span><span class="token punctuation">.</span>user_id
-<span class="token keyword">ORDER</span> <span class="token keyword">BY</span>  <span class="token number">b</span><span class="token punctuation">.</span>month<span class="token punctuation">)</span> <span class="token keyword">AS</span> sum_pv
-<span class="token keyword">FROM</span> 
-    <span class="token punctuation">(</span><span class="token keyword">SELECT</span> <span class="token number">a</span><span class="token punctuation">.</span>user_id <span class="token keyword">AS</span> user_id <span class="token punctuation">,</span>
-        <span class="token number">a</span><span class="token punctuation">.</span>month <span class="token keyword">AS</span> month <span class="token punctuation">,</span>
-        <span class="token function">sum</span><span class="token punctuation">(</span><span class="token number">a</span><span class="token punctuation">.</span>pv<span class="token punctuation">)</span> <span class="token keyword">AS</span> pv
-    <span class="token keyword">FROM</span> pview <span class="token number">a</span>
-    <span class="token keyword">GROUP</span> <span class="token keyword">BY</span>  <span class="token number">a</span><span class="token punctuation">.</span>user_id<span class="token punctuation">,</span> <span class="token number">a</span><span class="token punctuation">.</span>month <span class="token punctuation">)</span> <span class="token number">b</span> <span class="token punctuation">;</span> 
-</code></pre>
-<p>记住分析函数不会对原来的数据造成任何的影响变化</p>
-<h2 id="hive-rows-range的区别"><a href="#hive-rows-range的区别" class="headerlink" title="hive-rows-range的区别"></a>hive-rows-range的区别</h2><p><strong>窗口帧</strong> 用于从分区中选择指定的多条记录，供窗口函数处理。</p>
-<p>Hive 提供了两种定义窗口帧的形式：<code>ROWS</code> 和 <code>RANGE</code>。</p>
-<p>两种类型都需要配置上界和下界。</p>
-<p>例如，<code>ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW</code> 表示选择分区起始记录到当前记录的所有行；</p>
-<p><code>SUM(close) RANGE BETWEEN 100 PRECEDING AND 200 FOLLOWING</code> 则通过 <em>字段差值</em> 来进行选择。</p>
-<p>如当前行的 <code>close</code> 字段值是 <code>200</code>，那么这个窗口帧的定义就会选择分区中 <code>close</code> 字段值落在 <code>100</code> 至 <code>400</code> 区间的记录。</p>
-<p>以下是所有可能的窗口帧定义组合。如果没有定义窗口帧，则默认为 <code>RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW</code>。</p>
-<pre class=" language-sql"><code class="language-sql"><span class="token keyword">SELECT</span> user_id<span class="token punctuation">,</span>
- month<span class="token punctuation">,</span>
- pv<span class="token punctuation">,</span>
- <span class="token function">sum</span><span class="token punctuation">(</span>pv<span class="token punctuation">)</span> <span class="token keyword">over</span><span class="token punctuation">(</span><span class="token keyword">order</span> <span class="token keyword">by</span> pv range <span class="token operator">BETWEEN</span> <span class="token number">2</span> <span class="token keyword">PRECEDING</span> <span class="token operator">AND</span> <span class="token keyword">CURRENT</span> <span class="token keyword">ROW</span><span class="token punctuation">)</span> sum_pv_counts
-<span class="token keyword">FROM</span> pview
-<span class="token keyword">order</span> <span class="token keyword">by</span> pv<span class="token punctuation">;</span>
-</code></pre>
-<pre class=" language-tex"><code class="language-tex">user_id month   pv      sum_pv_counts
-B       2015-02 10      20.0
-B       2015-03 10      20.0
-B       2015-03 11      11.0
-A       2015-01 15      15.0
-A       2015-03 16      16.0
-A       2015-03 22      22.0
-B       2015-03 23      23.0
-B       2015-01 25      25.0
-A       2015-02 4       4.0
-A       2015-01 5       20.0
-B       2015-01 5       20.0
-A       2015-01 5       20.0
-B       2015-02 5       20.0
-A       2015-02 6       6.0
-A       2015-01 8       8.0
-</code></pre>
-<p>而且计算过的值是不会在进行计算的，而且只是针对于排序之后的值，也就是说，对于排序后相同的值来进行计算</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>其本质是要理解开窗函数执行顺序是和select同一级的，所以group by的结果作为子表供开窗函数使用，开窗函数也是基于group by后的结果进行分析，可以将其定位为select字段一致的用法只不过是加了分析后形成一个新的字段，一个新的属性，常常作为辅助列使用。</p>
-<p>小节<br>本文通过案例来引出对窗口函数的认识，总结了窗口函数的用法及使用规律，该案例主要是对窗口函数在移动计算中的应用，类似于滑动窗口，所谓的滑动窗口也就是指每一行对应对应的数据窗口都不同，通过窗口子句类实现移动计算时数据的范围，也就是窗口每次按行滑动时长度大小，但窗口中每一次对应的数据总是在变化。通过本文你可以获得如下知识：<br>**<br>（1）窗口函数的使用规则及用法<br>（2）窗口子句的使用规则<br>（3）窗口函数的执行顺序及原理<br>（4）窗口函数在移动计算中的应用<br>（5）partition by与group by的区别。</p>
-<p>最后<br>此为SQL窗口函数宇宙最强总结。</p>
+<p>这个一点都不难，思路就是关注表要获取对应的音乐ID和歌手，其它的都没有什么重点了，然后使用array(concat_ws(‘,’,collect_set()))</p>
 
                 
             </div>
@@ -624,7 +678,7 @@ A       2015-01 8       8.0
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://github.com/wmybigdata/2021/09/20/hive-2-SQL%E7%AA%97%E5%8F%A3%E5%87%BD%E6%95%B0%E5%AE%87%E5%AE%99%E6%9C%80%E5%BC%BA%E8%AF%A6%E7%BB%86%E8%AE%B2%E8%A7%A3/">https://github.com/wmybigdata/2021/09/20/hive-2-SQL%E7%AA%97%E5%8F%A3%E5%87%BD%E6%95%B0%E5%AE%87%E5%AE%99%E6%9C%80%E5%BC%BA%E8%AF%A6%E7%BB%86%E8%AE%B2%E8%A7%A3/</a>
+                    <a href="https://github.com/wmybigdata/2021/09/21/hive-%E6%8E%A8%E8%8D%90%E7%B1%BBSQL%E8%A7%A3%E6%B3%95/">https://github.com/wmybigdata/2021/09/21/hive-%E6%8E%A8%E8%8D%90%E7%B1%BBSQL%E8%A7%A3%E6%B3%95/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -833,9 +887,10 @@ A       2015-01 8       8.0
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+                <i class="far fa-dot-circle"></i>&nbsp;本篇
+            </div>
             <div class="card">
                 <a href="/2021/09/21/hive-%E6%8E%A8%E8%8D%90%E7%B1%BBSQL%E8%A7%A3%E6%B3%95/">
                     <div class="card-image">
@@ -853,9 +908,9 @@ A       2015-01 8       8.0
                         
                     </div>
                     <div class="publish-info">
-                        <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2021-09-21
-                        </span>
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-09-21
+                            </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
@@ -868,6 +923,7 @@ A       2015-01 8       8.0
                         </span>
                     </div>
                 </div>
+
                 
                 <div class="card-action article-tags">
                     
@@ -886,13 +942,13 @@ A       2015-01 8       8.0
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2021/09/20/hive-1-SQL%E4%B9%8B%E7%B4%AF%E7%A7%AF%E8%AE%A1%E7%AE%97%E9%97%AE%E9%A2%98/">
+                <a href="/2021/09/20/hive-2-SQL%E7%AA%97%E5%8F%A3%E5%87%BD%E6%95%B0%E5%AE%87%E5%AE%99%E6%9C%80%E5%BC%BA%E8%AF%A6%E7%BB%86%E8%AE%B2%E8%A7%A3/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/13.jpg" class="responsive-img" alt="SQL之累积计算问题">
+                        <img src="/medias/featureimages/22.jpg" class="responsive-img" alt="SQL窗口函数宇宙最强详细讲解">
                         
-                        <span class="card-title">SQL之累积计算问题</span>
+                        <span class="card-title">SQL窗口函数宇宙最强详细讲解</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
