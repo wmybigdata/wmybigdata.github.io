@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="hive-排序常见面试题, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
+    <meta name="keywords" content="hive-SQL算法之分桶重排序算法应用, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
     <meta name="description" content="本网站是个人兴趣爱好，总结分享经验，记录生活点滴的平台，希望在以后的学习旅途中，走出自己的风景。">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -16,7 +16,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>hive-排序常见面试题 | 情深骚明大数据之旅</title>
+    <title>hive-SQL算法之分桶重排序算法应用 | 情深骚明大数据之旅</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -314,12 +314,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/22.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/0.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">hive-排序常见面试题</h1>
+                    <h1 class="description center-align post-title">hive-SQL算法之分桶重排序算法应用</h1>
                 </div>
             </div>
         </div>
@@ -481,52 +481,103 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h1 id="hive-排序常见面试题"><a href="#hive-排序常见面试题" class="headerlink" title="hive-排序常见面试题"></a>hive-排序常见面试题</h1><h2 id="1、order-by"><a href="#1、order-by" class="headerlink" title="1、order by"></a>1、order by</h2><p>order by会对输入做全局排序，因此只有一个Reducer(多个Reducer无法保证全局有序)，然而只有一个Reducer，会导致当输入规模较大时，消耗较长的计算时间。关于order by的详细介绍请参考这篇文章：<a href="http://blog.csdn.net/lzm1340458776/article/details/43230517" target="_blank" rel="noopener">Hive Order by操作</a>。</p>
-<h2 id="2、sort-by"><a href="#2、sort-by" class="headerlink" title="2、sort by"></a>2、sort by</h2><p>sort by不是全局排序，其在数据进入reducer前完成排序，因此，如果用sort by进行排序，并且设置mapred.reduce.tasks&gt;1，则sort by只会保证每个reducer的输出有序，并不保证全局有序。sort by不同于order by，它不受hive.mapred.mode属性的影响，sort by的数据只能保证在同一个reduce中的数据可以按指定字段排序。使用sort by你可以指定执行的reduce个数(通过set mapred.reduce.tasks=n来指定)，对输出的数据再执行归并排序，即可得到全部结果。</p>
-<h2 id="3、distribute-by"><a href="#3、distribute-by" class="headerlink" title="3、distribute by"></a>3、distribute by</h2><p>distribute by是控制在map端如何拆分数据给reduce端的。hive会根据distribute by后面列，对应reduce的个数进行分发，默认是采用hash算法。sort by为每个reduce产生一个排序文件。在有些情况下，你需要控制某个特定行应该到哪个reducer，这通常是为了进行后续的聚集操作。distribute by刚好可以做这件事。因此，distribute by经常和sort by配合使用。</p>
-<p>注：Distribute by和sort by的使用场景</p>
-<p>1.Map输出的文件大小不均。</p>
-<p>2.Reduce输出文件大小不均。</p>
-<p>3.小文件过多。</p>
-<p>4.文件超大。</p>
-<p>set mapred.reduce.tasks=2;</p>
-<p>set mapred.reduce.tasks;  </p>
-<p>select * from temperature distribute by year sort by year asc,tempra desc;</p>
-<h2 id="4、cluster-by"><a href="#4、cluster-by" class="headerlink" title="4、cluster by"></a>4、cluster by</h2><p>cluster by除了具有distribute by的功能外还兼具sort by的功能。但是排序只能是倒叙排序，不能指定排序规则为ASC或者DESC。</p>
-<h2 id="5、案例"><a href="#5、案例" class="headerlink" title="5、案例"></a>5、案例</h2><pre class=" language-sql"><code class="language-sql">year<span class="token punctuation">,</span>tempra
-<span class="token number">2008</span><span class="token punctuation">,</span><span class="token number">30</span><span class="token punctuation">`</span>C
-<span class="token number">2008</span><span class="token punctuation">,</span><span class="token number">35</span><span class="token punctuation">`</span>C
-<span class="token number">2008</span><span class="token punctuation">,</span><span class="token number">32.5</span><span class="token punctuation">`</span>C
-<span class="token number">2008</span><span class="token punctuation">,</span><span class="token number">31.5</span><span class="token punctuation">`</span>C
-<span class="token number">2008</span><span class="token punctuation">,</span><span class="token number">31</span><span class="token punctuation">`</span>C
-<span class="token number">2015</span><span class="token punctuation">,</span><span class="token number">41</span><span class="token punctuation">`</span>C
-<span class="token number">2015</span><span class="token punctuation">,</span><span class="token number">39</span><span class="token punctuation">`</span>C
-<span class="token number">2015</span><span class="token punctuation">,</span><span class="token number">36</span><span class="token punctuation">`</span>C
-<span class="token number">2015</span><span class="token punctuation">,</span><span class="token number">33</span><span class="token punctuation">`</span>C
-<span class="token number">2015</span><span class="token punctuation">,</span><span class="token number">35</span><span class="token punctuation">`</span>C
-<span class="token number">2015</span><span class="token punctuation">,</span><span class="token number">37</span><span class="token punctuation">`</span>C
-
-<span class="token keyword">drop</span> <span class="token keyword">table</span> <span class="token keyword">if</span> <span class="token keyword">exists</span> temperature<span class="token punctuation">;</span>
-<span class="token keyword">create</span> <span class="token keyword">table</span> temperature <span class="token punctuation">(</span>
-year string <span class="token keyword">comment</span> <span class="token string">'年份'</span><span class="token punctuation">,</span>
-tempra string <span class="token keyword">comment</span> <span class="token string">'温度'</span>
-<span class="token punctuation">)</span>
-<span class="token keyword">row</span> format delimited <span class="token keyword">fields</span> <span class="token keyword">terminated by</span> <span class="token string">','</span><span class="token punctuation">;</span>
-
-<span class="token keyword">load</span> <span class="token keyword">data</span> <span class="token keyword">local</span> inpath <span class="token string">'/opt/bigdata/wmy/hive/data/temperature.txt'</span> <span class="token keyword">into</span> <span class="token keyword">table</span> temperature<span class="token punctuation">;</span>
+                <h1 id="SQL算法之分桶重排序"><a href="#SQL算法之分桶重排序" class="headerlink" title="SQL算法之分桶重排序"></a>SQL算法之分桶重排序</h1><h2 id="1、需求描述"><a href="#1、需求描述" class="headerlink" title="1、需求描述"></a>1、需求描述</h2><p>按照一个人的订单日期从 1 开始排序，并计算下一笔订单距离上一笔订单间隔日期。如果间隔日期超过一个月，则消费次数需要 重新排序，请用 HiveSQL 进行实现？</p>
+<p>原始数据表如下：order</p>
+<pre class=" language-sql"><code class="language-sql">客人    订单日期    消费次数    距离上一笔间隔
+A    <span class="token number">2019</span><span class="token operator">/</span><span class="token number">5</span><span class="token operator">/</span><span class="token number">15</span>    <span class="token number">1</span>    <span class="token number">0</span>
+A    <span class="token number">2019</span><span class="token operator">/</span><span class="token number">5</span><span class="token operator">/</span><span class="token number">16</span>    <span class="token number">2</span>    <span class="token number">1</span>
+A    <span class="token number">2019</span><span class="token operator">/</span><span class="token number">5</span><span class="token operator">/</span><span class="token number">19</span>    <span class="token number">3</span>    <span class="token number">3</span>
+A    <span class="token number">2019</span><span class="token operator">/</span><span class="token number">6</span><span class="token operator">/</span><span class="token number">20</span>    <span class="token number">4</span>    <span class="token number">32</span>
+A    <span class="token number">2019</span><span class="token operator">/</span><span class="token number">6</span><span class="token operator">/</span><span class="token number">24</span>    <span class="token number">5</span>    <span class="token number">4</span>
+B    <span class="token number">2019</span><span class="token operator">/</span><span class="token number">5</span><span class="token operator">/</span><span class="token number">20</span>    <span class="token number">1</span>    <span class="token number">0</span>
+B    <span class="token number">2019</span><span class="token operator">/</span><span class="token number">6</span><span class="token operator">/</span><span class="token number">21</span>    <span class="token number">2</span>    <span class="token number">32</span>
+B    <span class="token number">2019</span><span class="token operator">/</span><span class="token number">6</span><span class="token operator">/</span><span class="token number">22</span>    <span class="token number">3</span>    <span class="token number">1</span>
 </code></pre>
-<pre class=" language-sql"><code class="language-sql">year    tempra
-<span class="token number">2015</span>    <span class="token number">41</span><span class="token punctuation">`</span>C
-<span class="token number">2015</span>    <span class="token number">39</span><span class="token punctuation">`</span>C
-<span class="token number">2015</span>    <span class="token number">37</span><span class="token punctuation">`</span>C
-<span class="token number">2015</span>    <span class="token number">36</span><span class="token punctuation">`</span>C
-<span class="token number">2015</span>    <span class="token number">35</span><span class="token punctuation">`</span>C
-<span class="token number">2015</span>    <span class="token number">33</span><span class="token punctuation">`</span>C
-<span class="token number">2008</span>    <span class="token number">35</span><span class="token punctuation">`</span>C
-<span class="token number">2008</span>    <span class="token number">32.5</span><span class="token punctuation">`</span>C
-<span class="token number">2008</span>    <span class="token number">31</span><span class="token punctuation">`</span>C
-<span class="token number">2008</span>    <span class="token number">31.5</span><span class="token punctuation">`</span>C
-<span class="token number">2008</span>    <span class="token number">30</span><span class="token punctuation">`</span>C
+<p>期望获得结果如下：</p>
+<pre class=" language-sql"><code class="language-sql">客人    订单日期    消费次数    距离上一笔间隔    间隔超过一个月消费次数重新排序
+A    <span class="token number">2019</span><span class="token operator">/</span><span class="token number">5</span><span class="token operator">/</span><span class="token number">15</span>    <span class="token number">1</span>    <span class="token number">0</span>                    <span class="token number">1</span>
+A    <span class="token number">2019</span><span class="token operator">/</span><span class="token number">5</span><span class="token operator">/</span><span class="token number">16</span>    <span class="token number">2</span>    <span class="token number">1</span>                    <span class="token number">2</span>
+A    <span class="token number">2019</span><span class="token operator">/</span><span class="token number">5</span><span class="token operator">/</span><span class="token number">19</span>    <span class="token number">3</span>    <span class="token number">3</span>                    <span class="token number">3</span>
+A    <span class="token number">2019</span><span class="token operator">/</span><span class="token number">6</span><span class="token operator">/</span><span class="token number">20</span>    <span class="token number">4</span>    <span class="token number">32</span>                    <span class="token number">1</span>
+A    <span class="token number">2019</span><span class="token operator">/</span><span class="token number">6</span><span class="token operator">/</span><span class="token number">24</span>    <span class="token number">5</span>    <span class="token number">4</span>                    <span class="token number">2</span>
+B    <span class="token number">2019</span><span class="token operator">/</span><span class="token number">5</span><span class="token operator">/</span><span class="token number">20</span>    <span class="token number">1</span>    <span class="token number">0</span>                    <span class="token number">1</span>
+B    <span class="token number">2019</span><span class="token operator">/</span><span class="token number">6</span><span class="token operator">/</span><span class="token number">21</span>    <span class="token number">2</span>    <span class="token number">32</span>                    <span class="token number">1</span>
+B    <span class="token number">2019</span><span class="token operator">/</span><span class="token number">6</span><span class="token operator">/</span><span class="token number">22</span>    <span class="token number">3</span>    <span class="token number">1</span>                    <span class="token number">2</span>
+</code></pre>
+<h2 id="2、表创建和数据准备"><a href="#2、表创建和数据准备" class="headerlink" title="2、表创建和数据准备"></a>2、表创建和数据准备</h2><p>数据准备</p>
+<pre class=" language-sql"><code class="language-sql">A<span class="token punctuation">,</span><span class="token number">2019</span><span class="token operator">-</span><span class="token number">05</span><span class="token operator">-</span><span class="token number">15</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">0</span>
+A<span class="token punctuation">,</span><span class="token number">2019</span><span class="token operator">-</span><span class="token number">05</span><span class="token operator">-</span><span class="token number">16</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">1</span>
+A<span class="token punctuation">,</span><span class="token number">2019</span><span class="token operator">-</span><span class="token number">05</span><span class="token operator">-</span><span class="token number">19</span><span class="token punctuation">,</span><span class="token number">3</span><span class="token punctuation">,</span><span class="token number">3</span>
+A<span class="token punctuation">,</span><span class="token number">2019</span><span class="token operator">-</span><span class="token number">06</span><span class="token operator">-</span><span class="token number">20</span><span class="token punctuation">,</span><span class="token number">4</span><span class="token punctuation">,</span><span class="token number">32</span>
+A<span class="token punctuation">,</span><span class="token number">2019</span><span class="token operator">-</span><span class="token number">06</span><span class="token operator">-</span><span class="token number">24</span><span class="token punctuation">,</span><span class="token number">5</span><span class="token punctuation">,</span><span class="token number">4</span>
+B<span class="token punctuation">,</span><span class="token number">2019</span><span class="token operator">-</span><span class="token number">05</span><span class="token operator">-</span><span class="token number">20</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">0</span>
+B<span class="token punctuation">,</span><span class="token number">2019</span><span class="token operator">-</span><span class="token number">06</span><span class="token operator">-</span><span class="token number">21</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">32</span>
+B<span class="token punctuation">,</span><span class="token number">2019</span><span class="token operator">-</span><span class="token number">06</span><span class="token operator">-</span><span class="token number">22</span><span class="token punctuation">,</span><span class="token number">3</span><span class="token punctuation">,</span><span class="token number">1</span>
+</code></pre>
+<p>创建表</p>
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">drop</span> <span class="token keyword">table</span> <span class="token keyword">if</span> <span class="token keyword">exists</span> t_order<span class="token punctuation">;</span>
+<span class="token keyword">CREATE</span> <span class="token keyword">TABLE</span> t_order <span class="token punctuation">(</span> 
+        customer string <span class="token keyword">comment</span> <span class="token string">'顾客'</span><span class="token punctuation">,</span> 
+        order_dt string <span class="token keyword">comment</span> <span class="token string">'订单时间'</span><span class="token punctuation">,</span>
+        sale_times string <span class="token keyword">comment</span> <span class="token string">'消费次数'</span><span class="token punctuation">,</span>
+        last_diff_day string <span class="token keyword">comment</span> <span class="token string">'相差的天数'</span>
+        <span class="token punctuation">)</span>
+<span class="token keyword">ROW</span> format delimited <span class="token keyword">FIELDS</span> <span class="token keyword">TERMINATED BY</span> <span class="token string">","</span><span class="token punctuation">;</span>
+
+<span class="token keyword">load</span> <span class="token keyword">data</span> <span class="token keyword">local</span> inpath <span class="token string">'/opt/bigdata/wmy/hive/data/t_order.txt'</span> <span class="token keyword">into</span> <span class="token keyword">table</span> t_order<span class="token punctuation">;</span>
+</code></pre>
+<h2 id="3、知识点准备"><a href="#3、知识点准备" class="headerlink" title="3、知识点准备"></a>3、知识点准备</h2><p>tips：</p>
+<p>日期比较函数：datediff语法：datediff(string enddate,string startdate)</p>
+<p>返回值：int</p>
+<p>说明：返回结束日期减去开始日期的天数。</p>
+<p>支持输入的日期格式：</p>
+<p>select datediff(‘2018-12-22’,’2018-12-12’);</p>
+<p>LAG(col,n,DEFAULT) 用于统计窗口内往上第n行值</p>
+<blockquote>
+<p>第一个参数为列名，<br>第二个参数为往上第n行（可选，默认为1），<br>第三个参数为默认值（当往上第n行为NULL时候，取默认值，如不指定，则为NULL）</p>
+</blockquote>
+<h2 id="4、需求实现"><a href="#4、需求实现" class="headerlink" title="4、需求实现"></a>4、需求实现</h2><p>本质是分桶重排序问题，核心问题：如何构建分桶的映射关系</p>
+<p>算法步骤：<br>（1）当前行的日期减去上一行的日期，如果大于30天记录为一个事件用1表示，否则为0<br>（2）按照用户分组，订单日期排序累加步骤（1）的字段值，该值即为分桶的id号<br>（3）并按照用户及桶id进行分组，那么所有的具有相同特征的数据就被分为一个桶<br>（4）桶内重新排序</p>
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">SELECT</span> t2<span class="token punctuation">.</span>customer <span class="token punctuation">,</span>
+        t2<span class="token punctuation">.</span>order_dt <span class="token punctuation">,</span>
+        t2<span class="token punctuation">.</span>sale_times <span class="token punctuation">,</span>
+        t2<span class="token punctuation">.</span>last_diff_day <span class="token punctuation">,</span>
+        t2<span class="token punctuation">.</span>reflag <span class="token punctuation">,</span>
+        t2<span class="token punctuation">.</span>bucket_id <span class="token punctuation">,</span>
+        row_number<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">over</span><span class="token punctuation">(</span><span class="token keyword">partition</span> <span class="token keyword">by</span> t2<span class="token punctuation">.</span>customer<span class="token punctuation">,</span>
+        t2<span class="token punctuation">.</span>bucket_id<span class="token punctuation">)</span> <span class="token keyword">AS</span> final_sort
+<span class="token keyword">FROM</span> 
+    <span class="token punctuation">(</span><span class="token keyword">SELECT</span> <span class="token comment" spellcheck="true">--步骤2：按照用户分组，订单日期排序累加发生事件的次数 t1.customer,</span>
+         t1<span class="token punctuation">.</span>order_dt<span class="token punctuation">,</span>
+         t1<span class="token punctuation">.</span>sale_times<span class="token punctuation">,</span>
+         t1<span class="token punctuation">.</span>last_diff_day<span class="token punctuation">,</span>
+         t1<span class="token punctuation">.</span>reflag<span class="token punctuation">,</span>
+         <span class="token function">sum</span><span class="token punctuation">(</span>t1<span class="token punctuation">.</span>reflag<span class="token punctuation">)</span> <span class="token keyword">over</span><span class="token punctuation">(</span><span class="token keyword">partition</span> <span class="token keyword">by</span> t1<span class="token punctuation">.</span>customer
+    <span class="token keyword">ORDER</span> <span class="token keyword">BY</span>  t1<span class="token punctuation">.</span>order_dt<span class="token punctuation">)</span> <span class="token keyword">AS</span> bucket_id
+    <span class="token keyword">FROM</span> 
+        <span class="token punctuation">(</span><span class="token keyword">SELECT</span> <span class="token comment" spellcheck="true">--步骤1：当前行的日期减去上一行的日期，如果大于30天记录为一个事件用1表示，否则为0 customer,</span>
+         order_dt<span class="token punctuation">,</span>
+         sale_times<span class="token punctuation">,</span>
+         last_diff_day<span class="token punctuation">,</span>
+        
+            <span class="token keyword">CASE</span>
+            <span class="token keyword">WHEN</span> datediff<span class="token punctuation">(</span>order_dt<span class="token punctuation">,</span>lag<span class="token punctuation">(</span>order_dt<span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token keyword">over</span><span class="token punctuation">(</span><span class="token keyword">partition</span> <span class="token keyword">by</span> customer
+        <span class="token keyword">ORDER</span> <span class="token keyword">BY</span>  order_dt<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">></span> <span class="token number">30</span> <span class="token keyword">THEN</span>
+            <span class="token number">1</span>
+            <span class="token keyword">ELSE</span> <span class="token number">0</span>
+            <span class="token keyword">END</span> <span class="token keyword">AS</span> reflag
+        <span class="token keyword">FROM</span> wmy<span class="token punctuation">.</span>t_order <span class="token punctuation">)</span>t1 <span class="token punctuation">)</span>t2<span class="token punctuation">;</span>
+</code></pre>
+<h2 id="5、展现的效果"><a href="#5、展现的效果" class="headerlink" title="5、展现的效果"></a>5、展现的效果</h2><pre class=" language-sql"><code class="language-sql">t2<span class="token punctuation">.</span>customer     t2<span class="token punctuation">.</span>order_dt     t2<span class="token punctuation">.</span>sale_times   t2<span class="token punctuation">.</span>last_diff_day        t2<span class="token punctuation">.</span>reflag       t2<span class="token punctuation">.</span>bucket_id    final_sort
+A       <span class="token number">2019</span><span class="token operator">-</span><span class="token number">05</span><span class="token operator">-</span><span class="token number">19</span>      <span class="token number">3</span>       <span class="token number">3</span>       <span class="token number">0</span>       <span class="token number">0</span>       <span class="token number">1</span>
+A       <span class="token number">2019</span><span class="token operator">-</span><span class="token number">05</span><span class="token operator">-</span><span class="token number">16</span>      <span class="token number">2</span>       <span class="token number">1</span>       <span class="token number">0</span>       <span class="token number">0</span>       <span class="token number">2</span>
+A       <span class="token number">2019</span><span class="token operator">-</span><span class="token number">05</span><span class="token operator">-</span><span class="token number">15</span>      <span class="token number">1</span>       <span class="token number">0</span>       <span class="token number">0</span>       <span class="token number">0</span>       <span class="token number">3</span>
+A       <span class="token number">2019</span><span class="token operator">-</span><span class="token number">06</span><span class="token operator">-</span><span class="token number">24</span>      <span class="token number">5</span>       <span class="token number">4</span>       <span class="token number">0</span>       <span class="token number">1</span>       <span class="token number">1</span>
+A       <span class="token number">2019</span><span class="token operator">-</span><span class="token number">06</span><span class="token operator">-</span><span class="token number">20</span>      <span class="token number">4</span>       <span class="token number">32</span>      <span class="token number">1</span>       <span class="token number">1</span>       <span class="token number">2</span>
+B       <span class="token number">2019</span><span class="token operator">-</span><span class="token number">05</span><span class="token operator">-</span><span class="token number">20</span>      <span class="token number">1</span>       <span class="token number">0</span>       <span class="token number">0</span>       <span class="token number">0</span>       <span class="token number">1</span>
+B       <span class="token number">2019</span><span class="token operator">-</span><span class="token number">06</span><span class="token operator">-</span><span class="token number">22</span>      <span class="token number">3</span>       <span class="token number">1</span>       <span class="token number">0</span>       <span class="token number">1</span>       <span class="token number">1</span>
+B       <span class="token number">2019</span><span class="token operator">-</span><span class="token number">06</span><span class="token operator">-</span><span class="token number">21</span>      <span class="token number">2</span>       <span class="token number">32</span>      <span class="token number">1</span>       <span class="token number">1</span>       <span class="token number">2</span>
+Time taken: <span class="token number">89.626</span> seconds<span class="token punctuation">,</span> Fetched: <span class="token number">8</span> <span class="token keyword">row</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span>
 </code></pre>
 
                 
@@ -554,7 +605,7 @@ tempra string <span class="token keyword">comment</span> <span class="token stri
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://github.com/wmybigdata/2021/09/22/hive-%E6%8E%92%E5%BA%8F%E5%B8%B8%E8%A7%81%E9%9D%A2%E8%AF%95%E9%A2%98/">https://github.com/wmybigdata/2021/09/22/hive-%E6%8E%92%E5%BA%8F%E5%B8%B8%E8%A7%81%E9%9D%A2%E8%AF%95%E9%A2%98/</a>
+                    <a href="https://github.com/wmybigdata/2021/09/22/hive-SQL%E7%AE%97%E6%B3%95%E4%B9%8B%E5%88%86%E6%A1%B6%E9%87%8D%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95%E5%BA%94%E7%94%A8/">https://github.com/wmybigdata/2021/09/22/hive-SQL%E7%AE%97%E6%B3%95%E4%B9%8B%E5%88%86%E6%A1%B6%E9%87%8D%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95%E5%BA%94%E7%94%A8/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -767,13 +818,13 @@ tempra string <span class="token keyword">comment</span> <span class="token stri
             <div class="article-badge left-badge text-color">
                 <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2021/09/22/hive-SQL%E7%AE%97%E6%B3%95%E4%B9%8B%E5%88%86%E6%A1%B6%E9%87%8D%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95%E5%BA%94%E7%94%A8/">
+                <a href="/2021/09/22/hive-%E5%88%86%E6%9E%90%E7%AA%97%E5%8F%A3%E5%87%BD%E6%95%B0/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/0.jpg" class="responsive-img" alt="hive-SQL算法之分桶重排序算法应用">
+                        <img src="/medias/featureimages/14.jpg" class="responsive-img" alt="hive-分析窗口函数">
                         
-                        <span class="card-title">hive-SQL算法之分桶重排序算法应用</span>
+                        <span class="card-title">hive-分析窗口函数</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -788,23 +839,11 @@ tempra string <span class="token keyword">comment</span> <span class="token stri
                         </span>
                         <span class="publish-author">
                             
-                            <i class="fas fa-bookmark fa-fw icon-category"></i>
-                            
-                            <a href="/categories/hive/" class="post-category">
-                                    hive
-                                </a>
-                            
+                            <i class="fas fa-user fa-fw"></i>
+                            情深骚明
                             
                         </span>
                     </div>
-                </div>
-                
-                <div class="card-action article-tags">
-                    
-                    <a href="/tags/hive/">
-                        <span class="chip bg-color">hive</span>
-                    </a>
-                    
                 </div>
                 
             </div>
@@ -816,13 +855,13 @@ tempra string <span class="token keyword">comment</span> <span class="token stri
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2021/09/22/hive-%E6%B1%82%E9%83%A8%E9%97%A8%E7%AC%AC%E4%BA%8C%E9%AB%98%E8%96%AA%E6%B0%B4/">
+                <a href="/2021/09/22/hive-%E6%8E%92%E5%BA%8F%E5%B8%B8%E8%A7%81%E9%9D%A2%E8%AF%95%E9%A2%98/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/13.jpg" class="responsive-img" alt="hive-求部门第二高薪水">
+                        <img src="/medias/featureimages/22.jpg" class="responsive-img" alt="hive-排序常见面试题">
                         
-                        <span class="card-title">hive-求部门第二高薪水</span>
+                        <span class="card-title">hive-排序常见面试题</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
