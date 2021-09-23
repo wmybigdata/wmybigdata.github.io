@@ -4,6 +4,31 @@
   
     
     <entry>
+      <title>hive-count详解</title>
+      <link href="/2021/09/23/hive-count%E8%AF%A6%E8%A7%A3/"/>
+      <url>/2021/09/23/hive-count%E8%AF%A6%E8%A7%A3/</url>
+      
+        <content type="html"><![CDATA[<h1 id="count详解"><a href="#count详解" class="headerlink" title="count详解"></a>count详解</h1><h2 id="1、执行结果"><a href="#1、执行结果" class="headerlink" title="1、执行结果"></a>1、执行结果</h2><p>count(*)包括了所有的列，相当于行数，在统计结果的时候，不会忽略列值为NULL</p><p>count(1)包括了忽略所有列，用1代表代码行，在统计结果的时候，不会忽略列值为NULL</p><p>count(列名)只包括列名那一列，在统计结果的时候，会忽略列值为空（这里的空不是只空字符串或者0，而是表示null）的计数，即某个字段值为NULL时，不统计</p><h2 id="2、执行效率"><a href="#2、执行效率" class="headerlink" title="2、执行效率"></a>2、执行效率</h2><p>如果列为主键，count(列名)效率优于count(1)</p><p>如果列不为主键，count(1)效率优于count(列名)</p><p>如果表中存在主键，count(主键列名)效率最优</p><p>如果表中只有一列，则count(*)效率最优</p><p>如果表有多列，且不存在主键，则count(1)效率优于count(*)</p><h2 id="3、hive执行顺序"><a href="#3、hive执行顺序" class="headerlink" title="3、hive执行顺序"></a>3、hive执行顺序</h2><pre class=" language-sql"><code class="language-sql"><span class="token number">1</span><span class="token punctuation">.</span><span class="token keyword">from</span>  <span class="token number">2</span><span class="token punctuation">.</span><span class="token keyword">join</span> <span class="token keyword">on</span> 或 lateral <span class="token keyword">view</span> explode<span class="token punctuation">(</span>需炸裂的列<span class="token punctuation">)</span>  tbl   <span class="token keyword">as</span>  炸裂后的列名 <span class="token number">3</span><span class="token punctuation">.</span><span class="token keyword">where</span> <span class="token number">4</span><span class="token punctuation">.</span><span class="token keyword">group</span> <span class="token keyword">by</span>   <span class="token number">5</span><span class="token punctuation">.</span>聚合函数 如<span class="token function">Sum</span><span class="token punctuation">(</span><span class="token punctuation">)</span>  <span class="token function">avg</span><span class="token punctuation">(</span><span class="token punctuation">)</span>  <span class="token function">count</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>等 <span class="token number">6</span><span class="token punctuation">.</span><span class="token keyword">having</span>  在此开始可以使用<span class="token keyword">select</span>中的别名 <span class="token number">7</span><span class="token punctuation">.</span><span class="token keyword">select</span>  若包含<span class="token keyword">over</span>（）开窗函数，此时<span class="token keyword">select</span>中的内容作为窗口函数的输入，窗口中所选的数据范围也是在<span class="token keyword">group</span> <span class="token keyword">by</span>，<span class="token keyword">having</span>之后，并不是针对<span class="token keyword">where</span>后的数据进行开窗，这点要注意。需要注意开窗函数的执行顺序及时间点。 <span class="token number">8</span><span class="token punctuation">.</span><span class="token keyword">distinct</span> <span class="token number">9</span><span class="token punctuation">.</span><span class="token keyword">order</span> <span class="token keyword">by</span> </code></pre>]]></content>
+      
+      
+      <categories>
+          
+          <category> hive </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> hive </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>hive-SQL中的sumif统计问题</title>
       <link href="/2021/09/23/hive-SQL%E4%B8%AD%E7%9A%84sumif%E7%BB%9F%E8%AE%A1%E9%97%AE%E9%A2%98/"/>
       <url>/2021/09/23/hive-SQL%E4%B8%AD%E7%9A%84sumif%E7%BB%9F%E8%AE%A1%E9%97%AE%E9%A2%98/</url>
