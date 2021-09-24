@@ -4,6 +4,31 @@
   
     
     <entry>
+      <title>大数据面试题集合</title>
+      <link href="/2021/09/24/%E5%A4%A7%E6%95%B0%E6%8D%AE%E9%9D%A2%E8%AF%95%E9%A2%98%E9%9B%86%E5%90%88/"/>
+      <url>/2021/09/24/%E5%A4%A7%E6%95%B0%E6%8D%AE%E9%9D%A2%E8%AF%95%E9%A2%98%E9%9B%86%E5%90%88/</url>
+      
+        <content type="html"><![CDATA[<h1 id="大数据面试题集合"><a href="#大数据面试题集合" class="headerlink" title="大数据面试题集合"></a>大数据面试题集合</h1><h2 id="1、数据仓库"><a href="#1、数据仓库" class="headerlink" title="1、数据仓库"></a>1、数据仓库</h2><h2 id="2、Hive"><a href="#2、Hive" class="headerlink" title="2、Hive"></a>2、Hive</h2><h2 id="3、Spark"><a href="#3、Spark" class="headerlink" title="3、Spark"></a>3、Spark</h2><h2 id="4、Kafka"><a href="#4、Kafka" class="headerlink" title="4、Kafka"></a>4、Kafka</h2><h2 id="5、HBASE"><a href="#5、HBASE" class="headerlink" title="5、HBASE"></a>5、HBASE</h2><h2 id="6、Hadoop"><a href="#6、Hadoop" class="headerlink" title="6、Hadoop"></a>6、Hadoop</h2><h2 id="7、Flink"><a href="#7、Flink" class="headerlink" title="7、Flink"></a>7、Flink</h2><h2 id="8、Java"><a href="#8、Java" class="headerlink" title="8、Java"></a>8、Java</h2><h2 id="9、ES"><a href="#9、ES" class="headerlink" title="9、ES"></a>9、ES</h2><h2 id="10、Flume"><a href="#10、Flume" class="headerlink" title="10、Flume"></a>10、Flume</h2><h2 id="11、Sqoop"><a href="#11、Sqoop" class="headerlink" title="11、Sqoop"></a>11、Sqoop</h2><h2 id="12、Redis"><a href="#12、Redis" class="headerlink" title="12、Redis"></a>12、Redis</h2><h2 id="13、MySQL"><a href="#13、MySQL" class="headerlink" title="13、MySQL"></a>13、MySQL</h2><h2 id="14、数据结构与算法"><a href="#14、数据结构与算法" class="headerlink" title="14、数据结构与算法"></a>14、数据结构与算法</h2><h2 id="15、Linux"><a href="#15、Linux" class="headerlink" title="15、Linux"></a>15、Linux</h2><h2 id="16、Clickhouse"><a href="#16、Clickhouse" class="headerlink" title="16、Clickhouse"></a>16、Clickhouse</h2>]]></content>
+      
+      
+      <categories>
+          
+          <category> 情深骚明面试集 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 情深骚明面试集 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>hive-SQL取出累计值与1000相差最小差值的id</title>
       <link href="/2021/09/24/hive-SQL%E5%8F%96%E5%87%BA%E7%B4%AF%E8%AE%A1%E5%80%BC%E4%B8%8E1000%E7%9B%B8%E5%B7%AE%E6%9C%80%E5%B0%8F%E5%B7%AE%E5%80%BC%E7%9A%84id/"/>
       <url>/2021/09/24/hive-SQL%E5%8F%96%E5%87%BA%E7%B4%AF%E8%AE%A1%E5%80%BC%E4%B8%8E1000%E7%9B%B8%E5%B7%AE%E6%9C%80%E5%B0%8F%E5%B7%AE%E5%80%BC%E7%9A%84id/</url>
