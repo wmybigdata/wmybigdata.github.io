@@ -481,7 +481,131 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h1 id="SQL取出累计值"><a href="#SQL取出累计值" class="headerlink" title="SQL取出累计值"></a>SQL取出累计值</h1>
+                <h1 id="SQL取出累计值"><a href="#SQL取出累计值" class="headerlink" title="SQL取出累计值"></a>SQL取出累计值</h1><h2 id="1、需求分析"><a href="#1、需求分析" class="headerlink" title="1、需求分析"></a>1、需求分析</h2><p>​    问题: table1（id：自增id，money：费用）问题：按id顺序累加money，取出累计值与1000相差绝对值最小差值的id。</p>
+<h2 id="2、数据准备"><a href="#2、数据准备" class="headerlink" title="2、数据准备"></a>2、数据准备</h2><pre class=" language-sql"><code class="language-sql"><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">100</span>
+<span class="token number">2</span><span class="token punctuation">,</span><span class="token number">300</span>
+<span class="token number">3</span><span class="token punctuation">,</span><span class="token number">500</span>
+<span class="token number">4</span><span class="token punctuation">,</span><span class="token number">700</span>
+<span class="token number">5</span><span class="token punctuation">,</span><span class="token number">200</span>
+<span class="token number">6</span><span class="token punctuation">,</span><span class="token number">400</span>
+<span class="token number">7</span><span class="token punctuation">,</span><span class="token number">500</span>
+<span class="token number">8</span><span class="token punctuation">,</span><span class="token number">700</span>
+<span class="token number">9</span><span class="token punctuation">,</span><span class="token number">900</span>
+<span class="token number">10</span><span class="token punctuation">,</span><span class="token number">100</span>
+<span class="token number">11</span><span class="token punctuation">,</span><span class="token number">400</span>
+<span class="token number">12</span><span class="token punctuation">,</span><span class="token number">700</span>
+</code></pre>
+<h2 id="3、数据建表和导入"><a href="#3、数据建表和导入" class="headerlink" title="3、数据建表和导入"></a>3、数据建表和导入</h2><pre class=" language-sql"><code class="language-sql"><span class="token keyword">create</span> <span class="token keyword">table</span> <span class="token keyword">if</span> <span class="token operator">not</span> <span class="token keyword">exists</span> money<span class="token punctuation">(</span>
+id string<span class="token punctuation">,</span>
+money string
+<span class="token punctuation">)</span>
+<span class="token keyword">row</span> format delimited
+<span class="token keyword">fields</span> <span class="token keyword">terminated by</span> <span class="token string">','</span><span class="token punctuation">;</span>
+</code></pre>
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">load</span> <span class="token keyword">data</span> <span class="token keyword">local</span> inpath <span class="token string">'/opt/bigdata/wmy/hive/data/money.txt'</span> <span class="token keyword">into</span> <span class="token keyword">table</span> money<span class="token punctuation">;</span>
+</code></pre>
+<h2 id="4、需求实现"><a href="#4、需求实现" class="headerlink" title="4、需求实现"></a>4、需求实现</h2><h3 id="4-1-sum-over-first-value-over"><a href="#4-1-sum-over-first-value-over" class="headerlink" title="4.1 sum() over() first_value over()"></a>4.1 sum() over() first_value over()</h3><pre class=" language-sql"><code class="language-sql"><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span>
+<span class="token keyword">select</span> 
+id<span class="token punctuation">,</span>
+<span class="token function">sum</span><span class="token punctuation">(</span>money<span class="token punctuation">)</span> <span class="token keyword">over</span><span class="token punctuation">(</span><span class="token keyword">order</span> <span class="token keyword">by</span> id<span class="token punctuation">)</span>
+<span class="token keyword">from</span> money<span class="token punctuation">;</span>
+<span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span>
+id      sum_window_0
+<span class="token number">1</span>       <span class="token number">100.0</span>
+<span class="token number">10</span>      <span class="token number">200.0</span>
+<span class="token number">11</span>      <span class="token number">600.0</span>
+<span class="token number">12</span>      <span class="token number">1300.0</span>
+<span class="token number">2</span>       <span class="token number">1600.0</span>
+<span class="token number">3</span>       <span class="token number">2100.0</span>
+<span class="token number">4</span>       <span class="token number">2800.0</span>
+<span class="token number">5</span>       <span class="token number">3000.0</span>
+<span class="token number">6</span>       <span class="token number">3400.0</span>
+<span class="token number">7</span>       <span class="token number">3900.0</span>
+<span class="token number">8</span>       <span class="token number">4600.0</span>
+<span class="token number">9</span>       <span class="token number">5500.0</span>
+Time taken: <span class="token number">10.354</span> seconds<span class="token punctuation">,</span> Fetched: <span class="token number">12</span> <span class="token keyword">row</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span>
+<span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span>
+<span class="token keyword">select</span> 
+id<span class="token punctuation">,</span>
+abs<span class="token punctuation">(</span><span class="token function">sum</span><span class="token punctuation">(</span>money<span class="token punctuation">)</span> <span class="token keyword">over</span><span class="token punctuation">(</span><span class="token keyword">order</span> <span class="token keyword">by</span> id<span class="token punctuation">)</span> <span class="token operator">-</span> <span class="token number">1000</span><span class="token punctuation">)</span> 
+<span class="token keyword">from</span> money<span class="token punctuation">;</span>
+<span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span>
+id      _c1
+<span class="token number">1</span>       <span class="token number">900.0</span>
+<span class="token number">10</span>      <span class="token number">800.0</span>
+<span class="token number">11</span>      <span class="token number">400.0</span>
+<span class="token number">12</span>      <span class="token number">300.0</span>
+<span class="token number">2</span>       <span class="token number">600.0</span>
+<span class="token number">3</span>       <span class="token number">1100.0</span>
+<span class="token number">4</span>       <span class="token number">1800.0</span>
+<span class="token number">5</span>       <span class="token number">2000.0</span>
+<span class="token number">6</span>       <span class="token number">2400.0</span>
+<span class="token number">7</span>       <span class="token number">2900.0</span>
+<span class="token number">8</span>       <span class="token number">3600.0</span>
+<span class="token number">9</span>       <span class="token number">4500.0</span>
+Time taken: <span class="token number">10.423</span> seconds<span class="token punctuation">,</span> Fetched: <span class="token number">12</span> <span class="token keyword">row</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span>
+<span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span>
+<span class="token keyword">select</span>
+id<span class="token punctuation">,</span>
+first_value<span class="token punctuation">(</span>sum_abs_money<span class="token punctuation">)</span> <span class="token keyword">over</span><span class="token punctuation">(</span><span class="token keyword">order</span> <span class="token keyword">by</span> sum_abs_money<span class="token punctuation">)</span>
+<span class="token keyword">from</span> 
+<span class="token punctuation">(</span>
+<span class="token keyword">select</span> 
+id<span class="token punctuation">,</span>
+abs<span class="token punctuation">(</span><span class="token function">sum</span><span class="token punctuation">(</span>money<span class="token punctuation">)</span> <span class="token keyword">over</span><span class="token punctuation">(</span><span class="token keyword">order</span> <span class="token keyword">by</span> id<span class="token punctuation">)</span> <span class="token operator">-</span> <span class="token number">1000</span><span class="token punctuation">)</span> sum_abs_money
+<span class="token keyword">from</span> money
+<span class="token punctuation">)</span>t1
+<span class="token keyword">limit</span> <span class="token number">1</span><span class="token punctuation">;</span>
+<span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span>
+id      first_value_window_0
+<span class="token number">12</span>      <span class="token number">300.0</span>
+Time taken: <span class="token number">16.18</span> seconds<span class="token punctuation">,</span> Fetched: <span class="token number">1</span> <span class="token keyword">row</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span>
+</code></pre>
+<h3 id="4-2-sum-over-dense-rank"><a href="#4-2-sum-over-dense-rank" class="headerlink" title="4.2 sum() over() dense_rank()"></a>4.2 sum() over() dense_rank()</h3><pre class=" language-sql"><code class="language-sql"><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span>
+<span class="token keyword">select</span> 
+id<span class="token punctuation">,</span>
+sum_abs_money
+<span class="token keyword">from</span>
+<span class="token punctuation">(</span>
+<span class="token keyword">select</span> 
+id<span class="token punctuation">,</span>
+sum_abs_money<span class="token punctuation">,</span>
+dense_rank<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">over</span><span class="token punctuation">(</span><span class="token keyword">order</span> <span class="token keyword">by</span> sum_abs_money<span class="token punctuation">)</span> dk
+<span class="token keyword">from</span>
+<span class="token punctuation">(</span>
+<span class="token keyword">select</span> 
+id<span class="token punctuation">,</span>
+abs<span class="token punctuation">(</span><span class="token function">sum</span><span class="token punctuation">(</span>money<span class="token punctuation">)</span> <span class="token keyword">over</span><span class="token punctuation">(</span><span class="token keyword">order</span> <span class="token keyword">by</span> id<span class="token punctuation">)</span> <span class="token operator">-</span> <span class="token number">1000</span><span class="token punctuation">)</span> sum_abs_money
+<span class="token keyword">from</span> money
+<span class="token punctuation">)</span>t1
+<span class="token punctuation">)</span>t2
+<span class="token keyword">where</span> dk <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+
+<span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span>
+id      sum_abs_money   dk
+<span class="token number">12</span>      <span class="token number">300.0</span>   <span class="token number">1</span>
+<span class="token number">11</span>      <span class="token number">400.0</span>   <span class="token number">2</span>
+<span class="token number">2</span>       <span class="token number">600.0</span>   <span class="token number">3</span>
+<span class="token number">10</span>      <span class="token number">800.0</span>   <span class="token number">4</span>
+<span class="token number">1</span>       <span class="token number">900.0</span>   <span class="token number">5</span>
+<span class="token number">3</span>       <span class="token number">1100.0</span>  <span class="token number">6</span>
+<span class="token number">4</span>       <span class="token number">1800.0</span>  <span class="token number">7</span>
+<span class="token number">5</span>       <span class="token number">2000.0</span>  <span class="token number">8</span>
+<span class="token number">6</span>       <span class="token number">2400.0</span>  <span class="token number">9</span>
+<span class="token number">7</span>       <span class="token number">2900.0</span>  <span class="token number">10</span>
+<span class="token number">8</span>       <span class="token number">3600.0</span>  <span class="token number">11</span>
+<span class="token number">9</span>       <span class="token number">4500.0</span>  <span class="token number">12</span>
+Time taken: <span class="token number">14.076</span> seconds<span class="token punctuation">,</span> Fetched: <span class="token number">12</span> <span class="token keyword">row</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span>
+<span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span>
+id      sum_abs_money
+<span class="token number">12</span>      <span class="token number">300.0</span>
+Time taken: <span class="token number">6.816</span> seconds<span class="token punctuation">,</span> Fetched: <span class="token number">1</span> <span class="token keyword">row</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span>
+</code></pre>
+<h2 id="5、总结"><a href="#5、总结" class="headerlink" title="5、总结"></a>5、总结</h2><p>考察的知识点</p>
+<p>1、sum() over() 熟练掌握</p>
+<p>2、排序函数的熟练掌握</p>
+<p>3、first_value()函数的数量掌握</p>
+
                 
             </div>
             <hr/>
