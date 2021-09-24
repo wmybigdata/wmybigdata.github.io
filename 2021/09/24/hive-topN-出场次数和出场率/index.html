@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="hive-SQL分桶问题, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
+    <meta name="keywords" content="hive-topN-出场次数和出场率, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
     <meta name="description" content="本网站是个人兴趣爱好，总结分享经验，记录生活点滴的平台，希望在以后的学习旅途中，走出自己的风景。">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -16,7 +16,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>hive-SQL分桶问题 | 情深骚明大数据之旅</title>
+    <title>hive-topN-出场次数和出场率 | 情深骚明大数据之旅</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -314,12 +314,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/11.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/15.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">hive-SQL分桶问题</h1>
+                    <h1 class="description center-align post-title">hive-topN-出场次数和出场率</h1>
                 </div>
             </div>
         </div>
@@ -481,76 +481,49 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h1 id="SQL分桶问题"><a href="#SQL分桶问题" class="headerlink" title="SQL分桶问题"></a>SQL分桶问题</h1><h2 id="1、需求分析"><a href="#1、需求分析" class="headerlink" title="1、需求分析"></a>1、需求分析</h2><p>现有交易数据表user_trade如下：</p>
+                <h1 id="hive-topN"><a href="#hive-topN" class="headerlink" title="hive-topN"></a>hive-topN</h1><h2 id="1、需求分析"><a href="#1、需求分析" class="headerlink" title="1、需求分析"></a>1、需求分析</h2><p>英雄表如下：</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210924075753382.png" alt="英雄表"></p>
 <ul>
-<li>user_id 用户id</li>
-<li>pay_amount 用户支付额度</li>
+<li>求英雄的出场排名top3的出场次数及出场率。names代表英雄名字</li>
 </ul>
-<p>现在老板想知道支付金额在前20%的用户。</p>
-<p>输出要求如下：</p>
-<ul>
-<li>user_id用户名（前20%的用户）</li>
-</ul>
-<h2 id="2、数据准备"><a href="#2、数据准备" class="headerlink" title="2、数据准备"></a>2、数据准备</h2><pre class=" language-text"><code class="language-text">1001,100.7
-1001,70.8
-1002,50.4
-1003,70
-1005,100.5
-1002,80.1
-1003,36.7
-1004,38.5
-1003,50
-1004,30
-1004,300.5
-1005,500
-1005,3
-1006,260.1
-1007,360.4
-1008,680
+<h2 id="2、数据准备"><a href="#2、数据准备" class="headerlink" title="2、数据准备"></a>2、数据准备</h2><p>id|names</p>
+<pre class=" language-sql"><code class="language-sql"><span class="token number">1</span><span class="token operator">|</span><span class="token number">aa</span><span class="token punctuation">,</span><span class="token number">bb</span><span class="token punctuation">,</span><span class="token number">cc</span><span class="token punctuation">,</span><span class="token number">dd</span><span class="token punctuation">,</span><span class="token number">ee</span>
+<span class="token number">2</span><span class="token operator">|</span><span class="token number">aa</span><span class="token punctuation">,</span><span class="token number">bb</span><span class="token punctuation">,</span><span class="token number">ff</span><span class="token punctuation">,</span>ww<span class="token punctuation">,</span>qq
+<span class="token number">3</span><span class="token operator">|</span><span class="token number">aa</span><span class="token punctuation">,</span><span class="token number">cc</span><span class="token punctuation">,</span>rr<span class="token punctuation">,</span>yy
+<span class="token number">4</span><span class="token operator">|</span><span class="token number">aa</span><span class="token punctuation">,</span><span class="token number">bb</span><span class="token punctuation">,</span><span class="token number">dd</span><span class="token punctuation">,</span>oo<span class="token punctuation">,</span>pp
 </code></pre>
-<h2 id="3、创建表和导入"><a href="#3、创建表和导入" class="headerlink" title="3、创建表和导入"></a>3、创建表和导入</h2><pre class=" language-sql"><code class="language-sql"><span class="token keyword">drop</span> <span class="token keyword">table</span> <span class="token keyword">if</span> <span class="token keyword">exists</span> user_trade<span class="token punctuation">;</span>
-<span class="token keyword">CREATE</span> <span class="token keyword">TABLE</span> user_trade <span class="token punctuation">(</span> 
-       user_id string<span class="token punctuation">,</span>
-       pay_amount <span class="token keyword">double</span>
- <span class="token punctuation">)</span>
-<span class="token keyword">ROW</span> format delimited <span class="token keyword">FIELDS</span> <span class="token keyword">TERMINATED BY</span> <span class="token string">","</span><span class="token punctuation">;</span>
+<h2 id="3、创建表和数据导入"><a href="#3、创建表和数据导入" class="headerlink" title="3、创建表和数据导入"></a>3、创建表和数据导入</h2><pre class=" language-sql"><code class="language-sql"><span class="token keyword">create</span> <span class="token keyword">table</span> <span class="token keyword">if</span> <span class="token operator">not</span> <span class="token keyword">exists</span> heros<span class="token punctuation">(</span>
+id <span class="token keyword">int</span><span class="token punctuation">,</span>
+names string
+<span class="token punctuation">)</span> 
+<span class="token keyword">row</span> format delimited <span class="token keyword">fields</span> <span class="token keyword">terminated by</span> <span class="token string">'|'</span><span class="token punctuation">;</span>
 </code></pre>
-<pre class=" language-sql"><code class="language-sql"><span class="token keyword">load</span> <span class="token keyword">data</span> <span class="token keyword">local</span> inpath <span class="token string">'/opt/bigdata/wmy/hive/data/user_trade.txt'</span> <span class="token keyword">into</span> <span class="token keyword">table</span> user_trade<span class="token punctuation">;</span> 
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">load</span> <span class="token keyword">data</span> <span class="token keyword">local</span> inpath <span class="token string">'/opt/bigdata/wmy/hive/data/heros.txt'</span> <span class="token keyword">into</span> <span class="token keyword">table</span> heros<span class="token punctuation">;</span>
 </code></pre>
-<h2 id="4、需求实现"><a href="#4、需求实现" class="headerlink" title="4、需求实现"></a>4、需求实现</h2><h3 id="4-1-Ntile函数"><a href="#4-1-Ntile函数" class="headerlink" title="4.1 Ntile函数"></a>4.1 Ntile函数</h3><p>首先介绍一个窗口函数，与此题高度相关，以后工作中也会用得到</p>
-<p>Ntile函数使用<br>可以看成是：它把有序的数据集合平均分配到指定的数量（num）个桶中, 将桶号分配给每一行。如果不能平均分配，则优先分配较小编号的桶，并且各个桶中能放的行数最多相差1。（这个算法在很多当中使用，spark中数据分片的时候也是这个算法，只不过是不均匀的时候，优先分配给较大编号的分片，如下图所示）</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210924074323244.png" alt="位置"></p>
-<p>语法是：ntile (num) over ([partition_clause] order_by_clause) as your_bucket_num<br>然后可以根据桶号，选取前或后 n分之几的数据。<br>数据会完整展示出来，只是给相应的数据打标签；具体要取几分之几的数据，需要再嵌套一层根据标签取出。<br>NTILE不支持ROWS BETWEEN，比如 NTILE(2) OVER(PARTITION BY cookieid ORDER BY createtime ROWS BETWEEN 3 PRECEDING AND CURRENT ROW)。<br>本题要求的是支付金额前20%的用户，通过上述ntile函数分析 可知需要分5个桶，是对数据用户支付的总金额进行标签，然后求出对应的用户。具体SQL如下：</p>
-<h3 id="4-2-SQL实现"><a href="#4-2-SQL实现" class="headerlink" title="4.2 SQL实现"></a>4.2 SQL实现</h3><pre class=" language-sql"><code class="language-sql"><span class="token keyword">SELECT</span> user_id<span class="token punctuation">,</span>
-         sum_pay_amount<span class="token punctuation">,</span>
-         level
+<h2 id="4、数据分析"><a href="#4、数据分析" class="headerlink" title="4、数据分析"></a>4、数据分析</h2><pre class=" language-sql"><code class="language-sql"><span class="token keyword">SELECT</span> name<span class="token punctuation">,</span>
+         dk<span class="token punctuation">,</span>
+         ratio
 <span class="token keyword">FROM</span> 
-    <span class="token punctuation">(</span><span class="token keyword">SELECT</span> user_id<span class="token punctuation">,</span>
-         <span class="token function">sum</span><span class="token punctuation">(</span>pay_amount<span class="token punctuation">)</span> sum_pay_amount<span class="token punctuation">,</span>
-         ntile<span class="token punctuation">(</span><span class="token number">5</span><span class="token punctuation">)</span> <span class="token keyword">over</span><span class="token punctuation">(</span><span class="token keyword">order</span> <span class="token keyword">by</span> <span class="token function">sum</span><span class="token punctuation">(</span>pay_amount<span class="token punctuation">)</span> <span class="token keyword">desc</span><span class="token punctuation">)</span> <span class="token keyword">AS</span> level
-    <span class="token keyword">FROM</span> user_trade
-    <span class="token keyword">GROUP</span> <span class="token keyword">BY</span>  user_id <span class="token punctuation">)</span>t1
-<span class="token keyword">WHERE</span> level <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token punctuation">(</span><span class="token keyword">SELECT</span> name<span class="token punctuation">,</span>
+         cast<span class="token punctuation">(</span>cnt<span class="token operator">/</span><span class="token function">sum</span><span class="token punctuation">(</span>cnt<span class="token punctuation">)</span> <span class="token keyword">over</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">AS</span> <span class="token keyword">decimal</span><span class="token punctuation">(</span><span class="token number">3</span><span class="token punctuation">,</span>
+        <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token keyword">AS</span> ratio<span class="token punctuation">,</span>
+         dense_rank<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">over</span><span class="token punctuation">(</span><span class="token keyword">order</span> <span class="token keyword">by</span> cnt <span class="token keyword">desc</span><span class="token punctuation">)</span> dk
+    <span class="token keyword">FROM</span> 
+        <span class="token punctuation">(</span><span class="token keyword">SELECT</span> name<span class="token punctuation">,</span>
+         <span class="token function">count</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span> cnt
+        <span class="token keyword">FROM</span> heros lateral <span class="token keyword">view</span> explode<span class="token punctuation">(</span>split<span class="token punctuation">(</span>names<span class="token punctuation">,</span><span class="token string">','</span><span class="token punctuation">)</span><span class="token punctuation">)</span> t <span class="token keyword">AS</span> name
+        <span class="token keyword">GROUP</span> <span class="token keyword">BY</span>  name <span class="token punctuation">)</span>t1 <span class="token punctuation">)</span>t2
+    <span class="token keyword">WHERE</span> dk <span class="token operator">&lt;=</span> <span class="token number">3</span><span class="token punctuation">;</span>
 </code></pre>
-<pre class=" language-sql"><code class="language-sql"><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span>
-user_id sum_pay_amount  level
-<span class="token number">1008</span>    <span class="token number">680.0</span>   <span class="token number">1</span>
-<span class="token number">1005</span>    <span class="token number">603.5</span>   <span class="token number">1</span>
-<span class="token number">1004</span>    <span class="token number">369.0</span>   <span class="token number">2</span>
-<span class="token number">1007</span>    <span class="token number">360.4</span>   <span class="token number">2</span>
-<span class="token number">1006</span>    <span class="token number">260.1</span>   <span class="token number">3</span>
-<span class="token number">1001</span>    <span class="token number">171.5</span>   <span class="token number">3</span>
-<span class="token number">1003</span>    <span class="token number">156.7</span>   <span class="token number">4</span>
-<span class="token number">1002</span>    <span class="token number">130.5</span>   <span class="token number">5</span>
-Time taken: <span class="token number">57.37</span> seconds<span class="token punctuation">,</span> Fetched: <span class="token number">8</span> <span class="token keyword">row</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span>
-<span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span>
-user_id sum_pay_amount  level
-<span class="token number">1008</span>    <span class="token number">680.0</span>   <span class="token number">1</span>
-<span class="token number">1005</span>    <span class="token number">603.5</span>   <span class="token number">1</span>
-Time taken: <span class="token number">12.334</span> seconds<span class="token punctuation">,</span> Fetched: <span class="token number">2</span> <span class="token keyword">row</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span>
-<span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span>
+<pre class=" language-sql"><code class="language-sql">name    dk      ratio
+<span class="token number">aa</span>      <span class="token number">1</span>       <span class="token number">0.2</span>
+<span class="token number">bb</span>      <span class="token number">2</span>       <span class="token number">0.2</span>
+<span class="token number">cc</span>      <span class="token number">3</span>       <span class="token number">0.1</span>
+<span class="token number">dd</span>      <span class="token number">3</span>       <span class="token number">0.1</span>
+Time taken: <span class="token number">6.145</span> seconds<span class="token punctuation">,</span> Fetched: <span class="token number">4</span> <span class="token keyword">row</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span>
 </code></pre>
-<h2 id="5、总结"><a href="#5、总结" class="headerlink" title="5、总结"></a>5、总结</h2><p>​    本文主要通过案例来分析ntile()函数的使用方法，ntile()函数主要用于对数据进行分片、分桶，其算法为如果数据能均匀分配的话就按照平均分配，不能均匀分配的话，优先将数据分配到编号较小的桶中。ntile()函数主要用来求某个数据的前或后百分比问题题，在统计中具有重要意义。</p>
+<h2 id="5、总结"><a href="#5、总结" class="headerlink" title="5、总结"></a>5、总结</h2><p>本题是典型的TOPN问题，只不过里面嵌套了单列转多行问题，相对比较基础，也是比较常见的问题，作为SQLBOY是必须要掌握的问题。本题知识点总结如下：</p>
+<p>（1）TOPN问题求解。建议使用dense_rank()<br>（2）单列转多行问题。A lateral view explode() T as XXX （表生成函数）<br>（3）保留小数位数的方法，建议使用cast (XXX as decimal(3,1))</p>
 
                 
             </div>
@@ -577,7 +550,7 @@ Time taken: <span class="token number">12.334</span> seconds<span class="token p
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://github.com/wmybigdata/2021/09/24/hive-SQL%E5%88%86%E6%A1%B6%E9%97%AE%E9%A2%98/">https://github.com/wmybigdata/2021/09/24/hive-SQL%E5%88%86%E6%A1%B6%E9%97%AE%E9%A2%98/</a>
+                    <a href="https://github.com/wmybigdata/2021/09/24/hive-topN-%E5%87%BA%E5%9C%BA%E6%AC%A1%E6%95%B0%E5%92%8C%E5%87%BA%E5%9C%BA%E7%8E%87/">https://github.com/wmybigdata/2021/09/24/hive-topN-%E5%87%BA%E5%9C%BA%E6%AC%A1%E6%95%B0%E5%92%8C%E5%87%BA%E5%9C%BA%E7%8E%87/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -786,9 +759,10 @@ Time taken: <span class="token number">12.334</span> seconds<span class="token p
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+                <i class="far fa-dot-circle"></i>&nbsp;本篇
+            </div>
             <div class="card">
                 <a href="/2021/09/24/hive-topN-%E5%87%BA%E5%9C%BA%E6%AC%A1%E6%95%B0%E5%92%8C%E5%87%BA%E5%9C%BA%E7%8E%87/">
                     <div class="card-image">
@@ -806,9 +780,9 @@ Time taken: <span class="token number">12.334</span> seconds<span class="token p
                         
                     </div>
                     <div class="publish-info">
-                        <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2021-09-24
-                        </span>
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-09-24
+                            </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
@@ -821,6 +795,7 @@ Time taken: <span class="token number">12.334</span> seconds<span class="token p
                         </span>
                     </div>
                 </div>
+
                 
                 <div class="card-action article-tags">
                     
@@ -839,13 +814,13 @@ Time taken: <span class="token number">12.334</span> seconds<span class="token p
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2021/09/23/hive-SQL%E4%B9%8B%E5%88%86%E6%A1%B6%E9%87%8D%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95%E5%BA%94%E7%94%A83/">
+                <a href="/2021/09/24/hive-SQL%E5%88%86%E6%A1%B6%E9%97%AE%E9%A2%98/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/17.jpg" class="responsive-img" alt="hive-SQL之分桶重排序算法应用3">
+                        <img src="/medias/featureimages/11.jpg" class="responsive-img" alt="hive-SQL分桶问题">
                         
-                        <span class="card-title">hive-SQL之分桶重排序算法应用3</span>
+                        <span class="card-title">hive-SQL分桶问题</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -856,7 +831,7 @@ Time taken: <span class="token number">12.334</span> seconds<span class="token p
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2021-09-23
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-09-24
                             </span>
                         <span class="publish-author">
                             
