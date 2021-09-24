@@ -4,6 +4,31 @@
   
     
     <entry>
+      <title>hive-SQL取出累计值与1000相差最小差值的id</title>
+      <link href="/2021/09/24/hive-SQL%E5%8F%96%E5%87%BA%E7%B4%AF%E8%AE%A1%E5%80%BC%E4%B8%8E1000%E7%9B%B8%E5%B7%AE%E6%9C%80%E5%B0%8F%E5%B7%AE%E5%80%BC%E7%9A%84id/"/>
+      <url>/2021/09/24/hive-SQL%E5%8F%96%E5%87%BA%E7%B4%AF%E8%AE%A1%E5%80%BC%E4%B8%8E1000%E7%9B%B8%E5%B7%AE%E6%9C%80%E5%B0%8F%E5%B7%AE%E5%80%BC%E7%9A%84id/</url>
+      
+        <content type="html"><![CDATA[<h1 id="SQL取出累计值"><a href="#SQL取出累计值" class="headerlink" title="SQL取出累计值"></a>SQL取出累计值</h1>]]></content>
+      
+      
+      <categories>
+          
+          <category> hive </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> hive </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>hive-SQL统计断电次数及断电时长-分桶</title>
       <link href="/2021/09/24/hive-SQL%E7%BB%9F%E8%AE%A1%E6%96%AD%E7%94%B5%E6%AC%A1%E6%95%B0%E5%8F%8A%E6%96%AD%E7%94%B5%E6%97%B6%E9%95%BF-%E5%88%86%E6%A1%B6/"/>
       <url>/2021/09/24/hive-SQL%E7%BB%9F%E8%AE%A1%E6%96%AD%E7%94%B5%E6%AC%A1%E6%95%B0%E5%8F%8A%E6%96%AD%E7%94%B5%E6%97%B6%E9%95%BF-%E5%88%86%E6%A1%B6/</url>
