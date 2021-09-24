@@ -4,9 +4,59 @@
   
     
     <entry>
+      <title>kafka-学习记录</title>
+      <link href="/2021/09/24/kafka-%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/"/>
+      <url>/2021/09/24/kafka-%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/</url>
+      
+        <content type="html"><![CDATA[<h1 id="kafka-学习记录"><a href="#kafka-学习记录" class="headerlink" title="kafka-学习记录"></a>kafka-学习记录</h1><h2 id="1、Kafka基本概念"><a href="#1、Kafka基本概念" class="headerlink" title="1、Kafka基本概念"></a>1、Kafka基本概念</h2><h2 id="2、Kafka架构"><a href="#2、Kafka架构" class="headerlink" title="2、Kafka架构"></a>2、Kafka架构</h2><h2 id="3、Kafka监控"><a href="#3、Kafka监控" class="headerlink" title="3、Kafka监控"></a>3、Kafka监控</h2><h2 id="4、Kafka存储机制"><a href="#4、Kafka存储机制" class="headerlink" title="4、Kafka存储机制"></a>4、Kafka存储机制</h2><h2 id="5、Kafka基本命令"><a href="#5、Kafka基本命令" class="headerlink" title="5、Kafka基本命令"></a>5、Kafka基本命令</h2><h2 id="6、Kafka编程"><a href="#6、Kafka编程" class="headerlink" title="6、Kafka编程"></a>6、Kafka编程</h2><h2 id="7、深入了解Kafka"><a href="#7、深入了解Kafka" class="headerlink" title="7、深入了解Kafka"></a>7、深入了解Kafka</h2><h2 id="8、Kafka面试题实战"><a href="#8、Kafka面试题实战" class="headerlink" title="8、Kafka面试题实战"></a>8、Kafka面试题实战</h2>]]></content>
+      
+      
+      <categories>
+          
+          <category> kafka </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> kafka </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>大数据面试集合-公司</title>
+      <link href="/2021/09/24/%E5%A4%A7%E6%95%B0%E6%8D%AE%E9%9D%A2%E8%AF%95%E9%9B%86%E5%90%88-%E4%BC%81%E4%B8%9A/"/>
+      <url>/2021/09/24/%E5%A4%A7%E6%95%B0%E6%8D%AE%E9%9D%A2%E8%AF%95%E9%9B%86%E5%90%88-%E4%BC%81%E4%B8%9A/</url>
+      
+        <content type="html"><![CDATA[<h1 id="大数据面试集合-公司"><a href="#大数据面试集合-公司" class="headerlink" title="大数据面试集合-公司"></a>大数据面试集合-公司</h1><h2 id="1、字节"><a href="#1、字节" class="headerlink" title="1、字节"></a>1、字节</h2><h3 id="1-1-2020-12-数据开发"><a href="#1-1-2020-12-数据开发" class="headerlink" title="1.1 2020-12-数据开发"></a>1.1 2020-12-数据开发</h3><pre class=" language-text"><code class="language-text">1、flink与sparkstreaming的区别    2、假设一种场景，flink上游发送数据很慢，你认为可能什么原因导致，回答的资源可能不够，并行度不够，flink从kafka消费数据每批次拉取的数据条数太多，或者数据出现了倾斜，他问如果都不是这些情况还有可能什么原因。然后根据他的提示后有答出是checkpoint的时间设置比较大，可能失败后一直在做checkpoint的时间花得比较多，并且barrier设置的对齐，某几个barrier延迟到达导致其他barrier一直处于等待3、介绍你对泛型的理解，类/成员变量怎么使用泛型，哪些类型不能使用泛型4、int和Integer的区别，他们表示的数值的范围是一样的么5、手写hql,给定一个表event,字段是date,timestamp，event_name(有login_time和loginout_time两种)，uid，写出PCU(每天同时最大在线人数)6、手写java/scala实现从一个文本里面读取，统计出现次数top3的单词</code></pre>]]></content>
+      
+      
+      <categories>
+          
+          <category> 情深骚明面试集 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 情深骚明面试集 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>大数据面试题集合</title>
-      <link href="/2021/09/24/%E5%A4%A7%E6%95%B0%E6%8D%AE%E9%9D%A2%E8%AF%95%E9%A2%98%E9%9B%86%E5%90%88/"/>
-      <url>/2021/09/24/%E5%A4%A7%E6%95%B0%E6%8D%AE%E9%9D%A2%E8%AF%95%E9%A2%98%E9%9B%86%E5%90%88/</url>
+      <link href="/2021/09/24/%E5%A4%A7%E6%95%B0%E6%8D%AE%E9%9D%A2%E8%AF%95%E9%A2%98%E9%9B%86%E5%90%88-%E6%8A%80%E6%9C%AF/"/>
+      <url>/2021/09/24/%E5%A4%A7%E6%95%B0%E6%8D%AE%E9%9D%A2%E8%AF%95%E9%A2%98%E9%9B%86%E5%90%88-%E6%8A%80%E6%9C%AF/</url>
       
         <content type="html"><![CDATA[<h1 id="大数据面试题集合"><a href="#大数据面试题集合" class="headerlink" title="大数据面试题集合"></a>大数据面试题集合</h1><h2 id="1、数据仓库"><a href="#1、数据仓库" class="headerlink" title="1、数据仓库"></a>1、数据仓库</h2><h2 id="2、Hive"><a href="#2、Hive" class="headerlink" title="2、Hive"></a>2、Hive</h2><h2 id="3、Spark"><a href="#3、Spark" class="headerlink" title="3、Spark"></a>3、Spark</h2><h2 id="4、Kafka"><a href="#4、Kafka" class="headerlink" title="4、Kafka"></a>4、Kafka</h2><h2 id="5、HBASE"><a href="#5、HBASE" class="headerlink" title="5、HBASE"></a>5、HBASE</h2><h2 id="6、Hadoop"><a href="#6、Hadoop" class="headerlink" title="6、Hadoop"></a>6、Hadoop</h2><h2 id="7、Flink"><a href="#7、Flink" class="headerlink" title="7、Flink"></a>7、Flink</h2><h2 id="8、Java"><a href="#8、Java" class="headerlink" title="8、Java"></a>8、Java</h2><h2 id="9、ES"><a href="#9、ES" class="headerlink" title="9、ES"></a>9、ES</h2><h2 id="10、Flume"><a href="#10、Flume" class="headerlink" title="10、Flume"></a>10、Flume</h2><h2 id="11、Sqoop"><a href="#11、Sqoop" class="headerlink" title="11、Sqoop"></a>11、Sqoop</h2><h2 id="12、Redis"><a href="#12、Redis" class="headerlink" title="12、Redis"></a>12、Redis</h2><h2 id="13、MySQL"><a href="#13、MySQL" class="headerlink" title="13、MySQL"></a>13、MySQL</h2><h2 id="14、数据结构与算法"><a href="#14、数据结构与算法" class="headerlink" title="14、数据结构与算法"></a>14、数据结构与算法</h2><h2 id="15、Linux"><a href="#15、Linux" class="headerlink" title="15、Linux"></a>15、Linux</h2><h2 id="16、Clickhouse"><a href="#16、Clickhouse" class="headerlink" title="16、Clickhouse"></a>16、Clickhouse</h2>]]></content>
       
