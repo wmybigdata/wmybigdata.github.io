@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="hive-SQL如何解决NULL值引发的数据倾斜, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
+    <meta name="keywords" content="hive-连续多条记录合并问题, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
     <meta name="description" content="本网站是个人兴趣爱好，总结分享经验，记录生活点滴的平台，希望在以后的学习旅途中，走出自己的风景。">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -16,7 +16,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>hive-SQL如何解决NULL值引发的数据倾斜 | 情深骚明大数据之旅</title>
+    <title>hive-连续多条记录合并问题 | 情深骚明大数据之旅</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -314,12 +314,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/21.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/8.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">hive-SQL如何解决NULL值引发的数据倾斜</h1>
+                    <h1 class="description center-align post-title">hive-连续多条记录合并问题</h1>
                 </div>
             </div>
         </div>
@@ -481,31 +481,67 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h1 id="NULL值引发的数据倾斜"><a href="#NULL值引发的数据倾斜" class="headerlink" title="NULL值引发的数据倾斜"></a>NULL值引发的数据倾斜</h1><h2 id="1、需求描述"><a href="#1、需求描述" class="headerlink" title="1、需求描述"></a>1、需求描述</h2><p>实际业务中有些大量的null值或者一些无意义的数据参与到计算作业中，表中有大量的null值，如果表之间进行join操作，就会有shuffle产生，这样所有的null值都会被分配到一个reduce中，必然产生数据倾斜。</p>
-<h2 id="2、需求分析"><a href="#2、需求分析" class="headerlink" title="2、需求分析"></a>2、需求分析</h2><p>疑问：NULL值和需要匹配的字段根本就匹配不上，为什么会进入到同一个reduce?</p>
-<p>数据放到同一个reduce中的原因不是因为字段能不能join上，而是因为shuffle阶段的数据分发操作（数据路由算法决定的），因为join中的key要进行匹配，在mr中此时key需要被分发，只要key的hash结果是一样的，它们就会被拉到同一个reduce中，被分到redcue中才进行下一步的关联操作，才能决定能不能匹配上。</p>
-<h2 id="3、解决方案"><a href="#3、解决方案" class="headerlink" title="3、解决方案"></a>3、解决方案</h2><h3 id="3-1-不让null参与运行"><a href="#3-1-不让null参与运行" class="headerlink" title="3.1 不让null参与运行"></a>3.1 不让null参与运行</h3><ul>
-<li>第一种：可以直接不让null值参与join操作，即不让null值有shuffle阶段</li>
+                <h1 id="连续多条记录合并"><a href="#连续多条记录合并" class="headerlink" title="连续多条记录合并"></a>连续多条记录合并</h1><h2 id="1、需求描述"><a href="#1、需求描述" class="headerlink" title="1、需求描述"></a>1、需求描述</h2><ul>
+<li>对同一个用户，在同一个位置，连续的多条记录进行合并</li>
+<li>合并原则：开始时间取最早的，停留时长加和</li>
 </ul>
-<pre class=" language-sql"><code class="language-sql"><span class="token keyword">SELECT</span> <span class="token operator">*</span>
-<span class="token keyword">FROM</span> log <span class="token number">a</span>
-<span class="token keyword">LEFT</span> <span class="token keyword">JOIN</span> users <span class="token number">b</span>
-    <span class="token keyword">ON</span> <span class="token number">a</span><span class="token punctuation">.</span>user_id <span class="token operator">is</span> <span class="token operator">NOT</span> <span class="token boolean">null</span>
-        <span class="token operator">AND</span> <span class="token number">a</span><span class="token punctuation">.</span>user_id <span class="token operator">=</span> <span class="token number">b</span><span class="token punctuation">.</span>user_id
-<span class="token keyword">UNION</span>
-allSELECT <span class="token operator">*</span>
-<span class="token keyword">FROM</span> log <span class="token number">a</span>
-<span class="token keyword">WHERE</span> <span class="token number">a</span><span class="token punctuation">.</span>user_id <span class="token operator">is</span> <span class="token boolean">null</span><span class="token punctuation">;</span>
+<h2 id="2、建表和导入"><a href="#2、建表和导入" class="headerlink" title="2、建表和导入"></a>2、建表和导入</h2><pre class=" language-sql"><code class="language-sql"><span class="token keyword">create</span> <span class="token keyword">table</span> dura<span class="token punctuation">(</span> user_id string <span class="token keyword">comment</span> <span class="token string">'用户id'</span><span class="token punctuation">,</span> location_id string <span class="token keyword">comment</span> <span class="token string">'位置id'</span><span class="token punctuation">,</span> ts string <span class="token keyword">comment</span> <span class="token string">'时间'</span><span class="token punctuation">,</span> duration <span class="token keyword">int</span> <span class="token keyword">comment</span> <span class="token string">'持续时间'</span> <span class="token punctuation">)</span><span class="token keyword">row</span> format delimited <span class="token keyword">fields</span> <span class="token keyword">terminated by</span> <span class="token string">','</span><span class="token punctuation">;</span> 
 </code></pre>
-<h3 id="3-2-让null值赋予随机参数"><a href="#3-2-让null值赋予随机参数" class="headerlink" title="3.2 让null值赋予随机参数"></a>3.2 让null值赋予随机参数</h3><ul>
-<li>第二种：因为null值参与shuffle时的hash结果是一样的，那么我们可以给null值随机赋值，这样它们的hash结果就不一样，就会进到不同的reduce中：</li>
-</ul>
-<pre class=" language-sql"><code class="language-sql"><span class="token keyword">SELECT</span> <span class="token operator">*</span>
-<span class="token keyword">FROM</span> log <span class="token number">a</span>
-<span class="token keyword">LEFT</span> <span class="token keyword">JOIN</span> users <span class="token number">b</span>
-    <span class="token keyword">ON</span> <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token number">a</span><span class="token punctuation">.</span>user_id <span class="token operator">is</span> <span class="token boolean">NULL</span> <span class="token punctuation">,</span>concat<span class="token punctuation">(</span><span class="token string">'hive'</span><span class="token punctuation">,</span>rand<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token number">a</span><span class="token punctuation">.</span>user_id<span class="token punctuation">)</span> <span class="token operator">=</span> <span class="token number">b</span><span class="token punctuation">.</span>user_id<span class="token punctuation">;</span>
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">insert</span> <span class="token keyword">into</span> dura <span class="token keyword">values</span> 
+<span class="token punctuation">(</span><span class="token string">"user_a"</span><span class="token punctuation">,</span> <span class="token string">"location_a"</span><span class="token punctuation">,</span><span class="token string">"2018-01-01 08:00:00"</span><span class="token punctuation">,</span><span class="token number">60</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">(</span><span class="token string">"user_a"</span><span class="token punctuation">,</span> <span class="token string">"location_a"</span><span class="token punctuation">,</span><span class="token string">"2018-01-01 09:00:00"</span><span class="token punctuation">,</span><span class="token number">60</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">(</span><span class="token string">"user_a"</span><span class="token punctuation">,</span> <span class="token string">"location_a"</span><span class="token punctuation">,</span><span class="token string">"2018-01-01 11:00:00"</span><span class="token punctuation">,</span><span class="token number">60</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">(</span><span class="token string">"user_a"</span><span class="token punctuation">,</span> <span class="token string">"location_a"</span><span class="token punctuation">,</span><span class="token string">"2018-01-01 12:00:00"</span><span class="token punctuation">,</span><span class="token number">60</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">(</span><span class="token string">"user_a"</span><span class="token punctuation">,</span> <span class="token string">"location_b"</span><span class="token punctuation">,</span><span class="token string">"2018-01-01 10:00:00"</span><span class="token punctuation">,</span><span class="token number">60</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">(</span><span class="token string">"user_a"</span><span class="token punctuation">,</span> <span class="token string">"location_c"</span><span class="token punctuation">,</span><span class="token string">"2018-01-01 08:00:00"</span><span class="token punctuation">,</span><span class="token number">60</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">(</span><span class="token string">"user_a"</span><span class="token punctuation">,</span> <span class="token string">"location_c"</span><span class="token punctuation">,</span><span class="token string">"2018-01-01 09:00:00"</span><span class="token punctuation">,</span><span class="token number">60</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">(</span><span class="token string">"user_a"</span><span class="token punctuation">,</span> <span class="token string">"location_c"</span><span class="token punctuation">,</span><span class="token string">"2018-01-01 10:00:00"</span><span class="token punctuation">,</span><span class="token number">60</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">(</span><span class="token string">"user_b"</span><span class="token punctuation">,</span> <span class="token string">"location_a"</span><span class="token punctuation">,</span><span class="token string">"2018-01-01 15:00:00"</span><span class="token punctuation">,</span><span class="token number">60</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">(</span><span class="token string">"user_b"</span><span class="token punctuation">,</span> <span class="token string">"location_a"</span><span class="token punctuation">,</span><span class="token string">"2018-01-01 16:00:00"</span><span class="token punctuation">,</span><span class="token number">60</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">(</span><span class="token string">"user_b"</span><span class="token punctuation">,</span> <span class="token string">"location_a"</span><span class="token punctuation">,</span><span class="token string">"2018-01-01 18:00:00"</span><span class="token punctuation">,</span><span class="token number">60</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 </code></pre>
-<h2 id="4、总结"><a href="#4、总结" class="headerlink" title="4、总结"></a>4、总结</h2><p>本文讲述了在hivesql中如何解决NULL值引发的数据倾斜问题，其核心思路为一分为二思想，有null的单独过滤出不参与匹配，没NULL值的进行join匹配；另一种就是随机思想，将容易倾斜的key随机打散分到不同的redcue中而不是同一个reduce中。这两种思想是解决此类问题的核心思想。</p>
+<h2 id="3、数据分析"><a href="#3、数据分析" class="headerlink" title="3、数据分析"></a>3、数据分析</h2><p>本题主要是将连续数据进行合并，如果能将连续的数据分成一个组里面，所有的问题都能解决，因此本题实质上还是构造分组条件，如何去分组的问题。</p>
+<p>由题意知本题还是连续性问题，那么问题转换为如何判断连续问题，如果连续则相邻两行的差值相同。我们先求出相邻两行的差值观察结果</p>
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">SELECT</span> user_id<span class="token punctuation">,</span>
+         location_id<span class="token punctuation">,</span>
+         concat<span class="token punctuation">(</span><span class="token function">min</span><span class="token punctuation">(</span>ts<span class="token punctuation">)</span><span class="token punctuation">)</span> ts<span class="token punctuation">,</span>
+         <span class="token function">sum</span><span class="token punctuation">(</span>duration<span class="token punctuation">)</span> duration
+<span class="token keyword">FROM</span> 
+    <span class="token punctuation">(</span><span class="token keyword">SELECT</span> user_id<span class="token punctuation">,</span>
+         location_id<span class="token punctuation">,</span>
+         ts<span class="token punctuation">,</span>
+         duration<span class="token punctuation">,</span>
+         <span class="token function">sum</span><span class="token punctuation">(</span><span class="token keyword">if</span><span class="token punctuation">(</span>diff<span class="token operator">></span><span class="token number">1</span><span class="token punctuation">,</span>
+        <span class="token number">1</span><span class="token punctuation">,</span>
+        <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token keyword">over</span><span class="token punctuation">(</span><span class="token keyword">partition</span> <span class="token keyword">by</span> user_id<span class="token punctuation">,</span>
+        location_id
+    <span class="token keyword">ORDER</span> <span class="token keyword">BY</span>  ts<span class="token punctuation">)</span> diff_Flag
+    <span class="token keyword">FROM</span> 
+        <span class="token punctuation">(</span><span class="token keyword">SELECT</span> user_id<span class="token punctuation">,</span>
+         location_id<span class="token punctuation">,</span>
+         ts<span class="token punctuation">,</span>
+         duration<span class="token punctuation">,</span>
+         cast<span class="token punctuation">(</span><span class="token keyword">int</span><span class="token punctuation">(</span>unix_timestamp<span class="token punctuation">(</span>ts<span class="token punctuation">)</span> <span class="token operator">-</span> unix_timestamp<span class="token punctuation">(</span>lag<span class="token punctuation">(</span>ts<span class="token punctuation">,</span>
+        <span class="token number">1</span><span class="token punctuation">,</span>
+        ts<span class="token punctuation">)</span> <span class="token keyword">over</span><span class="token punctuation">(</span><span class="token keyword">partition</span> <span class="token keyword">by</span> user_id<span class="token punctuation">,</span>
+        location_id
+        <span class="token keyword">ORDER</span> <span class="token keyword">BY</span>  ts<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token number">3600</span> <span class="token keyword">AS</span> <span class="token keyword">int</span><span class="token punctuation">)</span> diff
+        <span class="token keyword">FROM</span> dura <span class="token punctuation">)</span>t1 <span class="token punctuation">)</span>t2
+    <span class="token keyword">GROUP</span> <span class="token keyword">BY</span>  user_id<span class="token punctuation">,</span>location_id<span class="token punctuation">,</span>diff_Flag<span class="token punctuation">;</span>
+</code></pre>
+<pre class=" language-tex"><code class="language-tex">user_id location_id     ts      duration
+user_a  location_a      2018-01-01 11:00:00     120
+user_b  location_a      2018-01-01 15:00:00     120
+user_b  location_a      2018-01-01 18:00:00     60
+user_a  location_a      2018-01-01 08:00:00     120
+user_a  location_c      2018-01-01 08:00:00     180
+user_a  location_b      2018-01-01 10:00:00     60
+Time taken: 4.474 seconds, Fetched: 6 row(s)
+</code></pre>
+<p>我们可以看到上述新加的列中已经依据我们的想法将数据进行区分。我们将这种大于某参照量的标记为1进行累加的算法称为重分组算法，用SQL表示为sum(if(XXX&gt;YYY,1,0)) over(partition by XXX order by XXX).</p>
+<p>我们按照user_id,location_id及grp_id进行分组，将需要的数据分到一个组里，然后求取最小时间值及对duration时间进行求和即为最终结果</p>
+<h2 id="4、总结"><a href="#4、总结" class="headerlink" title="4、总结"></a>4、总结</h2><p>本题关键点是如何构建分组条件，在分组中求出所需要的目标，是之前SQL题中总结的重分组算法的典型应用。本题在多家面试中被作为笔试题，要求用spark算子、mr编程或HQL语言实现，spark算子或mr编程实现方法网上文章讲的比较多，而SQL语言实现基本没有，本文给出了一种HQL语言的实现方法，弥补了此类问题用SQL语言实现的空缺。</p>
+<p>这道题的归根到底还是运用了hiveSQL的重分组算法，“充分组”算法在本博客之前的面试题中有重点讲解过，该算法在面试时候会经常用到，同学们多多了解下！</p>
 
                 
             </div>
@@ -532,7 +568,7 @@ allSELECT <span class="token operator">*</span>
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://github.com/wmybigdata/2021/09/25/hive-SQL%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3NULL%E5%80%BC%E5%BC%95%E5%8F%91%E7%9A%84%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C/">https://github.com/wmybigdata/2021/09/25/hive-SQL%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3NULL%E5%80%BC%E5%BC%95%E5%8F%91%E7%9A%84%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C/</a>
+                    <a href="https://github.com/wmybigdata/2021/09/25/hive-%E8%BF%9E%E7%BB%AD%E5%A4%9A%E6%9D%A1%E8%AE%B0%E5%BD%95%E5%90%88%E5%B9%B6%E9%97%AE%E9%A2%98/">https://github.com/wmybigdata/2021/09/25/hive-%E8%BF%9E%E7%BB%AD%E5%A4%9A%E6%9D%A1%E8%AE%B0%E5%BD%95%E5%90%88%E5%B9%B6%E9%97%AE%E9%A2%98/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -745,13 +781,13 @@ allSELECT <span class="token operator">*</span>
             <div class="article-badge left-badge text-color">
                 <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2021/09/25/hive-%E8%BF%9E%E7%BB%AD%E5%A4%9A%E6%9D%A1%E8%AE%B0%E5%BD%95%E5%90%88%E5%B9%B6%E9%97%AE%E9%A2%98/">
+                <a href="/2021/09/25/hive-%E7%BE%8E%E5%9B%A2%E4%BC%98%E9%80%89%E4%B8%80%E9%9D%A2/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/8.jpg" class="responsive-img" alt="hive-连续多条记录合并问题">
+                        <img src="/medias/featureimages/4.jpg" class="responsive-img" alt="hive-美团优选一面">
                         
-                        <span class="card-title">hive-连续多条记录合并问题</span>
+                        <span class="card-title">hive-美团优选一面</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -794,13 +830,13 @@ allSELECT <span class="token operator">*</span>
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2021/09/25/%E5%A4%A7%E6%95%B0%E6%8D%AE%E7%9B%91%E6%8E%A7%E6%8A%A5%E8%AD%A6%E5%B9%B3%E5%8F%B0/">
+                <a href="/2021/09/25/hive-SQL%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3NULL%E5%80%BC%E5%BC%95%E5%8F%91%E7%9A%84%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/15.jpg" class="responsive-img" alt="大数据监控报警平台">
+                        <img src="/medias/featureimages/21.jpg" class="responsive-img" alt="hive-SQL如何解决NULL值引发的数据倾斜">
                         
-                        <span class="card-title">大数据监控报警平台</span>
+                        <span class="card-title">hive-SQL如何解决NULL值引发的数据倾斜</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -817,8 +853,8 @@ allSELECT <span class="token operator">*</span>
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/%E7%9B%91%E6%8E%A7%E6%8A%A5%E8%AD%A6%E5%B9%B3%E5%8F%B0/" class="post-category">
-                                    监控报警平台
+                            <a href="/categories/hive/" class="post-category">
+                                    hive
                                 </a>
                             
                             
@@ -828,8 +864,8 @@ allSELECT <span class="token operator">*</span>
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/%E7%9B%91%E6%8E%A7%E6%8A%A5%E8%AD%A6%E5%B9%B3%E5%8F%B0/">
-                        <span class="chip bg-color">监控报警平台</span>
+                    <a href="/tags/hive/">
+                        <span class="chip bg-color">hive</span>
                     </a>
                     
                 </div>

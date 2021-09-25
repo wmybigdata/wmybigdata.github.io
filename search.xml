@@ -4,6 +4,106 @@
   
     
     <entry>
+      <title>hive-求股票的波峰和波谷</title>
+      <link href="/2021/09/25/hive-%E6%B1%82%E8%82%A1%E7%A5%A8%E7%9A%84%E6%B3%A2%E5%B3%B0%E5%92%8C%E6%B3%A2%E8%B0%B7/"/>
+      <url>/2021/09/25/hive-%E6%B1%82%E8%82%A1%E7%A5%A8%E7%9A%84%E6%B3%A2%E5%B3%B0%E5%92%8C%E6%B3%A2%E8%B0%B7/</url>
+      
+        <content type="html"><![CDATA[<h1 id="股票的波峰和波谷"><a href="#股票的波峰和波谷" class="headerlink" title="股票的波峰和波谷"></a>股票的波峰和波谷</h1>]]></content>
+      
+      
+      <categories>
+          
+          <category> hive </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> hive </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>hive-查找每个用户的受欢迎程度</title>
+      <link href="/2021/09/25/hive-%E6%9F%A5%E6%89%BE%E6%AF%8F%E4%B8%AA%E7%94%A8%E6%88%B7%E7%9A%84%E5%8F%97%E6%AC%A2%E8%BF%8E%E7%A8%8B%E5%BA%A6/"/>
+      <url>/2021/09/25/hive-%E6%9F%A5%E6%89%BE%E6%AF%8F%E4%B8%AA%E7%94%A8%E6%88%B7%E7%9A%84%E5%8F%97%E6%AC%A2%E8%BF%8E%E7%A8%8B%E5%BA%A6/</url>
+      
+        <content type="html"><![CDATA[<h1 id="受欢迎程度"><a href="#受欢迎程度" class="headerlink" title="受欢迎程度"></a>受欢迎程度</h1>]]></content>
+      
+      
+      <categories>
+          
+          <category> hive </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> hive </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>hive-美团优选一面</title>
+      <link href="/2021/09/25/hive-%E7%BE%8E%E5%9B%A2%E4%BC%98%E9%80%89%E4%B8%80%E9%9D%A2/"/>
+      <url>/2021/09/25/hive-%E7%BE%8E%E5%9B%A2%E4%BC%98%E9%80%89%E4%B8%80%E9%9D%A2/</url>
+      
+        <content type="html"><![CDATA[<h1 id="美团优选一面"><a href="#美团优选一面" class="headerlink" title="美团优选一面"></a>美团优选一面</h1>]]></content>
+      
+      
+      <categories>
+          
+          <category> hive </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> hive </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>hive-连续多条记录合并问题</title>
+      <link href="/2021/09/25/hive-%E8%BF%9E%E7%BB%AD%E5%A4%9A%E6%9D%A1%E8%AE%B0%E5%BD%95%E5%90%88%E5%B9%B6%E9%97%AE%E9%A2%98/"/>
+      <url>/2021/09/25/hive-%E8%BF%9E%E7%BB%AD%E5%A4%9A%E6%9D%A1%E8%AE%B0%E5%BD%95%E5%90%88%E5%B9%B6%E9%97%AE%E9%A2%98/</url>
+      
+        <content type="html"><![CDATA[<h1 id="连续多条记录合并"><a href="#连续多条记录合并" class="headerlink" title="连续多条记录合并"></a>连续多条记录合并</h1><h2 id="1、需求描述"><a href="#1、需求描述" class="headerlink" title="1、需求描述"></a>1、需求描述</h2><ul><li>对同一个用户，在同一个位置，连续的多条记录进行合并</li><li>合并原则：开始时间取最早的，停留时长加和</li></ul><h2 id="2、建表和导入"><a href="#2、建表和导入" class="headerlink" title="2、建表和导入"></a>2、建表和导入</h2><pre class=" language-sql"><code class="language-sql"><span class="token keyword">create</span> <span class="token keyword">table</span> dura<span class="token punctuation">(</span> user_id string <span class="token keyword">comment</span> <span class="token string">'用户id'</span><span class="token punctuation">,</span> location_id string <span class="token keyword">comment</span> <span class="token string">'位置id'</span><span class="token punctuation">,</span> ts string <span class="token keyword">comment</span> <span class="token string">'时间'</span><span class="token punctuation">,</span> duration <span class="token keyword">int</span> <span class="token keyword">comment</span> <span class="token string">'持续时间'</span> <span class="token punctuation">)</span><span class="token keyword">row</span> format delimited <span class="token keyword">fields</span> <span class="token keyword">terminated by</span> <span class="token string">','</span><span class="token punctuation">;</span> </code></pre><pre class=" language-sql"><code class="language-sql"><span class="token keyword">insert</span> <span class="token keyword">into</span> dura <span class="token keyword">values</span> <span class="token punctuation">(</span><span class="token string">"user_a"</span><span class="token punctuation">,</span> <span class="token string">"location_a"</span><span class="token punctuation">,</span><span class="token string">"2018-01-01 08:00:00"</span><span class="token punctuation">,</span><span class="token number">60</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token punctuation">(</span><span class="token string">"user_a"</span><span class="token punctuation">,</span> <span class="token string">"location_a"</span><span class="token punctuation">,</span><span class="token string">"2018-01-01 09:00:00"</span><span class="token punctuation">,</span><span class="token number">60</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token punctuation">(</span><span class="token string">"user_a"</span><span class="token punctuation">,</span> <span class="token string">"location_a"</span><span class="token punctuation">,</span><span class="token string">"2018-01-01 11:00:00"</span><span class="token punctuation">,</span><span class="token number">60</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token punctuation">(</span><span class="token string">"user_a"</span><span class="token punctuation">,</span> <span class="token string">"location_a"</span><span class="token punctuation">,</span><span class="token string">"2018-01-01 12:00:00"</span><span class="token punctuation">,</span><span class="token number">60</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token punctuation">(</span><span class="token string">"user_a"</span><span class="token punctuation">,</span> <span class="token string">"location_b"</span><span class="token punctuation">,</span><span class="token string">"2018-01-01 10:00:00"</span><span class="token punctuation">,</span><span class="token number">60</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token punctuation">(</span><span class="token string">"user_a"</span><span class="token punctuation">,</span> <span class="token string">"location_c"</span><span class="token punctuation">,</span><span class="token string">"2018-01-01 08:00:00"</span><span class="token punctuation">,</span><span class="token number">60</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token punctuation">(</span><span class="token string">"user_a"</span><span class="token punctuation">,</span> <span class="token string">"location_c"</span><span class="token punctuation">,</span><span class="token string">"2018-01-01 09:00:00"</span><span class="token punctuation">,</span><span class="token number">60</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token punctuation">(</span><span class="token string">"user_a"</span><span class="token punctuation">,</span> <span class="token string">"location_c"</span><span class="token punctuation">,</span><span class="token string">"2018-01-01 10:00:00"</span><span class="token punctuation">,</span><span class="token number">60</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token punctuation">(</span><span class="token string">"user_b"</span><span class="token punctuation">,</span> <span class="token string">"location_a"</span><span class="token punctuation">,</span><span class="token string">"2018-01-01 15:00:00"</span><span class="token punctuation">,</span><span class="token number">60</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token punctuation">(</span><span class="token string">"user_b"</span><span class="token punctuation">,</span> <span class="token string">"location_a"</span><span class="token punctuation">,</span><span class="token string">"2018-01-01 16:00:00"</span><span class="token punctuation">,</span><span class="token number">60</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token punctuation">(</span><span class="token string">"user_b"</span><span class="token punctuation">,</span> <span class="token string">"location_a"</span><span class="token punctuation">,</span><span class="token string">"2018-01-01 18:00:00"</span><span class="token punctuation">,</span><span class="token number">60</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre><h2 id="3、数据分析"><a href="#3、数据分析" class="headerlink" title="3、数据分析"></a>3、数据分析</h2><p>本题主要是将连续数据进行合并，如果能将连续的数据分成一个组里面，所有的问题都能解决，因此本题实质上还是构造分组条件，如何去分组的问题。</p><p>由题意知本题还是连续性问题，那么问题转换为如何判断连续问题，如果连续则相邻两行的差值相同。我们先求出相邻两行的差值观察结果</p><pre class=" language-sql"><code class="language-sql"><span class="token keyword">SELECT</span> user_id<span class="token punctuation">,</span>         location_id<span class="token punctuation">,</span>         concat<span class="token punctuation">(</span><span class="token function">min</span><span class="token punctuation">(</span>ts<span class="token punctuation">)</span><span class="token punctuation">)</span> ts<span class="token punctuation">,</span>         <span class="token function">sum</span><span class="token punctuation">(</span>duration<span class="token punctuation">)</span> duration<span class="token keyword">FROM</span>     <span class="token punctuation">(</span><span class="token keyword">SELECT</span> user_id<span class="token punctuation">,</span>         location_id<span class="token punctuation">,</span>         ts<span class="token punctuation">,</span>         duration<span class="token punctuation">,</span>         <span class="token function">sum</span><span class="token punctuation">(</span><span class="token keyword">if</span><span class="token punctuation">(</span>diff<span class="token operator">></span><span class="token number">1</span><span class="token punctuation">,</span>        <span class="token number">1</span><span class="token punctuation">,</span>        <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token keyword">over</span><span class="token punctuation">(</span><span class="token keyword">partition</span> <span class="token keyword">by</span> user_id<span class="token punctuation">,</span>        location_id    <span class="token keyword">ORDER</span> <span class="token keyword">BY</span>  ts<span class="token punctuation">)</span> diff_Flag    <span class="token keyword">FROM</span>         <span class="token punctuation">(</span><span class="token keyword">SELECT</span> user_id<span class="token punctuation">,</span>         location_id<span class="token punctuation">,</span>         ts<span class="token punctuation">,</span>         duration<span class="token punctuation">,</span>         cast<span class="token punctuation">(</span><span class="token keyword">int</span><span class="token punctuation">(</span>unix_timestamp<span class="token punctuation">(</span>ts<span class="token punctuation">)</span> <span class="token operator">-</span> unix_timestamp<span class="token punctuation">(</span>lag<span class="token punctuation">(</span>ts<span class="token punctuation">,</span>        <span class="token number">1</span><span class="token punctuation">,</span>        ts<span class="token punctuation">)</span> <span class="token keyword">over</span><span class="token punctuation">(</span><span class="token keyword">partition</span> <span class="token keyword">by</span> user_id<span class="token punctuation">,</span>        location_id        <span class="token keyword">ORDER</span> <span class="token keyword">BY</span>  ts<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token number">3600</span> <span class="token keyword">AS</span> <span class="token keyword">int</span><span class="token punctuation">)</span> diff        <span class="token keyword">FROM</span> dura <span class="token punctuation">)</span>t1 <span class="token punctuation">)</span>t2    <span class="token keyword">GROUP</span> <span class="token keyword">BY</span>  user_id<span class="token punctuation">,</span>location_id<span class="token punctuation">,</span>diff_Flag<span class="token punctuation">;</span></code></pre><pre class=" language-tex"><code class="language-tex">user_id location_id     ts      durationuser_a  location_a      2018-01-01 11:00:00     120user_b  location_a      2018-01-01 15:00:00     120user_b  location_a      2018-01-01 18:00:00     60user_a  location_a      2018-01-01 08:00:00     120user_a  location_c      2018-01-01 08:00:00     180user_a  location_b      2018-01-01 10:00:00     60Time taken: 4.474 seconds, Fetched: 6 row(s)</code></pre><p>我们可以看到上述新加的列中已经依据我们的想法将数据进行区分。我们将这种大于某参照量的标记为1进行累加的算法称为重分组算法，用SQL表示为sum(if(XXX&gt;YYY,1,0)) over(partition by XXX order by XXX).</p><p>我们按照user_id,location_id及grp_id进行分组，将需要的数据分到一个组里，然后求取最小时间值及对duration时间进行求和即为最终结果</p><h2 id="4、总结"><a href="#4、总结" class="headerlink" title="4、总结"></a>4、总结</h2><p>本题关键点是如何构建分组条件，在分组中求出所需要的目标，是之前SQL题中总结的重分组算法的典型应用。本题在多家面试中被作为笔试题，要求用spark算子、mr编程或HQL语言实现，spark算子或mr编程实现方法网上文章讲的比较多，而SQL语言实现基本没有，本文给出了一种HQL语言的实现方法，弥补了此类问题用SQL语言实现的空缺。</p><p>这道题的归根到底还是运用了hiveSQL的重分组算法，“充分组”算法在本博客之前的面试题中有重点讲解过，该算法在面试时候会经常用到，同学们多多了解下！</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> hive </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> hive </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>hive-SQL如何解决NULL值引发的数据倾斜</title>
       <link href="/2021/09/25/hive-SQL%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3NULL%E5%80%BC%E5%BC%95%E5%8F%91%E7%9A%84%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C/"/>
       <url>/2021/09/25/hive-SQL%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3NULL%E5%80%BC%E5%BC%95%E5%8F%91%E7%9A%84%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C/</url>
