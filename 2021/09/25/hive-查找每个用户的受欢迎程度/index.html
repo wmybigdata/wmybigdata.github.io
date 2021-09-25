@@ -481,7 +481,116 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h1 id="受欢迎程度"><a href="#受欢迎程度" class="headerlink" title="受欢迎程度"></a>受欢迎程度</h1>
+                <h1 id="受欢迎程度"><a href="#受欢迎程度" class="headerlink" title="受欢迎程度"></a>受欢迎程度</h1><h2 id="1、需求描述"><a href="#1、需求描述" class="headerlink" title="1、需求描述"></a>1、需求描述</h2><p>查找每个用户在app上的受欢迎程度百分比。</p>
+<p>受欢迎程度百分比定义为：用户拥有的朋友总数除以平台上的用户总数，然后乘以100转换成一个百分比。</p>
+<p>输出每个用户及其受欢迎程度百分比。按用户id升序排列。</p>
+<p>“user1”和“user2”列是成对的朋友。表如下：</p>
+<h2 id="2、数据准备"><a href="#2、数据准备" class="headerlink" title="2、数据准备"></a>2、数据准备</h2><p>user1,user2</p>
+<pre class=" language-sql"><code class="language-sql"><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span>
+<span class="token number">1</span><span class="token punctuation">,</span><span class="token number">3</span>
+<span class="token number">1</span><span class="token punctuation">,</span><span class="token number">4</span>
+<span class="token number">1</span><span class="token punctuation">,</span><span class="token number">5</span>
+<span class="token number">1</span><span class="token punctuation">,</span><span class="token number">6</span>
+<span class="token number">2</span><span class="token punctuation">,</span><span class="token number">6</span>
+<span class="token number">2</span><span class="token punctuation">,</span><span class="token number">7</span>
+<span class="token number">3</span><span class="token punctuation">,</span><span class="token number">8</span>
+<span class="token number">3</span><span class="token punctuation">,</span><span class="token number">9</span>
+</code></pre>
+<p>最终计算结果如下</p>
+<pre class=" language-sql"><code class="language-sql">user1    popularity_percent
+<span class="token number">1</span>        <span class="token number">55.556</span>
+<span class="token number">2</span>        <span class="token number">33.333</span>
+<span class="token number">3</span>        <span class="token number">33.333</span>
+<span class="token number">4</span>        <span class="token number">11.111</span>
+<span class="token number">5</span>        <span class="token number">11.111</span>
+<span class="token number">6</span>        <span class="token number">22.222</span>
+<span class="token number">7</span>        <span class="token number">11.111</span>
+<span class="token number">8</span>        <span class="token number">11.111</span>
+<span class="token number">9</span>        <span class="token number">11.111</span>
+</code></pre>
+<h2 id="3、创建表和导入数据"><a href="#3、创建表和导入数据" class="headerlink" title="3、创建表和导入数据"></a>3、创建表和导入数据</h2><pre class=" language-sql"><code class="language-sql"><span class="token keyword">create</span> <span class="token keyword">table</span> facebook_friends
+<span class="token punctuation">(</span>
+    user1 <span class="token keyword">int</span> <span class="token keyword">comment</span> <span class="token string">"用户"</span> <span class="token punctuation">,</span>
+    user2 <span class="token keyword">int</span> <span class="token keyword">comment</span> <span class="token string">"用户好友"</span>
+<span class="token punctuation">)</span><span class="token keyword">row</span> format delimited <span class="token keyword">fields</span> <span class="token keyword">terminated by</span> <span class="token string">','</span><span class="token punctuation">;</span>
+</code></pre>
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">insert</span> <span class="token keyword">into</span> facebook_friends <span class="token keyword">values</span> 
+<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">4</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">6</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">6</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">7</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">(</span><span class="token number">3</span><span class="token punctuation">,</span><span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">(</span><span class="token number">3</span><span class="token punctuation">,</span><span class="token number">9</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h2 id="4、分析用户"><a href="#4、分析用户" class="headerlink" title="4、分析用户"></a>4、分析用户</h2><p>目标：要求所有的用户数及每个用户对应的好友数。</p>
+<p>方法1：关联解法</p>
+<p>（1）由题做简单分析如下：</p>
+<p>用户1对应的好友2,3,4,5,6.</p>
+<p>用户2对应好友1,6,7</p>
+<p>用户3对应好友1,8,9</p>
+<p>用户4对应好友1</p>
+<p>…</p>
+<p>展开如下：</p>
+<pre class=" language-tex"><code class="language-tex">1    2
+1    3
+1    4
+1    5
+1    6
+2       1
+2    6
+2    7
+3       1
+3    8
+3    9
+4       1
+5       1
+6       1
+6       2
+7       2
+8       3
+9       3
+</code></pre>
+<p>可以看出上述的结果集实际上是 如下合并后的结果</p>
+<h3 id="4-1-采用union方案解决"><a href="#4-1-采用union方案解决" class="headerlink" title="4.1 采用union方案解决"></a>4.1 采用union方案解决</h3><pre class=" language-sql"><code class="language-sql"><span class="token keyword">SELECT</span> user1<span class="token punctuation">,</span>
+         cast<span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token function">sum</span><span class="token punctuation">(</span>cnt<span class="token punctuation">)</span><span class="token operator">/</span><span class="token function">count</span><span class="token punctuation">(</span><span class="token operator">*</span><span class="token punctuation">)</span> <span class="token keyword">over</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">*</span> <span class="token number">100</span><span class="token punctuation">)</span> <span class="token keyword">AS</span> <span class="token keyword">decimal</span><span class="token punctuation">(</span><span class="token number">5</span><span class="token punctuation">,</span>
+        <span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token keyword">FROM</span> 
+    <span class="token punctuation">(</span><span class="token keyword">SELECT</span> user1<span class="token punctuation">,</span>
+         <span class="token function">count</span><span class="token punctuation">(</span><span class="token operator">*</span><span class="token punctuation">)</span> cnt
+    <span class="token keyword">FROM</span> 
+        <span class="token punctuation">(</span><span class="token keyword">SELECT</span> user1<span class="token punctuation">,</span>
+        user2
+        <span class="token keyword">FROM</span> facebook_friends
+        <span class="token keyword">UNION</span>
+        <span class="token keyword">SELECT</span> user2 <span class="token keyword">AS</span> user1<span class="token punctuation">,</span>
+        user1 <span class="token keyword">AS</span> user2
+        <span class="token keyword">FROM</span> facebook_friends <span class="token punctuation">)</span>t1
+        <span class="token keyword">GROUP</span> <span class="token keyword">BY</span>  user1 <span class="token punctuation">)</span>t2
+    <span class="token keyword">GROUP</span> <span class="token keyword">BY</span>  user1
+<span class="token keyword">ORDER</span> <span class="token keyword">BY</span>  user1<span class="token punctuation">;</span>
+</code></pre>
+<h3 id="4-2-使用行转列的方式来解决"><a href="#4-2-使用行转列的方式来解决" class="headerlink" title="4.2 使用行转列的方式来解决"></a>4.2 使用行转列的方式来解决</h3><pre class=" language-sql"><code class="language-sql"><span class="token keyword">SELECT</span> user1<span class="token punctuation">,</span>
+         cast<span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token function">sum</span><span class="token punctuation">(</span>cnt<span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token function">count</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">over</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">*</span> <span class="token number">100</span> <span class="token punctuation">)</span> <span class="token keyword">AS</span> <span class="token keyword">decimal</span><span class="token punctuation">(</span><span class="token number">5</span><span class="token punctuation">,</span>
+        <span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token keyword">AS</span> precent
+<span class="token keyword">FROM</span> 
+    <span class="token punctuation">(</span><span class="token keyword">SELECT</span> user1<span class="token punctuation">,</span>
+         size<span class="token punctuation">(</span>collect_set<span class="token punctuation">(</span>user2<span class="token punctuation">)</span><span class="token punctuation">)</span> cnt
+    <span class="token keyword">FROM</span> 
+        <span class="token punctuation">(</span><span class="token keyword">SELECT</span> user1<span class="token punctuation">,</span>
+         user2
+        <span class="token keyword">FROM</span> facebook_friends
+        <span class="token keyword">UNION</span>
+        <span class="token keyword">SELECT</span> user2 <span class="token keyword">AS</span> user1<span class="token punctuation">,</span>
+         user1 <span class="token keyword">AS</span> user2
+        <span class="token keyword">FROM</span> facebook_friends <span class="token punctuation">)</span>t1
+        <span class="token keyword">GROUP</span> <span class="token keyword">BY</span>  user1 <span class="token punctuation">)</span>t2
+    <span class="token keyword">GROUP</span> <span class="token keyword">BY</span>  user1
+<span class="token keyword">ORDER</span> <span class="token keyword">BY</span>  user1<span class="token punctuation">;</span>
+</code></pre>
+
                 
             </div>
             <hr/>

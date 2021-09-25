@@ -481,7 +481,140 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h1 id="股票的波峰和波谷"><a href="#股票的波峰和波谷" class="headerlink" title="股票的波峰和波谷"></a>股票的波峰和波谷</h1>
+                <h1 id="股票的波峰和波谷"><a href="#股票的波峰和波谷" class="headerlink" title="股票的波峰和波谷"></a>股票的波峰和波谷</h1><h2 id="1、需求"><a href="#1、需求" class="headerlink" title="1、需求"></a>1、需求</h2><p>求股票的波峰Crest 和 波谷trough</p>
+<p>波峰：当天的股票价格大于前一天和后一天<br>波谷：当天的股票价格小于前一天和后一天</p>
+<p>数据准备： stock表有3个字段： id（股票id）、price（股票价格）、dt（日期）</p>
+<p>原始数据表stock如下：</p>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>price</th>
+<th>dt</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>20</td>
+<td>2021-07-01</td>
+</tr>
+<tr>
+<td>1</td>
+<td>21</td>
+<td>2021-07-02</td>
+</tr>
+<tr>
+<td>1</td>
+<td>19</td>
+<td>2021-07-03</td>
+</tr>
+<tr>
+<td>2</td>
+<td>98</td>
+<td>2021-07-01</td>
+</tr>
+</tbody></table>
+<h2 id="2、数据准备"><a href="#2、数据准备" class="headerlink" title="2、数据准备"></a>2、数据准备</h2><pre class=" language-sql"><code class="language-sql"><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">20</span><span class="token punctuation">,</span><span class="token number">2020</span><span class="token operator">-</span><span class="token number">09</span><span class="token operator">-</span><span class="token number">01</span>
+<span class="token number">1</span><span class="token punctuation">,</span><span class="token number">21</span><span class="token punctuation">,</span><span class="token number">2020</span><span class="token operator">-</span><span class="token number">09</span><span class="token operator">-</span><span class="token number">02</span>
+<span class="token number">1</span><span class="token punctuation">,</span><span class="token number">19</span><span class="token punctuation">,</span><span class="token number">2020</span><span class="token operator">-</span><span class="token number">09</span><span class="token operator">-</span><span class="token number">03</span>
+<span class="token number">2</span><span class="token punctuation">,</span><span class="token number">98</span><span class="token punctuation">,</span><span class="token number">2020</span><span class="token operator">-</span><span class="token number">09</span><span class="token operator">-</span><span class="token number">01</span>
+</code></pre>
+<h2 id="3、建表和导入"><a href="#3、建表和导入" class="headerlink" title="3、建表和导入"></a>3、建表和导入</h2><pre class=" language-sql"><code class="language-sql"><span class="token keyword">drop</span> <span class="token keyword">table</span> <span class="token keyword">if</span> <span class="token keyword">exists</span> stock<span class="token punctuation">;</span>
+<span class="token keyword">CREATE</span> <span class="token keyword">TABLE</span> stock <span class="token punctuation">(</span> 
+  id string<span class="token punctuation">,</span> 
+  price string<span class="token punctuation">,</span>
+  dt string
+<span class="token punctuation">)</span>
+<span class="token keyword">ROW</span> format delimited <span class="token keyword">FIELDS</span> <span class="token keyword">TERMINATED BY</span> <span class="token string">","</span><span class="token punctuation">;</span>
+</code></pre>
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">load</span> <span class="token keyword">data</span> <span class="token keyword">local</span> inpath <span class="token string">'/opt/bigdata/wmy/hive/data/stock.txt'</span> <span class="token keyword">into</span> <span class="token keyword">table</span> stock<span class="token punctuation">;</span>
+</code></pre>
+<h2 id="4、需求分析"><a href="#4、需求分析" class="headerlink" title="4、需求分析"></a>4、需求分析</h2><p>此题比较简单，主要是利用lag()和lead()函数便可以解决。直接给出SQL如下：</p>
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">SELECT</span> <span class="token operator">*</span>
+<span class="token keyword">FROM</span> 
+    <span class="token punctuation">(</span><span class="token keyword">SELECT</span> id<span class="token punctuation">,</span>
+         price<span class="token punctuation">,</span>
+         dt<span class="token punctuation">,</span>
+        
+        <span class="token keyword">CASE</span>
+        <span class="token keyword">WHEN</span> price <span class="token operator">></span> lag_price
+            <span class="token operator">AND</span> price <span class="token operator">></span> lead_price <span class="token keyword">THEN</span>
+        <span class="token string">"Crest"</span>
+        <span class="token keyword">WHEN</span> price <span class="token operator">&lt;</span> lag_price
+            <span class="token operator">AND</span> price <span class="token operator">&lt;</span> lead_price <span class="token keyword">THEN</span>
+        <span class="token string">"Through"</span>
+        <span class="token keyword">ELSE</span> <span class="token boolean">null</span>
+        <span class="token keyword">END</span> <span class="token keyword">AS</span> res
+    <span class="token keyword">FROM</span> 
+        <span class="token punctuation">(</span><span class="token keyword">SELECT</span> id<span class="token punctuation">,</span>
+         price<span class="token punctuation">,</span>
+         dt<span class="token punctuation">,</span>
+         lag<span class="token punctuation">(</span>price<span class="token punctuation">,</span>
+        <span class="token number">1</span><span class="token punctuation">,</span>
+        price<span class="token punctuation">)</span> <span class="token keyword">over</span><span class="token punctuation">(</span><span class="token keyword">partition</span> <span class="token keyword">by</span> id
+        <span class="token keyword">ORDER</span> <span class="token keyword">BY</span>  dt<span class="token punctuation">)</span> lag_price<span class="token punctuation">,</span> lead<span class="token punctuation">(</span>price<span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span>price<span class="token punctuation">)</span> <span class="token keyword">over</span><span class="token punctuation">(</span><span class="token keyword">partition</span> <span class="token keyword">by</span> id
+        <span class="token keyword">ORDER</span> <span class="token keyword">BY</span>  dt<span class="token punctuation">)</span> lead_price
+        <span class="token keyword">FROM</span> stock <span class="token punctuation">)</span>t1 <span class="token punctuation">)</span>t2
+    <span class="token keyword">WHERE</span> res <span class="token operator">is</span> <span class="token operator">NOT</span> <span class="token boolean">null</span><span class="token punctuation">;</span>
+</code></pre>
+<p>本文主要分析了一种股票求波峰波谷的方法，利用SQL中的lag()和lead()函数进行解决。</p>
+<pre class=" language-tex"><code class="language-tex">t2.id   t2.price        t2.dt   t2.res
+1       21      2020-09-02      Crest
+Time taken: 3.361 seconds, Fetched: 1 row(s)
+</code></pre>
+<h2 id="5、分析SQL"><a href="#5、分析SQL" class="headerlink" title="5、分析SQL"></a>5、分析SQL</h2><pre class=" language-sql"><code class="language-sql"><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span>
+hive <span class="token punctuation">(</span>wmy<span class="token punctuation">)</span><span class="token operator">></span> <span class="token keyword">select</span> <span class="token operator">*</span> <span class="token keyword">from</span> stock<span class="token punctuation">;</span>
+OK
+stock<span class="token punctuation">.</span>id        stock<span class="token punctuation">.</span>price     stock<span class="token punctuation">.</span>dt
+<span class="token number">1</span>       <span class="token number">20</span>      <span class="token number">2020</span><span class="token operator">-</span><span class="token number">09</span><span class="token operator">-</span><span class="token number">01</span>
+<span class="token number">1</span>       <span class="token number">21</span>      <span class="token number">2020</span><span class="token operator">-</span><span class="token number">09</span><span class="token operator">-</span><span class="token number">02</span>
+<span class="token number">1</span>       <span class="token number">19</span>      <span class="token number">2020</span><span class="token operator">-</span><span class="token number">09</span><span class="token operator">-</span><span class="token number">03</span>
+<span class="token number">2</span>       <span class="token number">98</span>      <span class="token number">2020</span><span class="token operator">-</span><span class="token number">09</span><span class="token operator">-</span><span class="token number">01</span>
+Time taken: <span class="token number">0.186</span> seconds<span class="token punctuation">,</span> Fetched: <span class="token number">4</span> <span class="token keyword">row</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span>
+
+<span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span>
+<span class="token keyword">select</span> 
+id<span class="token punctuation">,</span>
+price<span class="token punctuation">,</span>
+dt<span class="token punctuation">,</span>
+lag<span class="token punctuation">(</span>price<span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span>price<span class="token punctuation">)</span> <span class="token keyword">over</span><span class="token punctuation">(</span><span class="token keyword">partition</span> <span class="token keyword">by</span> id <span class="token keyword">order</span> <span class="token keyword">by</span> dt<span class="token punctuation">)</span> lag_price<span class="token punctuation">,</span>
+lead<span class="token punctuation">(</span>price<span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span>price<span class="token punctuation">)</span> <span class="token keyword">over</span><span class="token punctuation">(</span><span class="token keyword">partition</span> <span class="token keyword">by</span> id <span class="token keyword">order</span> <span class="token keyword">by</span> dt<span class="token punctuation">)</span> lead_price
+<span class="token keyword">from</span> stock<span class="token punctuation">;</span>
+<span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span>
+id      price   dt      lag_price   lead_price
+<span class="token number">1</span>       <span class="token number">20</span>      <span class="token number">2020</span><span class="token operator">-</span><span class="token number">09</span><span class="token operator">-</span><span class="token number">01</span>      <span class="token number">20</span>      <span class="token number">21</span>
+<span class="token number">1</span>       <span class="token number">21</span>      <span class="token number">2020</span><span class="token operator">-</span><span class="token number">09</span><span class="token operator">-</span><span class="token number">02</span>      <span class="token number">20</span>      <span class="token number">19</span>
+<span class="token number">1</span>       <span class="token number">19</span>      <span class="token number">2020</span><span class="token operator">-</span><span class="token number">09</span><span class="token operator">-</span><span class="token number">03</span>      <span class="token number">21</span>      <span class="token number">19</span>
+<span class="token number">2</span>       <span class="token number">98</span>      <span class="token number">2020</span><span class="token operator">-</span><span class="token number">09</span><span class="token operator">-</span><span class="token number">01</span>      <span class="token number">98</span>      <span class="token number">98</span>
+Time taken: <span class="token number">3.295</span> seconds<span class="token punctuation">,</span> Fetched: <span class="token number">4</span> <span class="token keyword">row</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span>
+<span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span><span class="token operator">=</span>
+<span class="token keyword">select</span>
+<span class="token operator">*</span> 
+<span class="token keyword">from</span> 
+<span class="token punctuation">(</span>
+<span class="token keyword">select</span> 
+id<span class="token punctuation">,</span>
+price<span class="token punctuation">,</span>
+dt<span class="token punctuation">,</span>
+<span class="token keyword">case</span> 
+<span class="token keyword">when</span> price <span class="token operator">></span> lag_price <span class="token operator">and</span>  price <span class="token operator">></span> lead_price <span class="token keyword">then</span> <span class="token string">"Crest"</span> 
+<span class="token keyword">when</span> price <span class="token operator">&lt;</span> lag_price <span class="token operator">and</span>  price <span class="token operator">&lt;</span> lead_price <span class="token keyword">then</span> <span class="token string">"Through"</span> 
+<span class="token keyword">else</span> <span class="token boolean">null</span> 
+<span class="token keyword">end</span> <span class="token keyword">as</span> res
+<span class="token keyword">from</span> 
+<span class="token punctuation">(</span>
+<span class="token keyword">select</span> 
+id<span class="token punctuation">,</span>
+price<span class="token punctuation">,</span>
+dt<span class="token punctuation">,</span>
+lag<span class="token punctuation">(</span>price<span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span>price<span class="token punctuation">)</span> <span class="token keyword">over</span><span class="token punctuation">(</span><span class="token keyword">partition</span> <span class="token keyword">by</span> id <span class="token keyword">order</span> <span class="token keyword">by</span> dt<span class="token punctuation">)</span> lag_price<span class="token punctuation">,</span>
+lead<span class="token punctuation">(</span>price<span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span>price<span class="token punctuation">)</span> <span class="token keyword">over</span><span class="token punctuation">(</span><span class="token keyword">partition</span> <span class="token keyword">by</span> id <span class="token keyword">order</span> <span class="token keyword">by</span> dt<span class="token punctuation">)</span> lead_price
+<span class="token keyword">from</span> stock
+<span class="token punctuation">)</span>t1
+<span class="token punctuation">)</span>t2
+<span class="token keyword">where</span> res <span class="token operator">is</span> <span class="token operator">not</span> <span class="token boolean">null</span><span class="token punctuation">;</span>
+</code></pre>
+
                 
             </div>
             <hr/>
