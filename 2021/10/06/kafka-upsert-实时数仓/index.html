@@ -435,8 +435,8 @@
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/kafka/">
-                                <span class="chip bg-color">kafka</span>
+                            <a href="/tags/Flink%E6%B5%81%E5%BC%8F%E5%BC%95%E6%93%8E/">
+                                <span class="chip bg-color">Flink流式引擎</span>
                             </a>
                         
                     </div>
@@ -447,8 +447,8 @@
                     <div class="post-cate">
                         <i class="fas fa-bookmark fa-fw icon-category"></i>
                         
-                            <a href="/categories/kafka/" class="post-category">
-                                kafka
+                            <a href="/categories/Flink%E6%B5%81%E5%BC%8F%E5%BC%95%E6%93%8E/" class="post-category">
+                                Flink流式引擎
                             </a>
                         
                     </div>
@@ -483,6 +483,215 @@
             <div id="articleContent">
                 <h1 id="upsert-kafka"><a href="#upsert-kafka" class="headerlink" title="upsert-kafka"></a>upsert-kafka</h1><p>参考链接：<a href="https://blog.csdn.net/jmx_bigdata/article/details/112572194" target="_blank" rel="noopener">https://blog.csdn.net/jmx_bigdata/article/details/112572194</a></p>
 <p>在某些场景中，比如GROUP BY聚合之后的结果，需要去更新之前的结果值。这个时候，需要将 Kafka 消息记录的 key 当成主键处理，用来确定一条数据是应该作为插入、删除还是更新记录来处理。在Flink1.11中，可以通过 flink-cdc-connectors 项目提供的 **changelog-json format **来实现该功能。关于该功能的使用，flink-cdc-connectors操作实践</p>
+<p>在Flink1.12版本中， 新增了一个 upsert connector(upsert-kafka)，该 connector 扩展自现有的 Kafka connector，工作在 upsert 模式（FLIP-149）下。新的 upsert-kafka connector 既可以作为 source 使用，也可以作为 sink 使用，并且提供了与现有的 kafka connector 相同的基本功能和持久性保证，因为两者之间复用了大部分代码。本文将以Flink1.12为例，介绍该功能的基本使用步骤，以下是全文，希望对你有所帮助。</p>
+<h2 id="1、Upsert-Kafka-connector简介"><a href="#1、Upsert-Kafka-connector简介" class="headerlink" title="1、Upsert Kafka connector简介"></a>1、Upsert Kafka connector简介</h2><p>Upsert Kafka Connector允许用户以upsert的方式从Kafka主题读取数据或将数据写入Kafka主题。</p>
+<p>当作为数据源时，upsert-kafka Connector会生产一个changelog流，其中每条数据记录都表示一个更新或删除事件。更准确地说，如果不存在对应的key，则视为INSERT操作。如果已经存在了相对应的key，则该key对应的value值为最后一次更新的值。</p>
+<p>用表来类比，changelog 流中的数据记录被解释为 UPSERT，也称为 INSERT/UPDATE，因为任何具有相同 key 的现有行都被覆盖。另外，value 为空的消息将会被视作为 DELETE 消息。</p>
+<p>当作为数据汇时，upsert-kafka Connector会消费一个changelog流。它将INSERT / UPDATE_AFTER数据作为正常的Kafka消息值写入(即INSERT和UPDATE操作，都会进行正常写入，如果是更新，则同一个key会存储多条数据，但在读取该表数据时，只保留最后一次更新的值)，并将 DELETE 数据以 value 为空的 Kafka 消息写入（key被打上墓碑标记，表示对应 key 的消息被删除）。Flink 将根据主键列的值对数据进行分区，从而保证主键上的消息有序，因此同一主键上的更新/删除消息将落在同一分区中</p>
+<h2 id="2、依赖"><a href="#2、依赖" class="headerlink" title="2、依赖"></a>2、依赖</h2><pre class=" language-xml"><code class="language-xml"><span class="token comment" spellcheck="true">&lt;!-- https://mvnrepository.com/artifact/org.apache.flink/flink-connector-kafka --></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dependency</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>groupId</span><span class="token punctuation">></span></span>org.apache.flink<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>groupId</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>artifactId</span><span class="token punctuation">></span></span>flink-connector-kafka_2.11<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>artifactId</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>version</span><span class="token punctuation">></span></span>1.13.2<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>version</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>dependency</span><span class="token punctuation">></span></span>
+</code></pre>
+<p>如果使用SQL Client，需要下载<strong>flink-connector-kafka_2.11-1.13.2.jar</strong>，并将其放置在Flink安装目录的lib文件夹下。</p>
+<h2 id="3、案例演示"><a href="#3、案例演示" class="headerlink" title="3、案例演示"></a>3、案例演示</h2><h3 id="3-1-pageviews-per-region"><a href="#3-1-pageviews-per-region" class="headerlink" title="3.1 pageviews_per_region"></a>3.1 pageviews_per_region</h3><pre class=" language-sql"><code class="language-sql"><span class="token comment" spellcheck="true">-- 创建一张kafka表，用户存储sink的数据</span>
+<span class="token keyword">CREATE</span> <span class="token keyword">TABLE</span> pageviews_per_region <span class="token punctuation">(</span>
+  user_region STRING<span class="token punctuation">,</span>
+  pv <span class="token keyword">BIGINT</span><span class="token punctuation">,</span>
+  uv <span class="token keyword">BIGINT</span><span class="token punctuation">,</span>
+  <span class="token keyword">PRIMARY</span> <span class="token keyword">KEY</span> <span class="token punctuation">(</span>user_region<span class="token punctuation">)</span> <span class="token operator">NOT</span> ENFORCED
+<span class="token punctuation">)</span> <span class="token keyword">WITH</span> <span class="token punctuation">(</span>
+  <span class="token string">'connector'</span> <span class="token operator">=</span> <span class="token string">'upsert-kafka'</span><span class="token punctuation">,</span>
+  <span class="token string">'topic'</span> <span class="token operator">=</span> <span class="token string">'test'</span><span class="token punctuation">,</span>
+  <span class="token string">'properties.bootstrap.servers'</span> <span class="token operator">=</span> <span class="token string">'flink01,flink02:9092,flink03:9092'</span><span class="token punctuation">,</span>
+  <span class="token string">'key.format'</span> <span class="token operator">=</span> <span class="token string">'avro'</span><span class="token punctuation">,</span>
+  <span class="token string">'value.format'</span> <span class="token operator">=</span> <span class="token string">'avro'</span>
+<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>尖叫提示：</p>
+<p>要使用 upsert-kafka connector，必须在创建表时使用<strong>PRIMARY KEY</strong>定义主键，并为键（key.format）和值（value.format）指定序列化反序列化格式。</p>
+<h3 id="3-2-参数解释"><a href="#3-2-参数解释" class="headerlink" title="3.2 参数解释"></a>3.2 参数解释</h3><pre class=" language-properties"><code class="language-properties"><span class="token attr-name">upsert-kafka</span> <span class="token attr-value">connector参数</span>
+connector
+<span class="token attr-name">必选。指定要使用的连接器，Upsert</span> <span class="token attr-value">Kafka 连接器使用：'upsert-kafka'。</span>
+
+topic
+<span class="token attr-name">必选。用于读取和写入的</span> <span class="token attr-value">Kafka topic 名称。</span>
+
+properties.bootstrap.servers
+<span class="token attr-name">必选。以逗号分隔的</span> <span class="token attr-value">Kafka brokers 列表。</span>
+
+key.format
+<span class="token attr-name">必选。用于对</span> <span class="token attr-value">Kafka 消息中 key 部分序列化和反序列化的格式。key 字段由 PRIMARY KEY 语法指定。支持的格式包括 'csv'、'json'、'avro'。</span>
+
+value.format
+<span class="token attr-name">必选。用于对</span> <span class="token attr-value">Kafka 消息中 value 部分序列化和反序列化的格式。支持的格式包括 'csv'、'json'、'avro'。</span>
+
+<span class="token attr-name">*properties.</span> <span class="token attr-value">**</span>
+<span class="token attr-name">可选。</span> <span class="token attr-value">该选项可以传递任意的 Kafka 参数。选项的后缀名必须匹配定义在 Kafka 参数文档中的参数名。 Flink 会自动移除 选项名中的 “properties.” 前缀，并将转换后的键名以及值传入 KafkaClient。 例如，你可以通过 'properties.allow.auto.create.topics' = 'false' 来禁止自动创建 topic。 但是，某些选项，例如'key.deserializer' 和 'value.deserializer' 是不允许通过该方式传递参数，因为 Flink 会重写这些参数的值。</span>
+
+value.fields-include
+<span class="token attr-name">可选，默认为ALL。控制key字段是否出现在</span> <span class="token attr-value">value 中。当取ALL时，表示消息的 value 部分将包含 schema 中所有的字段，包括定义为主键的字段。当取EXCEPT_KEY时，表示记录的 value 部分包含 schema 的所有字段，定义为主键的字段除外。</span>
+
+key.fields-prefix
+可选。为了避免与value字段命名冲突，为key字段添加一个自定义前缀。默认前缀为空。一旦指定了key字段的前缀，必须在DDL中指明前缀的名称，但是在构建key的序列化数据类型时，将移除该前缀。见下面的示例。在需要注意的是：使用该配置属性，value.fields-include的值必须为EXCEPT_KEY。
+</code></pre>
+<h3 id="3-3-result-total-pvuv-min-prefix"><a href="#3-3-result-total-pvuv-min-prefix" class="headerlink" title="3.3 result_total_pvuv_min_prefix"></a>3.3 result_total_pvuv_min_prefix</h3><pre class=" language-sql"><code class="language-sql">
+<span class="token comment" spellcheck="true">-- 创建一张upsert表，当指定了qwe前缀，涉及的key必须指定qwe前缀</span>
+<span class="token keyword">CREATE</span> <span class="token keyword">TABLE</span> result_total_pvuv_min_prefix <span class="token punctuation">(</span>
+    qwedo_date     STRING<span class="token punctuation">,</span>     <span class="token comment" spellcheck="true">-- 统计日期，必须包含qwe前缀</span>
+    qwedo_min      STRING<span class="token punctuation">,</span>      <span class="token comment" spellcheck="true">-- 统计分钟，必须包含qwe前缀</span>
+    pv          <span class="token keyword">BIGINT</span><span class="token punctuation">,</span>     <span class="token comment" spellcheck="true">-- 点击量</span>
+    uv          <span class="token keyword">BIGINT</span><span class="token punctuation">,</span>     <span class="token comment" spellcheck="true">-- 一天内同个访客多次访问仅计算一个UV</span>
+    currenttime <span class="token keyword">TIMESTAMP</span><span class="token punctuation">,</span>  <span class="token comment" spellcheck="true">-- 当前时间</span>
+    <span class="token keyword">PRIMARY</span> <span class="token keyword">KEY</span> <span class="token punctuation">(</span>qwedo_date<span class="token punctuation">,</span> qwedo_min<span class="token punctuation">)</span> <span class="token operator">NOT</span> ENFORCED <span class="token comment" spellcheck="true">-- 必须包含qwe前缀</span>
+<span class="token punctuation">)</span> <span class="token keyword">WITH</span> <span class="token punctuation">(</span>
+  <span class="token string">'connector'</span> <span class="token operator">=</span> <span class="token string">'upsert-kafka'</span><span class="token punctuation">,</span>
+  <span class="token string">'topic'</span> <span class="token operator">=</span> <span class="token string">'result_total_pvuv_min_prefix'</span><span class="token punctuation">,</span>
+  <span class="token string">'properties.bootstrap.servers'</span> <span class="token operator">=</span> <span class="token string">'flink01:9092,flink02:9092,flink03:9092'</span><span class="token punctuation">,</span>
+  <span class="token string">'key.json.ignore-parse-errors'</span> <span class="token operator">=</span> <span class="token string">'true'</span><span class="token punctuation">,</span>
+  <span class="token string">'value.json.fail-on-missing-field'</span> <span class="token operator">=</span> <span class="token string">'false'</span><span class="token punctuation">,</span>
+  <span class="token string">'key.format'</span> <span class="token operator">=</span> <span class="token string">'json'</span><span class="token punctuation">,</span>
+  <span class="token string">'value.format'</span> <span class="token operator">=</span> <span class="token string">'json'</span><span class="token punctuation">,</span>
+  <span class="token string">'key.fields-prefix'</span><span class="token operator">=</span><span class="token string">'qwe'</span><span class="token punctuation">,</span> <span class="token comment" spellcheck="true">-- 指定前缀qwe</span>
+  <span class="token string">'value.fields-include'</span> <span class="token operator">=</span> <span class="token string">'EXCEPT_KEY'</span> <span class="token comment" spellcheck="true">-- key不出现kafka消息的value中</span>
+<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>尖叫提示：</p>
+<p>如果指定了key字段前缀，但在DDL中并没有添加该前缀字符串，那么在向该表写入数时，会抛出下面异常：</p>
+<pre class=" language-properties"><code class="language-properties"><span class="token attr-name">[ERROR]</span> <span class="token attr-value">Could not execute SQL statement. Reason:</span>
+<span class="token attr-name">org.apache.flink.table.api.ValidationException</span><span class="token punctuation">:</span> <span class="token attr-value">All fields in ‘key.fields’ must be prefixed with ‘qwe’ when option ‘key.fields-prefix’ is set but field ‘do_date’ is not prefixed.</span>
+</code></pre>
+<pre class=" language-properties"><code class="language-properties">sink.parallelism
+<span class="token attr-name">可选。定义</span> <span class="token attr-value">upsert-kafka sink 算子的并行度。默认情况下，由框架确定并行度，与上游链接算子的并行度保持一致。</span>
+
+其他注意事项
+Key和Value的序列化格式
+<span class="token attr-name">关于Key、value的序列化可以参考Kafka</span> <span class="token attr-value">connector。值得注意的是，必须指定Key和Value的序列化格式，其中Key是通过PRIMARY KEY指定的。</span>
+
+<span class="token attr-name">Primary</span> <span class="token attr-value">Key约束</span>
+<span class="token attr-name">Upsert</span> <span class="token attr-value">Kafka 工作在 upsert 模式（FLIP-149）下。当我们创建表时，需要在 DDL 中定义主键。具有相同key的数据，会存在相同的分区中。在 changlog source 上定义主键意味着在物化后的 changelog 上主键具有唯一性。定义的主键将决定哪些字段出现在 Kafka 消息的 key 中。</span>
+
+一致性保障
+<span class="token attr-name">默认情况下，如果启用</span> <span class="token attr-value">checkpoint，Upsert Kafka sink 会保证至少一次将数据插入 Kafka topic。</span>
+
+<span class="token attr-name">这意味着，Flink</span> <span class="token attr-value">可以将具有相同 key 的重复记录写入 Kafka topic。但由于该连接器以 upsert 的模式工作，该连接器作为 source 读入时，可以确保具有相同主键值下仅最后一条消息会生效。因此，upsert-kafka 连接器可以像 HBase sink 一样实现幂等写入。</span>
+
+分区水位线
+<span class="token attr-name">Flink</span> <span class="token attr-value">支持根据 Upsert Kafka 的 每个分区的数据特性发送相应的 watermark。当使用这个特性的时候，watermark 是在 Kafka consumer 内部生成的。 合并每个分区生成的 watermark 的方式和 streaming shuffle 的方式是一致的(单个分区的输入取最大值，多个分区的输入取最小值)。 数据源产生的 watermark 是取决于该 consumer 负责的所有分区中当前最小的 watermark。如果该 consumer 负责的部分分区是空闲的，那么整体的 watermark 并不会前进。在这种情况下，可以通过设置合适的 table.exec.source.idle-timeout 来缓解这个问题。</span>
+
+数据类型
+<span class="token attr-name">Upsert</span> <span class="token attr-value">Kafka 用字节bytes存储消息的 key 和 value，因此没有 schema 或数据类型。消息按格式进行序列化和反序列化，例如：csv、json、avro。不同的序列化格式所提供的数据类型有所不同，因此需要根据使用的序列化格式进行确定表字段的数据类型是否与该序列化类型提供的数据类型兼容。</span>
+</code></pre>
+<h3 id="3-4-source-ods-fact-user-ippv"><a href="#3-4-source-ods-fact-user-ippv" class="headerlink" title="3.4 source_ods_fact_user_ippv"></a>3.4 source_ods_fact_user_ippv</h3><p>本文以实时地统计网页PV和UV的总量为例，介绍upsert-kafka基本使用方式：</p>
+<ul>
+<li>Kafka 数据源</li>
+</ul>
+<p>用户的ippv信息，一个用户在一天内可以有很多次pv</p>
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">CREATE</span> <span class="token keyword">TABLE</span> source_ods_fact_user_ippv <span class="token punctuation">(</span>
+    user_id      STRING<span class="token punctuation">,</span>       <span class="token comment" spellcheck="true">-- 用户ID</span>
+    client_ip    STRING<span class="token punctuation">,</span>       <span class="token comment" spellcheck="true">-- 客户端IP</span>
+    client_info  STRING<span class="token punctuation">,</span>       <span class="token comment" spellcheck="true">-- 设备机型信息</span>
+    pagecode     STRING<span class="token punctuation">,</span>       <span class="token comment" spellcheck="true">-- 页面代码</span>
+    access_time  <span class="token keyword">TIMESTAMP</span><span class="token punctuation">(</span><span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">,</span>    <span class="token comment" spellcheck="true">-- 请求时间</span>
+    dt           STRING<span class="token punctuation">,</span>       <span class="token comment" spellcheck="true">-- 时间分区天</span>
+    WATERMARK <span class="token keyword">FOR</span> access_time <span class="token keyword">AS</span> access_time <span class="token operator">-</span> INTERVAL <span class="token string">'5'</span> SECOND  <span class="token comment" spellcheck="true">-- 定义watermark</span>
+<span class="token punctuation">)</span> <span class="token keyword">WITH</span> <span class="token punctuation">(</span>
+   <span class="token string">'connector'</span> <span class="token operator">=</span> <span class="token string">'kafka'</span><span class="token punctuation">,</span> <span class="token comment" spellcheck="true">-- 使用 kafka connector</span>
+    <span class="token string">'topic'</span> <span class="token operator">=</span> <span class="token string">'user_ippv'</span><span class="token punctuation">,</span> <span class="token comment" spellcheck="true">-- kafka主题</span>
+    <span class="token string">'scan.startup.mode'</span> <span class="token operator">=</span> <span class="token string">'earliest-offset'</span><span class="token punctuation">,</span> <span class="token comment" spellcheck="true">-- 偏移量</span>
+    <span class="token string">'properties.group.id'</span> <span class="token operator">=</span> <span class="token string">'group1'</span><span class="token punctuation">,</span> <span class="token comment" spellcheck="true">-- 消费者组</span>
+    <span class="token string">'properties.bootstrap.servers'</span> <span class="token operator">=</span> <span class="token string">'flink01:9092,flink02:9092,flink03:9092'</span><span class="token punctuation">,</span>
+    <span class="token string">'format'</span> <span class="token operator">=</span> <span class="token string">'json'</span><span class="token punctuation">,</span> <span class="token comment" spellcheck="true">-- 数据源格式为json</span>
+    <span class="token string">'json.fail-on-missing-field'</span> <span class="token operator">=</span> <span class="token string">'false'</span><span class="token punctuation">,</span>
+    <span class="token string">'json.ignore-parse-errors'</span> <span class="token operator">=</span> <span class="token string">'true'</span>
+<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<ul>
+<li>Kafka Sink表</li>
+</ul>
+<p>统计每分钟的PV、UV，并将结果存储在Kafka中</p>
+<h3 id="3-5-result-total-pvuv-min"><a href="#3-5-result-total-pvuv-min" class="headerlink" title="3.5 result_total_pvuv_min"></a>3.5 result_total_pvuv_min</h3><pre class=" language-sql"><code class="language-sql">
+<span class="token keyword">CREATE</span> <span class="token keyword">TABLE</span> result_total_pvuv_min <span class="token punctuation">(</span>
+    do_date     STRING<span class="token punctuation">,</span>     <span class="token comment" spellcheck="true">-- 统计日期</span>
+    do_min      STRING<span class="token punctuation">,</span>      <span class="token comment" spellcheck="true">-- 统计分钟</span>
+    pv          <span class="token keyword">BIGINT</span><span class="token punctuation">,</span>     <span class="token comment" spellcheck="true">-- 点击量</span>
+    uv          <span class="token keyword">BIGINT</span><span class="token punctuation">,</span>     <span class="token comment" spellcheck="true">-- 一天内同个访客多次访问仅计算一个UV</span>
+    currenttime <span class="token keyword">TIMESTAMP</span><span class="token punctuation">,</span>  <span class="token comment" spellcheck="true">-- 当前时间</span>
+    <span class="token keyword">PRIMARY</span> <span class="token keyword">KEY</span> <span class="token punctuation">(</span>do_date<span class="token punctuation">,</span> do_min<span class="token punctuation">)</span> <span class="token operator">NOT</span> ENFORCED
+<span class="token punctuation">)</span> <span class="token keyword">WITH</span> <span class="token punctuation">(</span>
+  <span class="token string">'connector'</span> <span class="token operator">=</span> <span class="token string">'upsert-kafka'</span><span class="token punctuation">,</span>
+  <span class="token string">'topic'</span> <span class="token operator">=</span> <span class="token string">'result_total_pvuv_min'</span><span class="token punctuation">,</span>
+  <span class="token string">'properties.bootstrap.servers'</span> <span class="token operator">=</span> <span class="token string">'flink01:9092,flink02:9092,flink03:9092'</span><span class="token punctuation">,</span>
+  <span class="token string">'key.json.ignore-parse-errors'</span> <span class="token operator">=</span> <span class="token string">'true'</span><span class="token punctuation">,</span>
+  <span class="token string">'value.json.fail-on-missing-field'</span> <span class="token operator">=</span> <span class="token string">'false'</span><span class="token punctuation">,</span>
+  <span class="token string">'key.format'</span> <span class="token operator">=</span> <span class="token string">'json'</span><span class="token punctuation">,</span>
+  <span class="token string">'value.format'</span> <span class="token operator">=</span> <span class="token string">'json'</span><span class="token punctuation">,</span>
+  <span class="token string">'value.fields-include'</span> <span class="token operator">=</span> <span class="token string">'EXCEPT_KEY'</span> <span class="token comment" spellcheck="true">-- key不出现kafka消息的value中</span>
+<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<ul>
+<li>计算逻辑</li>
+</ul>
+<pre class=" language-sql"><code class="language-sql"><span class="token comment" spellcheck="true">-- 创建视图</span>
+<span class="token keyword">CREATE</span> <span class="token keyword">VIEW</span> view_total_pvuv_min <span class="token keyword">AS</span>
+<span class="token keyword">SELECT</span>
+     dt <span class="token keyword">AS</span> do_date<span class="token punctuation">,</span>                    <span class="token comment" spellcheck="true">-- 时间分区</span>
+     <span class="token function">count</span> <span class="token punctuation">(</span>client_ip<span class="token punctuation">)</span> <span class="token keyword">AS</span> pv<span class="token punctuation">,</span>          <span class="token comment" spellcheck="true">-- 客户端的IP</span>
+     <span class="token function">count</span> <span class="token punctuation">(</span><span class="token keyword">DISTINCT</span> client_ip<span class="token punctuation">)</span> <span class="token keyword">AS</span> uv<span class="token punctuation">,</span> <span class="token comment" spellcheck="true">-- 客户端去重</span>
+     <span class="token function">max</span><span class="token punctuation">(</span>access_time<span class="token punctuation">)</span> <span class="token keyword">AS</span> access_time   <span class="token comment" spellcheck="true">-- 请求的时间</span>
+<span class="token keyword">FROM</span>
+    source_ods_fact_user_ippv
+<span class="token keyword">GROUP</span> <span class="token keyword">BY</span> dt<span class="token punctuation">;</span>
+</code></pre>
+<pre class=" language-sql"><code class="language-sql"><span class="token comment" spellcheck="true">-- 写入数据</span>
+<span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> result_total_pvuv_min
+<span class="token keyword">SELECT</span>
+  do_date<span class="token punctuation">,</span>    <span class="token comment" spellcheck="true">--  时间分区</span>
+  cast<span class="token punctuation">(</span>DATE_FORMAT <span class="token punctuation">(</span>access_time<span class="token punctuation">,</span><span class="token string">'HH:mm'</span><span class="token punctuation">)</span> <span class="token keyword">AS</span> STRING<span class="token punctuation">)</span> <span class="token keyword">AS</span> do_min<span class="token punctuation">,</span><span class="token comment" spellcheck="true">-- 分钟级别的时间</span>
+  pv<span class="token punctuation">,</span>
+  uv<span class="token punctuation">,</span>
+  <span class="token keyword">CURRENT_TIMESTAMP</span> <span class="token keyword">AS</span> currenttime <span class="token comment" spellcheck="true">-- 当前时间</span>
+<span class="token keyword">from</span>
+  view_total_pvuv_min<span class="token punctuation">;</span>
+</code></pre>
+<ul>
+<li>生产用户访问数据到kafka，向kafka中的user_ippv插入数据：</li>
+</ul>
+<pre class=" language-properties"><code class="language-properties"><span class="token attr-name">{"user_id"</span><span class="token punctuation">:</span><span class="token attr-value">"1","client_ip":"192.168.12.1","client_info":"phone","pagecode":"1001","access_time":"2021-01-08 11:32:24","dt":"2021-01-08"}</span>
+
+<span class="token attr-name">{"user_id"</span><span class="token punctuation">:</span><span class="token attr-value">"1","client_ip":"192.168.12.1","client_info":"phone","pagecode":"1201","access_time":"2021-01-08 11:32:55","dt":"2021-01-08"}</span>
+
+<span class="token attr-name">{"user_id"</span><span class="token punctuation">:</span><span class="token attr-value">"2","client_ip":"192.165.12.1","client_info":"pc","pagecode":"1031","access_time":"2021-01-08 11:32:59","dt":"2021-01-08"}</span>
+
+<span class="token attr-name">{"user_id"</span><span class="token punctuation">:</span><span class="token attr-value">"1","client_ip":"192.168.12.1","client_info":"phone","pagecode":"1101","access_time":"2021-01-08 11:33:24","dt":"2021-01-08"}</span>
+
+<span class="token attr-name">{"user_id"</span><span class="token punctuation">:</span><span class="token attr-value">"3","client_ip":"192.168.10.3","client_info":"pc","pagecode":"1001","access_time":"2021-01-08 11:33:30","dt":"2021-01-08"}</span>
+
+<span class="token attr-name">{"user_id"</span><span class="token punctuation">:</span><span class="token attr-value">"1","client_ip":"192.168.12.1","client_info":"phone","pagecode":"1001","access_time":"2021-01-08 11:34:24","dt":"2021-01-08"}</span>
+</code></pre>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20211006133221111.png" alt="result_total_pvuv_min"></p>
+<p><strong>可以看出</strong>：每分钟的pv、uv只显示一条数据，即代表着截止到当前时间点的pv和uv</p>
+<p>查看Kafka中result_total_pvuv_min主题的数据，如下：</p>
+<pre class=" language-properties"><code class="language-properties"><span class="token attr-name">[root@flink01</span> <span class="token attr-value">lib]# producer.sh user_ippv</span>
+<span class="token attr-name">>{"user_id"</span><span class="token punctuation">:</span><span class="token attr-value">"1","client_ip":"192.168.12.1","client_info":"phone","pagecode":"1001","access_time":"2021-01-08 11:32:24","dt":"2021-01-08"}</span>
+<span class="token attr-name">>{"user_id"</span><span class="token punctuation">:</span><span class="token attr-value">"1","client_ip":"192.168.12.1","client_info":"phone","pagecode":"1201","access_time":"2021-01-08 11:32:55","dt":"2021-01-08"}</span>
+<span class="token attr-name">>{"user_id"</span><span class="token punctuation">:</span><span class="token attr-value">"2","client_ip":"192.165.12.1","client_info":"pc","pagecode":"1031","access_time":"2021-01-08 11:32:59","dt":"2021-01-08"}</span>
+<span class="token attr-name">>{"user_id"</span><span class="token punctuation">:</span><span class="token attr-value">"1","client_ip":"192.168.12.1","client_info":"phone","pagecode":"1101","access_time":"2021-01-08 11:33:24","dt":"2021-01-08"}</span>
+<span class="token attr-name">>{"user_id"</span><span class="token punctuation">:</span><span class="token attr-value">"3","client_ip":"192.168.10.3","client_info":"pc","pagecode":"1001","access_time":"2021-01-08 11:33:30","dt":"2021-01-08"}</span>
+<span class="token attr-name">>{"user_id"</span><span class="token punctuation">:</span><span class="token attr-value">"1","client_ip":"192.168.12.1","client_info":"phone","pagecode":"1001","access_time":"2021-01-08 11:34:24","dt":"2021-01-08"}</span>
+</code></pre>
+<p><strong>可以看出</strong>：针对每一条访问数据，触发计算了一次PV、UV，每一条数据都是截止到当前时间的累计PV和UV。</p>
+<p>尖叫提示：</p>
+<p>默认情况下，如果在启用了检查点的情况下执行查询，Upsert Kafka接收器会将具有至少一次保证的数据提取到Kafka主题中。</p>
+<p>这意味着，Flink可能会将具有相同键的重复记录写入Kafka主题。但是，由于连接器在upsert模式下工作，因此作为源读回时，同一键上的最后一条记录将生效。因此，upsert-kafka连接器就像HBase接收器一样实现幂等写入。</p>
+<h2 id="4、总结"><a href="#4、总结" class="headerlink" title="4、总结"></a>4、总结</h2><p>本文以Flink1.13.2为例，介绍了**upsert connector(upsert-kafka)**的基本使用，该方式允许用户以upsert 的方式读写Kafka中的表，使用起来非常方便。另外本文也给出了一个具体的使用案例，可以进一步加深对该功能的使用。</p>
+<p>在某些场景中，比如GROUP BY聚合之后的结果，需要去更新之前的结果值。这个时候，需要将 Kafka 消息记录的 key 当成主键处理，用来确定一条数据是应该作为插入、删除还是更新记录来处理。在Flink1.11中，可以通过 flink-cdc-connectors 项目提供的 **changelog-json format **来实现该功能。关于该功能的使用，见之前的分享Flink1.11中的CDC Connectors操作实践。</p>
+<p>在Flink1.12版本中， 新增了一个 upsert connector(upsert-kafka)，该 connector 扩展自现有的 Kafka connector，工作在 upsert 模式（FLIP-149）下。新的 upsert-kafka connector 既可以作为 source 使用，也可以作为 sink 使用，并且提供了与现有的 kafka connector 相同的基本功能和持久性保证，因为两者之间复用了大部分代码。本文将以Flink1.12为例，介绍该功能的基本使用步骤，以下是全文，希望对你有所帮助。</p>
+<p>尖叫提示：</p>
+<p>默认情况下，如果在启用了检查点的情况下执行查询，Upsert Kafka接收器会将具有至少一次保证的数据提取到Kafka主题中。</p>
+<p>这意味着，Flink可能会将具有相同键的重复记录写入Kafka主题。但是，由于连接器在upsert模式下工作，因此作为源读回时，同一键上的最后一条记录将生效。因此，upsert-kafka连接器就像HBase接收器一样实现幂等写入。</p>
 
                 
             </div>
@@ -547,8 +756,8 @@
                     
                         <div class="article-tag">
                             
-                                <a href="/tags/kafka/">
-                                    <span class="chip bg-color">kafka</span>
+                                <a href="/tags/Flink%E6%B5%81%E5%BC%8F%E5%BC%95%E6%93%8E/">
+                                    <span class="chip bg-color">Flink流式引擎</span>
                                 </a>
                             
                         </div>
