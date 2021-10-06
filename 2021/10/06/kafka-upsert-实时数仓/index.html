@@ -481,7 +481,9 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                
+                <h1 id="upsert-kafka"><a href="#upsert-kafka" class="headerlink" title="upsert-kafka"></a>upsert-kafka</h1><p>参考链接：<a href="https://blog.csdn.net/jmx_bigdata/article/details/112572194" target="_blank" rel="noopener">https://blog.csdn.net/jmx_bigdata/article/details/112572194</a></p>
+<p>在某些场景中，比如GROUP BY聚合之后的结果，需要去更新之前的结果值。这个时候，需要将 Kafka 消息记录的 key 当成主键处理，用来确定一条数据是应该作为插入、删除还是更新记录来处理。在Flink1.11中，可以通过 flink-cdc-connectors 项目提供的 **changelog-json format **来实现该功能。关于该功能的使用，flink-cdc-connectors操作实践</p>
+
                 
             </div>
             <hr/>
@@ -507,7 +509,7 @@
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://github.com/wmybigdata/2021/10/06/upsert-kafka-%E5%AE%9E%E6%97%B6%E6%95%B0%E4%BB%93/">https://github.com/wmybigdata/2021/10/06/upsert-kafka-%E5%AE%9E%E6%97%B6%E6%95%B0%E4%BB%93/</a>
+                    <a href="https://github.com/wmybigdata/2021/10/06/kafka-upsert-%E5%AE%9E%E6%97%B6%E6%95%B0%E4%BB%93/">https://github.com/wmybigdata/2021/10/06/kafka-upsert-%E5%AE%9E%E6%97%B6%E6%95%B0%E4%BB%93/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -716,18 +718,17 @@
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="far fa-dot-circle"></i>&nbsp;本篇
-            </div>
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2021/10/06/upsert-kafka-%E5%AE%9E%E6%97%B6%E6%95%B0%E4%BB%93/">
+                <a href="/2021/10/06/flink-cdc-connectors%E6%93%8D%E4%BD%9C%E5%AE%9E%E8%B7%B5/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/0.jpg" class="responsive-img" alt="upsert-kafka-实时数仓">
+                        <img src="/medias/featureimages/20.jpg" class="responsive-img" alt="flink-cdc-connectors操作实践">
                         
-                        <span class="card-title">upsert-kafka-实时数仓</span>
+                        <span class="card-title">flink-cdc-connectors操作实践</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -737,27 +738,26 @@
                         
                     </div>
                     <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2021-10-06
-                            </span>
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2021-10-06
+                        </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/kafka/" class="post-category">
-                                    kafka
+                            <a href="/categories/Flink%E6%B5%81%E5%BC%8F%E5%BC%95%E6%93%8E/" class="post-category">
+                                    Flink流式引擎
                                 </a>
                             
                             
                         </span>
                     </div>
                 </div>
-
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/kafka/">
-                        <span class="chip bg-color">kafka</span>
+                    <a href="/tags/Flink%E6%B5%81%E5%BC%8F%E5%BC%95%E6%93%8E/">
+                        <span class="chip bg-color">Flink流式引擎</span>
                     </a>
                     
                 </div>
