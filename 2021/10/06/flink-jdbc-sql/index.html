@@ -482,6 +482,105 @@
         <div class="card-content article-card-content">
             <div id="articleContent">
                 <h1 id="flink-jdbc-sql"><a href="#flink-jdbc-sql" class="headerlink" title="flink-jdbc-sql"></a>flink-jdbc-sql</h1><p><a href="https://nightlies.apache.org/flink/flink-docs-release-1.13/zh/docs/connectors/table/jdbc/" target="_blank" rel="noopener">https://nightlies.apache.org/flink/flink-docs-release-1.13/zh/docs/connectors/table/jdbc/</a></p>
+<h2 id="1、简介"><a href="#1、简介" class="headerlink" title="1、简介"></a>1、简介</h2><p>JDBC 连接器允许使用 JDBC 驱动向任意类型的关系型数据库读取或者写入数据。本文档描述了针对关系型数据库如何通过建立 JDBC 连接器来执行 SQL 查询。</p>
+<p>如果在 DDL 中定义了主键，JDBC sink 将以 upsert 模式与外部系统交换 UPDATE/DELETE 消息；否则，它将以 append 模式与外部系统交换消息且不支持消费 UPDATE/DELETE 消息。</p>
+<h2 id="2、依赖"><a href="#2、依赖" class="headerlink" title="2、依赖"></a>2、依赖</h2><pre class=" language-xml"><code class="language-xml"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dependency</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>groupId</span><span class="token punctuation">></span></span>org.apache.flink<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>groupId</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>artifactId</span><span class="token punctuation">></span></span>flink-connector-jdbc_2.11<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>artifactId</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>version</span><span class="token punctuation">></span></span>1.13.2<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>version</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>dependency</span><span class="token punctuation">></span></span>
+</code></pre>
+<p>flink-connector-jdbc_2.11-1.13.2.jar</p>
+<table>
+<thead>
+<tr>
+<th align="left">Driver</th>
+<th align="left">Group Id</th>
+<th align="left">Artifact Id</th>
+<th align="left">JAR</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">MySQL</td>
+<td align="left"><code>mysql</code></td>
+<td align="left"><code>mysql-connector-java</code></td>
+<td align="left"><a href="https://repo.maven.apache.org/maven2/mysql/mysql-connector-java/" target="_blank" rel="noopener">下载</a></td>
+</tr>
+<tr>
+<td align="left">PostgreSQL</td>
+<td align="left"><code>org.postgresql</code></td>
+<td align="left"><code>postgresql</code></td>
+<td align="left"><a href="https://jdbc.postgresql.org/download.html" target="_blank" rel="noopener">下载</a></td>
+</tr>
+<tr>
+<td align="left">Derby</td>
+<td align="left"><code>org.apache.derby</code></td>
+<td align="left"><code>derby</code></td>
+<td align="left"><a href="http://db.apache.org/derby/derby_downloads.html" target="_blank" rel="noopener">下载</a></td>
+</tr>
+</tbody></table>
+<h2 id="3、如何创建JDBC表"><a href="#3、如何创建JDBC表" class="headerlink" title="3、如何创建JDBC表"></a>3、如何创建JDBC表</h2><pre class=" language-sql"><code class="language-sql"><span class="token comment" spellcheck="true">-- 在 Flink SQL 中注册一张 MySQL 表 'users'</span>
+<span class="token keyword">CREATE</span> <span class="token keyword">TABLE</span> vendors <span class="token punctuation">(</span>
+  vend_id <span class="token keyword">int</span><span class="token punctuation">,</span>
+  vend_name STRING<span class="token punctuation">,</span>
+  vend_address STRING<span class="token punctuation">,</span>
+  vend_city STRING<span class="token punctuation">,</span>
+  vend_state  STRING<span class="token punctuation">,</span>
+  vend_zip    STRING<span class="token punctuation">,</span>
+  vend_country STRING<span class="token punctuation">,</span>
+  <span class="token keyword">PRIMARY</span> <span class="token keyword">KEY</span> <span class="token punctuation">(</span>vend_id<span class="token punctuation">)</span> <span class="token operator">NOT</span> ENFORCED
+<span class="token punctuation">)</span> <span class="token keyword">WITH</span> <span class="token punctuation">(</span>
+   <span class="token string">'connector'</span> <span class="token operator">=</span> <span class="token string">'jdbc'</span><span class="token punctuation">,</span>
+   <span class="token string">'url'</span> <span class="token operator">=</span> 'jdbc:mysql:<span class="token comment" spellcheck="true">//dm:3306/wmy',</span>
+   <span class="token string">'table-name'</span> <span class="token operator">=</span> <span class="token string">'vendors'</span><span class="token punctuation">,</span>
+   <span class="token string">'username'</span> <span class="token operator">=</span> <span class="token string">'root'</span><span class="token punctuation">,</span>
+   <span class="token string">'password'</span> <span class="token operator">=</span> <span class="token string">'000000'</span>
+<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h2 id="4、操作"><a href="#4、操作" class="headerlink" title="4、操作"></a>4、操作</h2><pre class=" language-sql"><code class="language-sql"><span class="token keyword">select</span> <span class="token operator">*</span> <span class="token keyword">from</span> vendors<span class="token punctuation">;</span>
+
+<span class="token keyword">insert</span> <span class="token keyword">into</span> vendors <span class="token keyword">values</span><span class="token punctuation">(</span><span class="token number">102</span><span class="token punctuation">,</span><span class="token string">'1'</span><span class="token punctuation">,</span><span class="token string">'2'</span><span class="token punctuation">,</span><span class="token string">'3'</span><span class="token punctuation">,</span><span class="token string">'4'</span><span class="token punctuation">,</span><span class="token string">'5'</span><span class="token punctuation">,</span><span class="token string">'6'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<table>
+<thead>
+<tr>
+<th align="left">Database</th>
+<th align="left">Upsert Grammar</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">MySQL</td>
+<td align="left">INSERT .. ON DUPLICATE KEY UPDATE ..</td>
+</tr>
+<tr>
+<td align="left">PostgreSQL</td>
+<td align="left">INSERT .. ON CONFLICT .. DO UPDATE SET ..</td>
+</tr>
+</tbody></table>
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">create</span> <span class="token keyword">table</span> vendors_cnt<span class="token punctuation">(</span>
+    vend_id <span class="token keyword">int</span> <span class="token keyword">primary</span> <span class="token keyword">key</span><span class="token punctuation">,</span>
+    cnt <span class="token keyword">bigint</span>
+<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">CREATE</span> <span class="token keyword">TABLE</span> vendors_cnt <span class="token punctuation">(</span>
+  vend_id <span class="token keyword">int</span><span class="token punctuation">,</span>
+  cnt <span class="token keyword">bigint</span><span class="token punctuation">,</span>
+  <span class="token keyword">PRIMARY</span> <span class="token keyword">KEY</span> <span class="token punctuation">(</span>vend_id<span class="token punctuation">)</span> <span class="token operator">NOT</span> ENFORCED
+<span class="token punctuation">)</span> <span class="token keyword">WITH</span> <span class="token punctuation">(</span>
+   <span class="token string">'connector'</span> <span class="token operator">=</span> <span class="token string">'jdbc'</span><span class="token punctuation">,</span>
+   <span class="token string">'url'</span> <span class="token operator">=</span> 'jdbc:mysql:<span class="token comment" spellcheck="true">//dm:3306/wmy',</span>
+   <span class="token string">'table-name'</span> <span class="token operator">=</span> <span class="token string">'vendors_cnt'</span><span class="token punctuation">,</span>
+   <span class="token string">'username'</span> <span class="token operator">=</span> <span class="token string">'root'</span><span class="token punctuation">,</span>
+   <span class="token string">'password'</span> <span class="token operator">=</span> <span class="token string">'000000'</span>
+<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">insert</span> <span class="token keyword">into</span> vendors_cnt 
+<span class="token keyword">select</span> vend_id<span class="token punctuation">,</span><span class="token function">count</span><span class="token punctuation">(</span>vend_id<span class="token punctuation">)</span> cnt <span class="token keyword">from</span> vendors <span class="token keyword">group</span> <span class="token keyword">by</span> vend_id<span class="token punctuation">;</span>
+</code></pre>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20211006170927198.png" alt="vendors_cnt "></p>
+<p>记住，这个一定要注意，我们在进行计算的时候这个是bigint类型的，所以前期我花了大量的时间进行这个得验证上面，upsert 就是一定要注意主键和字段的类型，不过flink sql有一个好处就是它可以自动的推断出你查询之后的字段类型是什么？</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20211006171242638.png" alt="字段类型"></p>
+<p>刚开始不注意这点就开始忙碌的去找错误，浪费了大量的时间。。。</p>
 
                 
             </div>
