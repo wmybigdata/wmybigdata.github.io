@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="Flink-维表关联, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
+    <meta name="keywords" content="java-正则表达式, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
     <meta name="description" content="本网站是个人兴趣爱好，总结分享经验，记录生活点滴的平台，希望在以后的学习旅途中，走出自己的风景。">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -16,7 +16,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>Flink-维表关联 | 情深骚明大数据之旅</title>
+    <title>java-正则表达式 | 情深骚明大数据之旅</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -314,12 +314,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/6.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/8.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">Flink-维表关联</h1>
+                    <h1 class="description center-align post-title">java-正则表达式</h1>
                 </div>
             </div>
         </div>
@@ -435,8 +435,8 @@
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/Flink%E6%B5%81%E5%BC%8F%E5%BC%95%E6%93%8E/">
-                                <span class="chip bg-color">Flink流式引擎</span>
+                            <a href="/tags/java/">
+                                <span class="chip bg-color">java</span>
                             </a>
                         
                     </div>
@@ -447,8 +447,8 @@
                     <div class="post-cate">
                         <i class="fas fa-bookmark fa-fw icon-category"></i>
                         
-                            <a href="/categories/Flink%E6%B5%81%E5%BC%8F%E5%BC%95%E6%93%8E/" class="post-category">
-                                Flink流式引擎
+                            <a href="/categories/java/" class="post-category">
+                                java
                             </a>
                         
                     </div>
@@ -460,7 +460,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2021-09-29
+                    2021-10-04
                 </div>
                 
 
@@ -481,105 +481,210 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h1 id="Flink-维表关联"><a href="#Flink-维表关联" class="headerlink" title="Flink-维表关联"></a>Flink-维表关联</h1><p>参考连接：<a href="https://www.cnblogs.com/zz-ksw/p/13223193.html" target="_blank" rel="noopener">https://www.cnblogs.com/zz-ksw/p/13223193.html</a></p>
-<p>在实际生产中，我们经常会有这样的需求，需要以原始数据流作为基础，然后关联大量的外部表来补充一些属性。例如，我们在订单数据中，希望能得到订单收货人所在省的名称，一般来说订单中会记录一个省的 ID，那么需要根据 ID 去查询外部的维度表补充省名称属性。</p>
-<p>在 Flink 流式计算中，我们的一些维度属性一般存储在 MySQL/HBase/Redis 中，这些维表数据存在定时更新，需要我们根据业务进行关联。根据我们业务对维表数据关联的时效性要求，有以下几种解决方案：</p>
-<ol>
-<li>实时查询维表关联</li>
-<li>预加载维表关联</li>
-<li>热存储关联</li>
-<li>其他</li>
-</ol>
-<h2 id="1、TPS和QPS的区别和理解"><a href="#1、TPS和QPS的区别和理解" class="headerlink" title="1、TPS和QPS的区别和理解"></a>1、TPS和QPS的区别和理解</h2><p>我们在日常工作中经常会听到QPS/TPS这些名词，也会经常被别人问起说你的系统吞吐量有多大。这个问题从业务上来讲，可以理解为应用系统每秒钟最大能接受的用户访问量。或者每秒钟最大能处理的请求数；<br>QPS: 是Queries Per Second的缩写，意思是每秒查询率，是一台服务器每秒能够相应的查询次数，是对一个特定的查询服务器在规定时间内所处理流量多少的衡量标准。每秒钟处理完请求的次数；注意这里是处理完。具体是指发出请求到服务器处理完成功返回结果。可以理解在server中有个counter，每处理一个请求加1，1秒后counter=QPS。<br>TPS：是Transactions Per Second的缩写，也就是事务数/秒。它是软件测试结果的测量单位。一个事务是指一个客户机向服务器发送请求然后服务器做出反应的过程。客户机在发送请求时开始计时，收到服务器响应后结束计时，以此来计算使用的时间和完成的事务个数。每秒钟处理完的事务次数，一般TPS是对整个系统来讲的。一个应用系统1s能完成多少事务处理，一个事务在分布式处理中，可能会对应多个请求，对于衡量单个接口服务的处理能力，用QPS比较多。<br>并发量：系统能同时处理的请求数<br>RT：响应时间，处理一次请求所需要的平均处理时间<br>计算关系：<br>QPS = 并发量 / 平均响应时间<br>并发量 = QPS * 平均响应时间</p>
-<p>PS：下面是性能测试的主要概念和计算公式，记录下：</p>
-<h3 id="1-1-系统吞吐量关系"><a href="#1-1-系统吞吐量关系" class="headerlink" title="1.1 系统吞吐量关系"></a>1.1 系统吞吐量关系</h3><p>一个系统的吞度量（承压能力）与request对CPU的消耗、外部接口、IO等等紧密关联。单个reqeust 对CPU消耗越高，外部系统接口、IO影响速度越慢，系统吞吐能力越低，反之越高。</p>
-<p>系统吞吐量几个重要参数：QPS（TPS）、并发数、响应时间</p>
-<p>QPS（TPS）：每秒钟request/事务 数量</p>
-<p>并发数： 系统同时处理的request/事务数</p>
-<p>响应时间： 一般取平均响应时间</p>
-<p>（很多人经常会把并发数和TPS理解混淆）</p>
-<p>理解了上面三个要素的意义之后，就能推算出它们之间的关系：<br>QPS（TPS）= 并发数/平均响应时间 或者 并发数 = QPS<em>平均响应时间<br>一个典型的上班签到系统，早上8点上班，7点半到8点的30分钟的时间里用户会登录签到系统进行签到。公司员工为1000人，平均每个员上登录签到系统的时长为5分钟。可以用下面的方法计算。<br>QPS = 1000/(30</em>60) 事务/秒<br>平均响应时间为 = 5<em>60 秒<br>并发数= QPS</em>平均响应时间 = 1000/(30*60) <em>(5</em>60)=166.7</p>
-<p>一个系统吞吐量通常由QPS（TPS）、并发数两个因素决定，每套系统这两个值都有一个相对极限值，在应用场景访问压力下，只要某一项达到系统最高值，系统的吞吐量就上不去了，如果压力继续增大，系统的吞吐量反而会下降，原因是系统超负荷工作，上下文切换、内存等等其它消耗导致系统性能下降。</p>
-<p>决定系统响应时间要素</p>
-<p>我们做项目要排计划，可以多人同时并发做多项任务，也可以一个人或者多个人串行工作，始终会有一条关键路径，这条路径就是项目的工期。</p>
-<p>系统一次调用的响应时间跟项目计划一样，也有一条关键路径，这个关键路径是就是系统影响时间；</p>
-<p>关键路径是有CPU运算、IO、外部系统响应等等组成。</p>
-<h2 id="2、Flink-DataStream-关联维表实战"><a href="#2、Flink-DataStream-关联维表实战" class="headerlink" title="2、Flink DataStream 关联维表实战"></a>2、Flink DataStream 关联维表实战</h2><p>参考连接：<a href="https://flink-learning.org.cn/article/detail/b8df32fbc6542257a5b449114e137cc3" target="_blank" rel="noopener">https://flink-learning.org.cn/article/detail/b8df32fbc6542257a5b449114e137cc3</a></p>
-<p>作者： </p>
-<p><a href="https://flink-learning.org.cn/author/c1a6dab4ec4850d6f27280d5aa8b7868" target="_blank" rel="noopener">林小铂</a></p>
-<p>上篇博客提到 Flink SQL 如何 Join 两个数据流，有读者反馈说如果不打算用 SQL 或者想自己实现底层操作，那么如何基于 DataStream API 来关联维表呢？实际上由于 Flink DataStream API 的灵活性，实现这个需求的方式是非常多样的，但是大部分用户很难在设计架构时就考虑得很全面，可能会走不少弯路。</p>
-<p>针对于此，笔者根据工作经验以及社区资源整理了用 DataStream 实现 Join 维表的常见方式，并给每种的方式优劣和适用场景给出一点可作为参考的个人观点</p>
-<h3 id="2-1-衡量指标"><a href="#2-1-衡量指标" class="headerlink" title="2.1 衡量指标"></a>2.1 衡量指标</h3><p>总体来讲，关联维表有三个基础的方式：实时数据库查找关联（Per-Record Reference Data Lookup）、预加载维表关联（Pre-Loading of Reference Data）和维表变更日志关联（Reference Data Change Stream），而根据实现上的优化可以衍生出多种关联方式，且这些优化还可以灵活组合产生不同效果（不过为了简单性这里不讨论同时应用多种优化的实现方式）。对于不同的关联方式，我们可以从以下 7 个关键指标来衡量（每个指标的得分将以 1-5 五档来表示）:</p>
-<ol>
-<li><strong>实现简单性</strong>: 设计是否足够简单，易于迭代和维护。</li>
-<li><strong>吞吐量</strong>: 性能是否足够好。</li>
-<li><strong>维表数据的实时性</strong>: 维度表的更新是否可以立刻对作业可见。</li>
-<li><strong>数据库的负载:</strong> 是否对外部数据库造成较大的负载（负载越低分越高）。</li>
-<li><strong>内存资源占用</strong>: 是否需要大量内存来缓存维表数据（内存占用越少分越高）。</li>
-<li><strong>可拓展性</strong>: 在更大规模的数据下会不会出现瓶颈。</li>
-<li><strong>结果确定性</strong>: 在数据延迟或者数据重放情况下，是否可以得到一致的结果。</li>
-</ol>
-<p>和大多数架构设计一样，这三类关联方式不存在绝对的好坏，更多的是针对业务场景在各指标上的权衡取舍，因此这里的得分也仅仅是针对通用场景来说。</p>
-<h3 id="2-2-实时数据库查找关联"><a href="#2-2-实时数据库查找关联" class="headerlink" title="2.2 实时数据库查找关联"></a>2.2 实时数据库查找关联</h3><p>实时数据库查找关联是在 DataStream API 用户函数中直接访问数据库来进行关联的方式。这种方式通常开发量最小，但一般会给数据库带来很大的压力，而且因为关联是基于 Processing Time 的，如果数据有延迟或者重放，会得到和原来不一致的数据。</p>
-<h4 id="2-2-1-同步数据库查找关联"><a href="#2-2-1-同步数据库查找关联" class="headerlink" title="2.2.1 同步数据库查找关联"></a>2.2.1 同步数据库查找关联</h4><p>同步实时数据库查找关联是最为简单的关联方式，只需要在一个 Map 或者 FlatMap 函数中访问数据库，处理好关联逻辑后，将结果数据输出。</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210929114511354.png" alt="同步数据库查找关联"></p>
-<p>这种方式的主要优点在于实现简单、不需要额外内存且维表的更新延迟很低，然而缺点也很明显:</p>
-<ol>
-<li>因为每条数据都需要请求一次数据库，给数据库造成的压力很大；</li>
-<li>访问数据库是同步调用，导致 subtak 线程会被阻塞，影响吞吐量；</li>
-<li>关联是基于 Processing Time 的，结果并不具有确定性；</li>
-<li>瓶颈在数据库端，但实时计算的流量通常远大于普通数据库的设计流量，因此可拓展性比较低。</li>
-</ol>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210929114646136.png" alt="同步数据库查找关联"></p>
-<p>从应用场景来说，同步数据库查找关联可以用于流量比较低的作业，但通常不是最好的选择。</p>
-<h4 id="2-2-2-异步数据库查找关联"><a href="#2-2-2-异步数据库查找关联" class="headerlink" title="2.2.2 异步数据库查找关联"></a>2.2.2 异步数据库查找关联</h4><p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210929114903990.png" alt="异步数据库查找关联"></p>
-<p>比起同步数据库查找关联，异步数据库查找关联稍微复杂一点，但是大部分的逻辑都由 Flink AsyncIO API 封装，因此总体来看还是比较简单。然而，有序输出模式下的 AsyncIO 会需要缓存数据，且这些数据会被写入 checkpoint，因此在内容资源方面的得分会低一点。另一方面，同步数据库查找关联的吞吐量问题得到解决，但仍不可避免地有数据库负载高和结果不确定两个问题。</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210929115040792.png" alt="异步查询维表关联关键指标"></p>
-<p>从应用场景来说，异步数据库查找关联比较适合流量低的实时计算。</p>
-<h4 id="2-2-3-带缓存的数据库查找关联"><a href="#2-2-3-带缓存的数据库查找关联" class="headerlink" title="2.2.3 带缓存的数据库查找关联"></a>2.2.3 带缓存的数据库查找关联</h4><p>为了解决上述两种关联方式对数据库造成太大压力的问题，可以引入一层缓存来减少直接对数据库的请求。缓存并一般不需要通过 checkpoint 机制持久化，因此简单地用一个 WeakHashMap 或者 Guava Cache 就可以实现。</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210929141022045.png" alt="缓存的数据库查找关联"></p>
-<p>虽然在冷启动的时候仍会给数据库造成一定压力，但后续取决于缓存命中率，数据库的压力将得到一定程度的缓解。然而使用缓存带来的问题是维表的更新并不能及时反应到关联操作上，当然这也和缓存剔除的策略有关，需要根据维度表更新频率和业务对过时维表数据的容忍程度来设计。</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210929141122065.png" alt="缓存查找指标"></p>
-<p>总而言之，带缓存的数据库查找关联适合于流量比较低，且对维表数据实时性要求不太高或维表更新比较少的业务场景。</p>
-<h3 id="2-3-预加载维表关联"><a href="#2-3-预加载维表关联" class="headerlink" title="2.3 预加载维表关联"></a>2.3 预加载维表关联</h3><p>相比起实时数据库查找在运行期间为每条数据访问一次数据库，预加载维表关联是在作业启动时就将维表读到内存中，而在后续运行期间，每条数据都会和内存中的维表进行关联，而不会直接触发对数据的访问。与带缓存的实时数据库查找关联相比，区别是后者如果不命中缓存还可以 fallback 到数据库访问，而前者如果不名中则会关联不到数据。</p>
-<h4 id="2-3-1-启动预加载维表"><a href="#2-3-1-启动预加载维表" class="headerlink" title="2.3.1 启动预加载维表"></a>2.3.1 启动预加载维表</h4><p>启动预加载维表是最为简单的一种方式，即在作业初始化的时候，比如用户函数的 open() 方法，直接从数据库将维表拷贝到内存中。维表并不需要用 State 来保存，因为无论是手动重启或者是 Flink 的错误重试机制导致的重启，open() 方法都会被执行，从而得到最新的维表数据。</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210929141447329.png" alt="启动预加载维表架构"></p>
-<p>启动预加载维表对数据库的压力只持续很短时间，但因为是拷贝整个维表所以压力是很大的，而换来的优势是在运行期间不需要再访问数据库，可以提高效率，有点类似离线计算。相对地，问题在于运行期间维表数据不能更新，且对 TaskManager 内存的要求比较高。<img src="C:/Users/wmy/AppData/Roaming/Typora/typora-user-images/image-20210929141604293.png" alt="启动预加载维表指标"></p>
-<p>启动预加载维表适合于维表比较小、变更实时性要求不高的场景，比如根据 ip 库解析国家地区，如果 ip 库有新版本，重启作业即可。</p>
-<h4 id="2-3-2-启动预加载分区维表"><a href="#2-3-2-启动预加载分区维表" class="headerlink" title="2.3.2 启动预加载分区维表"></a>2.3.2 启动预加载分区维表</h4><p>对于维表比较大的情况，可以启动预加载维表基础之上增加分区功能。简单来说就是将数据流按字段进行分区，然后每个 Subtask 只需要加在对应分区范围的维表数据。值得注意的是，这里的分区方式并不是用 keyby 这种通用的 hash 分区，而是需要根据业务数据定制化分区策略，然后调用 DataStream#partitionCustom。比如按照 userId 等区间划分，0-999 划分到 subtask 1，1000-1999 划分到 subtask 2，以此类推。而在 open() 方法中，我们再根据 subtask 的 id 和总并行度来计算应该加载的维表数据范围。</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210929141835787.png" alt="启动预加载分区维表架构"></p>
-<p>通过这种分区方式，维表的大小上限理论上可以线性拓展，解决了维表大小受限于单个 TaskManager 内存的问题（现在是取决于所有 TaskManager 的内存总量），但同时给带来设计和维护分区策略的复杂性。</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210929141927812.png" alt="启动预加载分区维表关键指标"></p>
-<p>总而言之，启动预加载分区维表适合维表比较大而变更实时性要求不高的场景，比如用户点击数据关联用户所在地。</p>
-<h4 id="2-3-3-启动预加载维表并定时刷新"><a href="#2-3-3-启动预加载维表并定时刷新" class="headerlink" title="2.3.3 启动预加载维表并定时刷新"></a>2.3.3 启动预加载维表并定时刷新</h4><p>除了维表大小的限制，启动预加载维表的另一个主要问题在于维度数据的更新，我们可以通过引入定时刷新机制的办法来缓解这个问题。定时刷新可以通过 Flink ProcessFucntion 提供的 Timer 或者直接在 open() 初始化一个线程（池）来做这件事。不过 Timer 要求 KeyedStream，而上述的 DataStream#partitionCustom 并不会返回一个 KeyedStream，因此两者并不兼容。而如果使用额外线程定时刷新的办法则不受这个限制。</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210929142252003.png" alt="启动预加载维表并定时刷新架构"></p>
-<p>比起基础的启动预加载维表 ，这种方式在于引入比较小复杂性的情况下大大缓解了的维度表更新问题，但也给维表数据库带来更多压力，因为每次 reload 的时候都是一次请求高峰。</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210929142405263.png" alt="启动预加载维表并定时刷新关键指标"></p>
-<p>启动预加载维表和定时刷新的组合适合维表变更实时性要求不是特别高的场景。取决于定时刷新的频率和数据库的性能，这种方式可以满足大部分关联维表的业务。</p>
-<h4 id="2-3-4-启动预加载维表-实时数据库查找"><a href="#2-3-4-启动预加载维表-实时数据库查找" class="headerlink" title="2.3.4 启动预加载维表 + 实时数据库查找"></a>2.3.4 启动预加载维表 + 实时数据库查找</h4><p>启动预加载维表还可以和实时数据库查找混合使用，即将预加载的维表作为缓存给实时关联时使用，若未名中则 fallback 到数据库查找。</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210929142529674.png" alt="启动预加载维表结合实时数据库查找架构"></p>
-<p>这种方式实际是带缓存的数据库查找关联的衍生，不同之处在于相比冷启动时未命中缓存导致的多次实时数据库访问，该方式直接批量拉取整个维表效率更高，但也有可能拉取到不会访问到的多余数据。下面雷达图中显示的是用异步数据库查找，如果是同步数据库查找吞吐量上会低一些。</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210929142628938.png" alt="启动预加载维表结合实时数据库查找关键指标"></p>
-<p>这种方式和带缓存的实时数据库查找关联基本相同，适合流量比较低，且对维表数据实时性要求不太高或维表更新比较少的业务场景。</p>
-<h3 id="2-4-维表变更日志关联"><a href="#2-4-维表变更日志关联" class="headerlink" title="2.4 维表变更日志关联"></a>2.4 维表变更日志关联</h3><p>不同于上述两者将维表作为静态表关联的方式，维表变更日志关联将维表以 changelog 数据流的方式表示，从而将维表关联转变为两个数据流的 join。这里的 changelog 数据流类似于 MySQL 的 binlog，通常需要维表数据库端以 push 的方式将日志写到 Kafka 等消息队列中。Changelog 数据流称为 build 数据流，另外待关联的主要数据流成为 probe 数据流。</p>
-<p>维表变更日志关联的好处在于可以获取某个 key 数据变化的时间，从而使得我们能在关联中使用 Event Time（当然也可以使用 Processing Time）。</p>
-<h4 id="2-4-1-Processing-Time-维表变更日志关联"><a href="#2-4-1-Processing-Time-维表变更日志关联" class="headerlink" title="2.4.1 Processing Time 维表变更日志关联"></a>2.4.1 Processing Time 维表变更日志关联</h4><p>如果基于 Processing Time 做关联，我们可以利用 keyby 将两个数据流中关联字段值相同的数据划分到 KeyedCoProcessFunction 的同一个分区，然后用 ValueState 或者 MapState 将维表数据保存下来。在普通数据流的一条记录进到函数时，到 State 中查找有无符合条件的 join 对象，若有则关联输出结果，若无则根据 join 的类型决定是直接丢弃还是与空值关联。这里要注意的是，State 的大小要尽量控制好。首先是只保存每个 key 最新的维度数据值，其次是要给 State 设置好 TTL，让 Flink 可以自动清理。</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210929142944578.png" alt="Processing Time 维表变更日志关联架构"></p>
-<p>基于 Processing Time 的维表变更日志关联优点是不需要直接请求数据库，不会对数据库造成压力；缺点是比较复杂，相当于使用 changelog 在 Flink 应用端重新构建一个维表，会占用一定的 CPU 和比较多的内存和磁盘资源。值得注意的是，我们可以利用 Flink 提供的 RocksDB StateBackend，将大部分的维表数据存在磁盘而不是内存中，所以并不会占用很高的内存。不过基于 Processing Time 的这种关联对两个数据流的延迟要求比较高，否则如果其中一个数据流出现 lag 时，关联得到的结果可能并不是我们想要的，比如可能会关联到未来时间点的维表数据。</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210929143051132.png" alt="Processing Time 维表变更日志关联关键指标"></p>
-<p>基于 Processing Time 的维表变更日志关联比较适用于不便直接访问数据的场景（比如维表数据库是业务线上数据库，出于安全和负载的原因不能直接访问），或者对维表的变更实时性要求比较高的场景（但因为数据准确性的关系，一般用下文的 Event Time 关联会更好）。</p>
-<h4 id="2-4-2-Event-Time-维表变更日志关联"><a href="#2-4-2-Event-Time-维表变更日志关联" class="headerlink" title="2.4.2 Event Time 维表变更日志关联"></a>2.4.2 Event Time 维表变更日志关联</h4><p>基于 Event Time 的维表关联实际上和基于 Processing Time 的十分相似，不同之处在于我们将维表 changelog 的多个时间版本都记录下来，然后每当一条记录进来，我们会找到对应时间版本的维表数据来和它关联，而不是总用最新版本，因此延迟数据的关联准确性大大提高。不过因为目前 State 并没有提供 Event Time 的 TTL，因此我们需要自己设计和实现 State 的清理策略，比如直接设置一个 Event Time Timer（但要注意 Timer 不能太多导致性能问题），再比如对于单个 key 只保存最近的 10 个版本，当有更新版本的维表数据到达时，要清理掉最老版本的数据。</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210929143634371.png" alt="Event Time 维表变更日志关联架构"></p>
-<p>基于 Event Time 的维表变更日志关联相对基于 Processing Time 的方式来说是一个改进，虽然多个维表版本导致空间资源要求更大，但确保准确性对于大多数场景来说都是十分重要的。相比 Processing Time 对两个数据的延迟都有要求，Event Time 要求 build 数据流的延迟低，否则可能一条数据到达时关联不到对应维表数据或者关联了一个过时版本的维表数据，基于 Event Time 的维表变更日志关联比较适合于维表变更比较多且对变更实时性要求较高的场景 同时也适合于不便直接访问数据库的场景。</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210929143851303.png" alt="Time 维表变更日志关联关键指标"></p>
-<h4 id="2-4-3-Temporal-Table-Join"><a href="#2-4-3-Temporal-Table-Join" class="headerlink" title="2.4.3 Temporal Table Join"></a>2.4.3 Temporal Table Join</h4><p>可以容忍任意数据流的延迟，数据准确性更好。Temporal Table Join 在 SQL/Table API 使用时是十分简单的，但如果想在 DataStream API 中使用，则需要自己实现对应的逻辑。</p>
-<p>总体思路是使用一个 CoProcessFunction，将 build 数据流以时间版本为 key 保存在 MapState 中（与基于 Event Time 的维表变更日志关联相同），再将 probe 数据流和输出结果也用 State 缓存起来（同样以 Event Time 为 key），一直等到 Watermark 提升到它们对应的 Event Time，才把结果输出和将两个数据流的输入清理掉。</p>
-<p>这个 Watermark 触发很自然地是用 Event Time Timer 来实现，但要注意不要为每条数据都设置一遍 Timer，因为一旦 Watermark 提升会触发很多个 Timer 导致性能急剧下降。比较好的实践是为每个 key 只注册一个 Timer。实现上可以记录当前未处理的最早一个 Event Time，并用来注册 Timer。当前 Watermark。每当 Watermark 触发 Timer 时，我们检查处理掉未处理的最早 Event Time 到当前 Event Time 的所有数据，并将未处理的最早 Event Time 更新为当前时间。</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210929144147615.png" alt="Temporal Table Join 架构"></p>
-<p>Temporal Table Join 的好处在于对于两边数据流的延迟的容忍度较大，但作为代价会引入一定的输出结果的延迟，这也是基于 Watermark 机制的计算的常见问题，或者说，妥协。另外因为吞吐量较大的 probe 数据流也需要缓存，Flink 应用对空间资源的需求会大很多。最好，要注意的是如果维表变更太慢，导致 Watermark 提升太慢，会导致 probe 数据流被大量缓存，所以最好要确保 build 数据流尽量实时，同时给 Source 设置一个比较短的 idle timeout。</p>
-<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210929144429436.png" alt="Temporal Table Join 关键指标"></p>
-<p>Temporal Table Join 这种方式最为复杂，但数据准确性最好，适合一些对数据准确性要求高且可以容忍一定延迟（一般分钟级别）的关键业务。</p>
-<h3 id="2-5-衡量指标"><a href="#2-5-衡量指标" class="headerlink" title="2.5 衡量指标"></a>2.5 衡量指标</h3><p>用 Flink DataStream API 实现关联维表的方式十分丰富，可以直接访问数据库查找（实时数据库查找关联），可以启动时就将全量维表读到内存（预加载维表关联），也可以通过维表的 changelog 在 Flink 应用端实时构建一个新的维表（维表变更日志关联）。我们可以从实现简单性、吞吐量、维表数据的实时性、数据库的负载、内存资源占用、可拓展性和结果确定性这 7 个维度来衡量一个具体实现方式，并根据业务需求来选择最合适的实现。</p>
+                <h1 id="正则表达式"><a href="#正则表达式" class="headerlink" title="正则表达式"></a>正则表达式</h1><h2 id="1、快速入门"><a href="#1、快速入门" class="headerlink" title="1、快速入门"></a>1、快速入门</h2><ul>
+<li>提取文章中所有的英文单词</li>
+</ul>
+<pre class=" language-java"><code class="language-java"><span class="token annotation punctuation">@Test</span>
+<span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">test1</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//假定，编写了爬虫，从百度页面得到如下文本</span>
+    String content <span class="token operator">=</span> <span class="token string">"1995年，互联网的蓬勃发展给了Oak机会。业界为了使死板、单调的"</span> <span class="token operator">+</span>
+        <span class="token string">"静态网页能够“灵活”起来，急需一种软件技术来开发一种程序，这种程序可以通"</span> <span class="token operator">+</span>
+        <span class="token string">"过网络传播并且能够跨平台运行。于是，世界各大IT企业为此纷纷投入了大量的"</span> <span class="token operator">+</span>
+        <span class="token string">"人力、物力和财力。这个时候，Sun公司想起了那个被搁置起来很久的Oak，并且"</span> <span class="token operator">+</span>
+        <span class="token string">"重新审视了那个用软件编写的试验平台，由于它是按照嵌入式系统硬件平台体系结"</span> <span class="token operator">+</span>
+        <span class="token string">"构进行编写的，所以非常小，特别适用于网络上的传输系统，而Oak也是一种精简的"</span> <span class="token operator">+</span>
+        <span class="token string">"语言，程序非常小，适合在网络上传输。Sun公司首先推出了可以嵌入网页并且可以"</span> <span class="token operator">+</span>
+        <span class="token string">"随同网页在网络上传输的Applet（Applet是一种将小程序嵌入到网页中进行执行的技术），"</span> <span class="token operator">+</span>
+        <span class="token string">"并将Oak更名为Java（在申请注册商标时，发现Oak已经被人使用了，再想了一系列"</span> <span class="token operator">+</span>
+        <span class="token string">"名字之后，最终，使用了提议者在喝一杯Java咖啡时无意提到的Java词"</span> <span class="token operator">+</span>
+        <span class="token string">"语）。5月23日，Sun公司在Sun world会议上正式发"</span> <span class="token operator">+</span>
+        <span class="token string">"布Java和HotJava浏览器。IBM、Apple、DEC、Adobe、HP、Oracle、Netscape和微软"</span> <span class="token operator">+</span>
+        <span class="token string">"等各大公司都纷纷停止了自己的相关开发项目，竞相购买了Java使用许可证，并为自己的产"</span> <span class="token operator">+</span>
+        <span class="token string">"品开发了相应的Java平台"</span><span class="token punctuation">;</span>
+
+    <span class="token comment" spellcheck="true">//提取文章中所有的英文单词</span>
+    <span class="token comment" spellcheck="true">//提取文章中所有的数字</span>
+    <span class="token comment" spellcheck="true">//提取文章中所有的英文单词和数字</span>
+    <span class="token comment" spellcheck="true">//提取百度热榜 标题</span>
+    <span class="token comment" spellcheck="true">//(1). 传统方法. 使用遍历方式，代码量大，效率不高</span>
+    <span class="token comment" spellcheck="true">//(2). 正则表达式技术</span>
+
+    <span class="token comment" spellcheck="true">// 1、先创建一个Pattern对象，可以理解为正则表达式对象</span>
+    Pattern pattern <span class="token operator">=</span> Pattern<span class="token punctuation">.</span><span class="token function">compile</span><span class="token punctuation">(</span><span class="token string">"[a-zA-Z]+"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment" spellcheck="true">// 2、创建一个匹配器对象,找到就返回true，否则就返回false</span>
+    Matcher matcher <span class="token operator">=</span> pattern<span class="token punctuation">.</span><span class="token function">matcher</span><span class="token punctuation">(</span>content<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment" spellcheck="true">// 3、可以开始循环的匹配</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span>matcher<span class="token punctuation">.</span><span class="token function">find</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// 匹配的内容和文本会放到 m.group()对象中去</span>
+        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"找到："</span> <span class="token operator">+</span> matcher<span class="token punctuation">.</span><span class="token function">group</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<ul>
+<li>提取文章中所有的数字</li>
+<li>提取文章中所有的英文单词和数字</li>
+<li>提取百度热榜 标题</li>
+</ul>
+<pre class=" language-java"><code class="language-java">Pattern pattern <span class="token operator">=</span> Pattern<span class="token punctuation">.</span><span class="token function">compile</span><span class="token punctuation">(</span><span class="token string">"[a-zA-Z]+"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+Pattern pattern <span class="token operator">=</span> Pattern<span class="token punctuation">.</span><span class="token function">compile</span><span class="token punctuation">(</span><span class="token string">"[0-9]+"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+Pattern pattern <span class="token operator">=</span> Pattern<span class="token punctuation">.</span><span class="token function">compile</span><span class="token punctuation">(</span><span class="token string">"([0-9]+)|([a-zA-Z]+)"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+Pattern pattern <span class="token operator">=</span> Pattern<span class="token punctuation">.</span><span class="token function">compile</span><span class="token punctuation">(</span><span class="token string">"&lt;a target=\"_blank\" title=\"(\\S*)\""</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+Pattern pattern <span class="token operator">=</span> Pattern<span class="token punctuation">.</span><span class="token function">compile</span><span class="token punctuation">(</span><span class="token string">"\\d+\\.\\d+\\.\\d+\\.\\d+"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h3 id="1-1、正则表达式需求"><a href="#1-1、正则表达式需求" class="headerlink" title="1.1、正则表达式需求"></a>1.1、正则表达式需求</h3><p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20211004173829352.png" alt="image-20211004173829352">]</p>
+<h2 id="2、正则表达式语法"><a href="#2、正则表达式语法" class="headerlink" title="2、正则表达式语法"></a>2、正则表达式语法</h2><ul>
+<li>限定符</li>
+<li>选择匹配符</li>
+<li>分组组合和反向引用符</li>
+<li>特殊字符</li>
+<li>字符串匹配符</li>
+<li>定位符</li>
+</ul>
+<h3 id="2-1-元字符-Metacharacter-转义号"><a href="#2-1-元字符-Metacharacter-转义号" class="headerlink" title="2.1 元字符(Metacharacter)-转义号"></a>2.1 元字符(Metacharacter)-转义号</h3><pre class=" language-java"><code class="language-java"><span class="token annotation punctuation">@Test</span>
+<span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">test1</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    String content <span class="token operator">=</span> <span class="token string">"abc$(a.bc.(123("</span><span class="token punctuation">;</span>
+    Pattern regexp <span class="token operator">=</span> Pattern<span class="token punctuation">.</span><span class="token function">compile</span><span class="token punctuation">(</span><span class="token string">"\\("</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    Pattern regexp1 <span class="token operator">=</span> Pattern<span class="token punctuation">.</span><span class="token function">compile</span><span class="token punctuation">(</span><span class="token string">"\\."</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    Matcher matcher <span class="token operator">=</span> regexp1<span class="token punctuation">.</span><span class="token function">matcher</span><span class="token punctuation">(</span>content<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span>matcher<span class="token punctuation">.</span><span class="token function">find</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"找到："</span> <span class="token operator">+</span> matcher<span class="token punctuation">.</span><span class="token function">group</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>注意：需要用到转移符号的字符 —-&gt; .*+()$/?[]^{}</p>
+<h3 id="2-2-元字符-字符匹配符"><a href="#2-2-元字符-字符匹配符" class="headerlink" title="2.2 元字符-字符匹配符"></a>2.2 元字符-字符匹配符</h3><table>
+<thead>
+<tr>
+<th>符号</th>
+<th>符号</th>
+<th>示例</th>
+<th>解释</th>
+<th>匹配输入</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>[]</td>
+<td>可接受的字符串列表</td>
+<td>[efgh]</td>
+<td>e、f、g、h中的任意1个字符</td>
+<td></td>
+</tr>
+<tr>
+<td>[^]</td>
+<td>不可接受的字符串列表</td>
+<td>[^abc]</td>
+<td>除a、b、c之外的任意一个字符，包括数字和特殊符号</td>
+<td></td>
+</tr>
+<tr>
+<td>-</td>
+<td>连字符</td>
+<td>A-Z</td>
+<td>任意单个大写字母</td>
+<td></td>
+</tr>
+<tr>
+<td>.</td>
+<td>匹配除\n以外的任何字符</td>
+<td>a..b</td>
+<td>以a开头、b结尾，中间包括2个任意字符的长度为4的字符串</td>
+<td>aaab、aefb、……</td>
+</tr>
+<tr>
+<td>\d</td>
+<td>匹配单个数字字符、相当于[0-9]</td>
+<td>\d{3}{\d}?</td>
+<td>包含3个或4个数字的字符串</td>
+<td>123、9876</td>
+</tr>
+<tr>
+<td>\D</td>
+<td>匹配单个非数字字符、相当于[^0-9]</td>
+<td>\D(\d)*</td>
+<td>以单个非数字字符开头、后接任意个数字字符串</td>
+<td>a、A123456……</td>
+</tr>
+<tr>
+<td>\w</td>
+<td>匹配单个数字、大小写字母字符，相当于[0-9a-zA-Z]</td>
+<td>\d{3}\w{4}</td>
+<td>以3个数字字符开头的长度为7的数字字母字符串</td>
+<td>234abcd</td>
+</tr>
+<tr>
+<td>\W</td>
+<td>匹配单个非数字、大小写字母字符、相当于[^0-9a-zA-Z]</td>
+<td>\W+\d{2}</td>
+<td>以至少1个非数字字母字符串开头、2个数字字符串结尾</td>
+<td>#29、#?@10</td>
+</tr>
+<tr>
+<td>|</td>
+<td>匹配 “|”之前或之后的表达式</td>
+<td>ab|cd</td>
+<td>ab或者cd</td>
+<td></td>
+</tr>
+<tr>
+<td>*</td>
+<td>指定字符重复0此或者n次（无要求）零到多</td>
+<td>(abc)*</td>
+<td>仅包含任意个abc的字符串、等效于\w*</td>
+<td>abc、abcabcabc……</td>
+</tr>
+<tr>
+<td>+</td>
+<td>指定字符串重复1次或者n次（至少一次）</td>
+<td>m+(abc)*</td>
+<td>以1个m开头，后接任意个abc的字符串</td>
+<td>m、mabc</td>
+</tr>
+<tr>
+<td>?</td>
+<td>指定字符串重复0次或者1次（最多一次）</td>
+<td>m+abc?</td>
+<td>以1个m开头，后接ab或者abc的字符串</td>
+<td>mab、mabc、mmmab、mmabc</td>
+</tr>
+<tr>
+<td>{n}</td>
+<td>只能输入n个字符</td>
+<td>{abcd}{3}</td>
+<td>由abcd中字母组成的任意长度为3的字符串</td>
+<td>abc、dbc、adc</td>
+</tr>
+<tr>
+<td>{n,}</td>
+<td>指定至少n个匹配</td>
+<td>[abcd]{3,}</td>
+<td>由abcd中字母组成的任意长度不小于3的字符串</td>
+<td>aab、dbc、aaadbc</td>
+</tr>
+<tr>
+<td>{n,m}</td>
+<td>指定至少n个但不多于m个匹配</td>
+<td>[abcd]{3,5}</td>
+<td>由abcd中字母组成的任意长度不小于3、不大于5的字符串</td>
+<td>abc、abcd、aaaaa</td>
+</tr>
+<tr>
+<td>(?i)</td>
+<td>不区分大小写</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Pattern regexp = Pattern.compile(regStr,Pattern.CASE_INSENSITIVE);</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p>更多的想要参考的可以参考：<a href="https://www.runoob.com/regexp/regexp-metachar.html" target="_blank" rel="noopener">https://www.runoob.com/regexp/regexp-metachar.html</a></p>
 
                 
             </div>
@@ -606,7 +711,7 @@
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://github.com/wmybigdata/2021/09/29/Flink-%E7%BB%B4%E8%A1%A8%E5%85%B3%E8%81%94/">https://github.com/wmybigdata/2021/09/29/Flink-%E7%BB%B4%E8%A1%A8%E5%85%B3%E8%81%94/</a>
+                    <a href="https://github.com/wmybigdata/2021/10/04/java-%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F/">https://github.com/wmybigdata/2021/10/04/java-%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -644,8 +749,8 @@
                     
                         <div class="article-tag">
                             
-                                <a href="/tags/Flink%E6%B5%81%E5%BC%8F%E5%BC%95%E6%93%8E/">
-                                    <span class="chip bg-color">Flink流式引擎</span>
+                                <a href="/tags/java/">
+                                    <span class="chip bg-color">java</span>
                                 </a>
                             
                         </div>
@@ -819,13 +924,13 @@
             <div class="article-badge left-badge text-color">
                 <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2021/10/04/java-%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F/">
+                <a href="/2021/10/06/kafka-%E5%88%86%E5%8C%BA%E7%AE%97%E6%B3%95/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/8.jpg" class="responsive-img" alt="java-正则表达式">
+                        <img src="/medias/featureimages/15.jpg" class="responsive-img" alt="kafka-分区算法">
                         
-                        <span class="card-title">java-正则表达式</span>
+                        <span class="card-title">kafka-分区算法</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -836,14 +941,14 @@
                     </div>
                     <div class="publish-info">
                         <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2021-10-04
+                            <i class="far fa-clock fa-fw icon-date"></i>2021-10-06
                         </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/java/" class="post-category">
-                                    java
+                            <a href="/categories/kafka/" class="post-category">
+                                    kafka
                                 </a>
                             
                             
@@ -853,8 +958,8 @@
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/java/">
-                        <span class="chip bg-color">java</span>
+                    <a href="/tags/kafka/">
+                        <span class="chip bg-color">kafka</span>
                     </a>
                     
                 </div>
@@ -868,13 +973,13 @@
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2021/09/28/flink-sql-%E5%AE%98%E7%BD%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E8%AE%B0%E5%BD%95/">
+                <a href="/2021/09/29/Flink-%E7%BB%B4%E8%A1%A8%E5%85%B3%E8%81%94/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/16.jpg" class="responsive-img" alt="flink-sql-官网学习笔记记录">
+                        <img src="/medias/featureimages/6.jpg" class="responsive-img" alt="Flink-维表关联">
                         
-                        <span class="card-title">flink-sql-官网学习笔记记录</span>
+                        <span class="card-title">Flink-维表关联</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -885,7 +990,7 @@
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2021-09-28
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-09-29
                             </span>
                         <span class="publish-author">
                             
