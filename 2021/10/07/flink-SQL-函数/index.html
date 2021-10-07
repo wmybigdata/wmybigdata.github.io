@@ -1105,6 +1105,113 @@ score  <span class="token keyword">VARCHAR</span><span class="token punctuation"
    <span class="token string">'password'</span> <span class="token operator">=</span> <span class="token string">'000000'</span>
 <span class="token punctuation">)</span><span class="token punctuation">;</span>
 </code></pre>
+<h2 id="4、用户自定义函数"><a href="#4、用户自定义函数" class="headerlink" title="4、用户自定义函数"></a>4、用户自定义函数</h2><h3 id="4-1-UDF"><a href="#4-1-UDF" class="headerlink" title="4.1 UDF"></a>4.1 UDF</h3><pre class=" language-java"><code class="language-java"><span class="token keyword">package</span> com<span class="token punctuation">.</span>wmy<span class="token punctuation">.</span>flink<span class="token punctuation">.</span>sql<span class="token punctuation">.</span>flinksql<span class="token punctuation">.</span>fun<span class="token punctuation">.</span>udf<span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> lombok<span class="token punctuation">.</span>*<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>flink<span class="token punctuation">.</span>api<span class="token punctuation">.</span>common<span class="token punctuation">.</span>functions<span class="token punctuation">.</span>MapFunction<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>flink<span class="token punctuation">.</span>streaming<span class="token punctuation">.</span>api<span class="token punctuation">.</span>datastream<span class="token punctuation">.</span>DataStreamSource<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>flink<span class="token punctuation">.</span>streaming<span class="token punctuation">.</span>api<span class="token punctuation">.</span>datastream<span class="token punctuation">.</span>SingleOutputStreamOperator<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>flink<span class="token punctuation">.</span>streaming<span class="token punctuation">.</span>api<span class="token punctuation">.</span>environment<span class="token punctuation">.</span>StreamExecutionEnvironment<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>flink<span class="token punctuation">.</span>table<span class="token punctuation">.</span>api<span class="token punctuation">.</span>EnvironmentSettings<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>flink<span class="token punctuation">.</span>table<span class="token punctuation">.</span>api<span class="token punctuation">.</span>Table<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>flink<span class="token punctuation">.</span>table<span class="token punctuation">.</span>api<span class="token punctuation">.</span>bridge<span class="token punctuation">.</span>java<span class="token punctuation">.</span>StreamTableEnvironment<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>flink<span class="token punctuation">.</span>table<span class="token punctuation">.</span>functions<span class="token punctuation">.</span>ScalarFunction<span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token keyword">static</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>flink<span class="token punctuation">.</span>table<span class="token punctuation">.</span>api<span class="token punctuation">.</span>Expressions<span class="token punctuation">.</span>$<span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token keyword">static</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>flink<span class="token punctuation">.</span>table<span class="token punctuation">.</span>api<span class="token punctuation">.</span>Expressions<span class="token punctuation">.</span>call<span class="token punctuation">;</span>
+
+
+<span class="token comment" spellcheck="true">/**
+ * @project_name: flinkDemo
+ * @package_name: com.wmy.flink.sql.flinksql.fun.udf
+ * @Author: wmy
+ * @Date: 2021/10/7
+ * @Major: 数据科学与大数据技术
+ * @Post：大数据实时开发
+ * @Email：wmy_2000@163.com
+ * @Desription: flink UDF 用户案例
+ * @Version: wmy-version-01
+ */</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">Flink_SQL_Fun_UDF_01</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token keyword">throws</span> Exception <span class="token punctuation">{</span>
+
+        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"Flink_SQL_Fun_UDF_01 >>> 2021-10-07"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment" spellcheck="true">// 创建流式环境和表环境</span>
+        StreamExecutionEnvironment env <span class="token operator">=</span> StreamExecutionEnvironment<span class="token punctuation">.</span><span class="token function">getExecutionEnvironment</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        env<span class="token punctuation">.</span><span class="token function">setParallelism</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        EnvironmentSettings environmentSettings <span class="token operator">=</span> EnvironmentSettings
+                <span class="token punctuation">.</span><span class="token function">newInstance</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+                <span class="token punctuation">.</span><span class="token function">inStreamingMode</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+                <span class="token punctuation">.</span><span class="token function">useBlinkPlanner</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+                <span class="token punctuation">.</span><span class="token function">build</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        StreamTableEnvironment tableEnv <span class="token operator">=</span> StreamTableEnvironment<span class="token punctuation">.</span><span class="token function">create</span><span class="token punctuation">(</span>env<span class="token punctuation">,</span> environmentSettings<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment" spellcheck="true">// 读取数据</span>
+        DataStreamSource<span class="token operator">&lt;</span>String<span class="token operator">></span> socketTextStream <span class="token operator">=</span> env<span class="token punctuation">.</span><span class="token function">socketTextStream</span><span class="token punctuation">(</span><span class="token string">"flink01"</span><span class="token punctuation">,</span> <span class="token number">8888</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment" spellcheck="true">// 对数据进行转换</span>
+        SingleOutputStreamOperator<span class="token operator">&lt;</span>User<span class="token operator">></span> waterSensorDS <span class="token operator">=</span> socketTextStream
+                <span class="token punctuation">.</span><span class="token function">map</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">MapFunction</span><span class="token operator">&lt;</span>String<span class="token punctuation">,</span> User<span class="token operator">></span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    <span class="token annotation punctuation">@Override</span>
+                    <span class="token keyword">public</span> User <span class="token function">map</span><span class="token punctuation">(</span>String value<span class="token punctuation">)</span> <span class="token keyword">throws</span> Exception <span class="token punctuation">{</span>
+                        String<span class="token punctuation">[</span><span class="token punctuation">]</span> fields <span class="token operator">=</span> value<span class="token punctuation">.</span><span class="token function">split</span><span class="token punctuation">(</span><span class="token string">","</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                        <span class="token keyword">return</span> User<span class="token punctuation">.</span><span class="token function">builder</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+                                        <span class="token punctuation">.</span><span class="token function">id</span><span class="token punctuation">(</span>fields<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+                                        <span class="token punctuation">.</span><span class="token function">name</span><span class="token punctuation">(</span>fields<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+                                        <span class="token punctuation">.</span><span class="token function">age</span><span class="token punctuation">(</span>Integer<span class="token punctuation">.</span><span class="token function">parseInt</span><span class="token punctuation">(</span>fields<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+                                        <span class="token punctuation">.</span><span class="token function">build</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    <span class="token punctuation">}</span>
+                <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment" spellcheck="true">//3.将流转换为动态表</span>
+        Table table <span class="token operator">=</span> tableEnv<span class="token punctuation">.</span><span class="token function">fromDataStream</span><span class="token punctuation">(</span>waterSensorDS<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment" spellcheck="true">// 不注册就进行使用</span>
+        <span class="token comment" spellcheck="true">//table.select($("id"), $("name"), call(UserNameLength.class, $("name")).as("nameLength"), $("age")).execute().print();</span>
+
+        <span class="token comment" spellcheck="true">// 注册在进行使用</span>
+        tableEnv<span class="token punctuation">.</span><span class="token function">createTemporarySystemFunction</span><span class="token punctuation">(</span><span class="token string">"nameLength"</span><span class="token punctuation">,</span> UserNameLength<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        tableEnv<span class="token punctuation">.</span><span class="token function">sqlQuery</span><span class="token punctuation">(</span><span class="token string">"select id,name,age,nameLength(name) as nameLength from "</span> <span class="token operator">+</span> table<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">execute</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">print</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment" spellcheck="true">// 执行流式环境</span>
+        env<span class="token punctuation">.</span><span class="token function">execute</span><span class="token punctuation">(</span><span class="token string">"Flink_SQL_Fun_UDF_01 >>> 2021-10-07"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment" spellcheck="true">// define function logic</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">class</span> <span class="token class-name">UserNameLength</span> <span class="token keyword">extends</span> <span class="token class-name">ScalarFunction</span> <span class="token punctuation">{</span>
+        <span class="token keyword">public</span> <span class="token keyword">int</span> <span class="token function">eval</span><span class="token punctuation">(</span>String value<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">return</span> value<span class="token punctuation">.</span><span class="token function">length</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token annotation punctuation">@Data</span>
+    <span class="token annotation punctuation">@NoArgsConstructor</span>
+    <span class="token annotation punctuation">@AllArgsConstructor</span>
+    <span class="token annotation punctuation">@Builder</span>
+    <span class="token annotation punctuation">@ToString</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">class</span> <span class="token class-name">User</span> <span class="token punctuation">{</span>
+        <span class="token keyword">private</span> String id<span class="token punctuation">;</span>
+        <span class="token keyword">private</span> String name<span class="token punctuation">;</span>
+        <span class="token keyword">private</span> <span class="token keyword">int</span> age<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token annotation punctuation">@Data</span>
+    <span class="token annotation punctuation">@NoArgsConstructor</span>
+    <span class="token annotation punctuation">@AllArgsConstructor</span>
+    <span class="token annotation punctuation">@Builder</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">class</span> <span class="token class-name">WaterSensor</span> <span class="token punctuation">{</span>
+        <span class="token keyword">private</span> String id<span class="token punctuation">;</span>
+        <span class="token keyword">private</span> Long ts<span class="token punctuation">;</span>
+        <span class="token keyword">private</span> Integer vc<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<pre class=" language-properties"><code class="language-properties"><span class="token attr-name">[root@flink01</span> <span class="token attr-value">~]# nc -l 8888</span>
+1001,wumingyang,21
+1002,andylaoshi,25
+</code></pre>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20211007173147093.png" alt="image-20211007173147093"></p>
 
                 
             </div>
