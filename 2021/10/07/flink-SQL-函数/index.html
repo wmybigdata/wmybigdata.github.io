@@ -1025,17 +1025,87 @@ is_alpha<span class="token punctuation">(</span><span class="token string">''</s
 </code></pre>
 <h4 id="3-7-5-map-value"><a href="#3-7-5-map-value" class="headerlink" title="3.7.5 map [value ]"></a>3.7.5 map [value ]</h4><pre class=" language-sql"><code class="language-sql"><span class="token keyword">select</span> map<span class="token punctuation">[</span><span class="token string">'k1'</span><span class="token punctuation">,</span><span class="token string">'v1'</span><span class="token punctuation">,</span><span class="token string">'k2'</span><span class="token punctuation">,</span><span class="token string">'v2'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
 </code></pre>
-<h3 id="3-8-JSON-函数"><a href="#3-8-JSON-函数" class="headerlink" title="3.8 JSON 函数"></a>3.8 JSON 函数</h3><p>JSON 函数使用 SQL 标准的 ISO/IEC TR 19075-6 中描述的 JSON 路径表达式。它们的语法受 ECMAScript 的许多功能启发并采用了它，但既不是其子集也不是其超集。</p>
-<p>路径表达式有两种风格，松散和严格。省略时，默认为严格模式。严格模式旨在从模式的角度检查数据，只要数据不符合路径表达式就会抛出错误。但是，<code>JSON_VALUE</code>如果遇到错误，则允许定义回退行为之类的功能。另一方面，松散模式更宽容，并将错误转换为空序列。</p>
-<p>特殊字符<code>$</code>表示 JSON 路径中的根节点。路径可以访问属性 ( <code>$.a</code>)、数组元素 ( <code>$.a[0].b</code>) 或分支数组中的所有元素 ( <code>$.a[*].b</code>)。</p>
-<p>已知限制：</p>
-<ul>
-<li>当前并非所有 Lax 模式的功能都得到正确支持。这是一个上游错误 (CALCITE-4717)。不保证非标准行为。</li>
-</ul>
-<h4 id="3-8-1-json-exists"><a href="#3-8-1-json-exists" class="headerlink" title="3.8.1 json_exists"></a>3.8.1 json_exists</h4><p>json_exists(jsonvalue, path [ { true | false | unknown | error } on error ])</p>
-<p>确定 JSON 字符串是否满足给定的路径搜索条件。如果省略错误行为，<code>FALSE ON ERROR</code>则假定为默认值。</p>
-<h4 id="3-8-2-JSON-VALUE"><a href="#3-8-2-JSON-VALUE" class="headerlink" title="3.8.2 JSON_VALUE"></a>3.8.2 JSON_VALUE</h4><p>———— 学习到这里2021-10-06</p>
-<h2 id="4、聚合函数"><a href="#4、聚合函数" class="headerlink" title="4、聚合函数"></a>4、聚合函数</h2><h2 id="5、时间间隔和点单位说明符"><a href="#5、时间间隔和点单位说明符" class="headerlink" title="5、时间间隔和点单位说明符"></a>5、时间间隔和点单位说明符</h2><h2 id="6、列函数"><a href="#6、列函数" class="headerlink" title="6、列函数"></a>6、列函数</h2>
+<h3 id="3-8-聚合函数"><a href="#3-8-聚合函数" class="headerlink" title="3.8 聚合函数"></a>3.8 聚合函数</h3><table>
+<thead>
+<tr>
+<th>时间函数</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>count()     count(columName)     count(distinct columName)     count(1)     count(*)</td>
+<td>count() 函数返回匹配指定条件的行数。     COUNT(column_name) 函数返回指定列的值的数目（NULL 不计入）     COUNT(<em>) 函数返回表中的记录数     COUNT(DISTINCT column_name) 函数返回指定列的不同值的数目     count(1) 最好是使用count(1) 因为大多数情况count(1)都比count(</em>)好</td>
+</tr>
+<tr>
+<td>rank()</td>
+<td>返回值在一组值中的排名。     结果是 1 加上分区顺序中当前行之前或等于当前行的行数。     这些值将在序列中产生间隙。</td>
+</tr>
+<tr>
+<td>dense_rank()</td>
+<td>返回值在一组值中的排名。结果是一加先前分配的等级值。     与函数 rank 不同，dense_rank 不会在排名序列中产生间隙。</td>
+</tr>
+<tr>
+<td>row_number()</td>
+<td>根据窗口分区内行的顺序，为每一行分配一个唯一的序列号，从一开始。     ROW_NUMBER 和 RANK 相似。ROW_NUMBER 按顺序对所有行进行编号     （例如 1、2、3、4、5）。     RANK 为平局提供相同的数值（例如 1、2、2、4、5）。</td>
+</tr>
+<tr>
+<td>lead</td>
+<td>返回窗口中当前行之后第 offsetth  行处的表达式值。     offset 的默认值为 1，default 的默认值为 NULL。</td>
+</tr>
+<tr>
+<td>lag</td>
+<td>返回窗口中当前行之前第 offsetth  行处的表达式值。     offset 的默认值为 1，default 的默认值为 NULL。</td>
+</tr>
+<tr>
+<td>first_value</td>
+<td>返回一组有序值中的第一个值。</td>
+</tr>
+<tr>
+<td>last_value</td>
+<td>返回一组有序值中的最后一个值。</td>
+</tr>
+<tr>
+<td>listagg</td>
+<td>连接字符串表达式的值并在它们之间放置分隔符值。     字符串末尾不添加分隔符。分隔符的默认值为“,”。</td>
+</tr>
+</tbody></table>
+<pre class=" language-sql"><code class="language-sql">https:<span class="token comment" spellcheck="true">//www.jianshu.com/p/ab6315190d01#comments</span>
+
+<span class="token keyword">insert</span> <span class="token keyword">into</span>  test_rank <span class="token keyword">values</span>
+<span class="token punctuation">(</span><span class="token string">'孙悟空'</span><span class="token punctuation">,</span><span class="token string">'语文'</span><span class="token punctuation">,</span><span class="token string">'87'</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">(</span><span class="token string">'孙悟空'</span><span class="token punctuation">,</span><span class="token string">'数学'</span><span class="token punctuation">,</span><span class="token string">'95'</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">(</span><span class="token string">'孙悟空'</span><span class="token punctuation">,</span><span class="token string">'英语'</span><span class="token punctuation">,</span><span class="token string">'68'</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">(</span><span class="token string">'沙悟净'</span><span class="token punctuation">,</span><span class="token string">'语文'</span><span class="token punctuation">,</span><span class="token string">'94'</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">(</span><span class="token string">'沙悟净'</span><span class="token punctuation">,</span><span class="token string">'数学'</span><span class="token punctuation">,</span><span class="token string">'56'</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">(</span><span class="token string">'沙悟净'</span><span class="token punctuation">,</span><span class="token string">'英语'</span><span class="token punctuation">,</span><span class="token string">'78'</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">(</span><span class="token string">'宋松松'</span><span class="token punctuation">,</span><span class="token string">'语文'</span><span class="token punctuation">,</span><span class="token string">'64'</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">(</span><span class="token string">'宋松松'</span><span class="token punctuation">,</span><span class="token string">'数学'</span><span class="token punctuation">,</span><span class="token string">'86'</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">(</span><span class="token string">'宋松松'</span><span class="token punctuation">,</span><span class="token string">'英语'</span><span class="token punctuation">,</span><span class="token string">'84'</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">(</span><span class="token string">'罗婷婷'</span><span class="token punctuation">,</span><span class="token string">'语文'</span><span class="token punctuation">,</span><span class="token string">'87'</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">(</span><span class="token string">'罗婷婷'</span><span class="token punctuation">,</span><span class="token string">'数学'</span><span class="token punctuation">,</span><span class="token string">'85'</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">(</span><span class="token string">'罗婷婷'</span><span class="token punctuation">,</span><span class="token string">'英语'</span><span class="token punctuation">,</span><span class="token string">'78'</span><span class="token punctuation">)</span>
+<span class="token punctuation">;</span>
+
+<span class="token keyword">create</span> <span class="token keyword">table</span> test_rank<span class="token punctuation">(</span>
+name <span class="token keyword">VARCHAR</span><span class="token punctuation">(</span><span class="token number">255</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+subject <span class="token keyword">VARCHAR</span><span class="token punctuation">(</span><span class="token number">255</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+score  <span class="token keyword">VARCHAR</span><span class="token punctuation">(</span><span class="token number">255</span><span class="token punctuation">)</span>
+<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+
+<span class="token keyword">CREATE</span> <span class="token keyword">TABLE</span> test_rank <span class="token punctuation">(</span>
+  name STRING<span class="token punctuation">,</span>
+  subject STRING<span class="token punctuation">,</span>
+  score STRING
+<span class="token punctuation">)</span> <span class="token keyword">WITH</span> <span class="token punctuation">(</span>
+   <span class="token string">'connector'</span> <span class="token operator">=</span> <span class="token string">'jdbc'</span><span class="token punctuation">,</span>
+   <span class="token string">'url'</span> <span class="token operator">=</span> 'jdbc:mysql:<span class="token comment" spellcheck="true">//dm:3306/wmy',</span>
+   <span class="token string">'table-name'</span> <span class="token operator">=</span> <span class="token string">'test_rank'</span><span class="token punctuation">,</span>
+   <span class="token string">'username'</span> <span class="token operator">=</span> <span class="token string">'root'</span><span class="token punctuation">,</span>
+   <span class="token string">'password'</span> <span class="token operator">=</span> <span class="token string">'000000'</span>
+<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+
                 
             </div>
             <hr/>
