@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="hive入门, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
+    <meta name="keywords" content="spark-运行架构, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
     <meta name="description" content="本网站是个人兴趣爱好，总结分享经验，记录生活点滴的平台，希望在以后的学习旅途中，走出自己的风景。">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -16,7 +16,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>hive入门 | 情深骚明大数据之旅</title>
+    <title>spark-运行架构 | 情深骚明大数据之旅</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -314,12 +314,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/21.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/14.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">hive入门</h1>
+                    <h1 class="description center-align post-title">spark-运行架构</h1>
                 </div>
             </div>
         </div>
@@ -435,8 +435,8 @@
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/hive/">
-                                <span class="chip bg-color">hive</span>
+                            <a href="/tags/spark/">
+                                <span class="chip bg-color">spark</span>
                             </a>
                         
                     </div>
@@ -447,8 +447,8 @@
                     <div class="post-cate">
                         <i class="fas fa-bookmark fa-fw icon-category"></i>
                         
-                            <a href="/categories/hive/" class="post-category">
-                                hive
+                            <a href="/categories/spark/" class="post-category">
+                                spark
                             </a>
                         
                     </div>
@@ -460,7 +460,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2021-09-18
+                    2021-10-08
                 </div>
                 
 
@@ -481,43 +481,7 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h1 id="hive入门"><a href="#hive入门" class="headerlink" title="hive入门"></a>hive入门</h1><h2 id="1、连接hive"><a href="#1、连接hive" class="headerlink" title="1、连接hive"></a>1、连接hive</h2><pre class=" language-properties"><code class="language-properties"><span class="token attr-name">hadoop</span> <span class="token attr-value">fs -mkdir /tmp</span>
-<span class="token attr-name">hadoop</span> <span class="token attr-value">fs -mkdir /user/hive/warehouse</span>
-<span class="token attr-name">hadoop</span> <span class="token attr-value">fs -chmod 777 /tmp</span>
-<span class="token attr-name">hadoop</span> <span class="token attr-value">fs -chmod 777 /user/hive/warehouse</span>
-
-core-site.xml
-<span class="token attr-name">--------------------------</span> <span class="token attr-value">在hadoop和hive都要重新设置和启动</span>
-<span class="token attr-name">&lt;property></span> <span class="token attr-value">    </span>
-<span class="token attr-name">    &lt;name>hadoop.proxyuser.root.hosts&lt;/name></span> <span class="token attr-value">    </span>
-    &lt;value>*&lt;/value>
-<span class="token attr-name"> &lt;/property></span> 
-<span class="token attr-name">&lt;property></span> <span class="token attr-value">    </span>
-<span class="token attr-name">    &lt;name>hadoop.proxyuser.root.groups&lt;/name></span> <span class="token attr-value">   </span>
-<span class="token attr-name">    &lt;value>*&lt;/value></span> 
-&lt;/property>
-<span class="token attr-name">&lt;property></span> <span class="token attr-value">    </span>
-<span class="token attr-name">    &lt;name>hadoop.proxyuser.wmy.hosts&lt;/name></span> <span class="token attr-value">    </span>
-<span class="token attr-name">    &lt;value>*&lt;/value></span> 
-<span class="token attr-name">&lt;/property></span> 
-<span class="token attr-name">&lt;property></span> <span class="token attr-value">    </span>
-<span class="token attr-name">    &lt;name>hadoop.proxyuser.wmy.groups&lt;/name></span> <span class="token attr-value">    </span>
-<span class="token attr-name">    &lt;value>*&lt;/value></span> 
-&lt;/property>
-
-
-
-$HIVE_HOME/bin/hiveserver2
-
-<span class="token attr-name">$HIVE_HOME/bin/beeline</span> <span class="token attr-value">-u jdbc:hive2://flink01:10000</span>
-
-</code></pre>
-<p><a href="http://flink01:10002/" target="_blank" rel="noopener">HiveServer2</a></p>
-<p>旅游案例展示</p>
-<p><a href="https://cwiki.apache.org/confluence/display/Hive/Tutorial#Tutorial-QueryingandInsertingData" target="_blank" rel="noopener">https://cwiki.apache.org/confluence/display/Hive/Tutorial#Tutorial-QueryingandInsertingData</a></p>
-<p>这里面有日志、电影和旅游案例</p>
-<p><a href="https://cwiki.apache.org/confluence/display/Hive/GettingStarted#GettingStarted-RunningHiveServer2andBeeline" target="_blank" rel="noopener">https://cwiki.apache.org/confluence/display/Hive/GettingStarted#GettingStarted-RunningHiveServer2andBeeline</a></p>
-
+                
                 
             </div>
             <hr/>
@@ -543,7 +507,7 @@ $HIVE_HOME/bin/hiveserver2
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://github.com/wmybigdata/2021/09/18/hive%E5%85%A5%E9%97%A8/">https://github.com/wmybigdata/2021/09/18/hive%E5%85%A5%E9%97%A8/</a>
+                    <a href="https://github.com/wmybigdata/2021/10/08/spark-%E8%BF%90%E8%A1%8C%E6%9E%B6%E6%9E%84/">https://github.com/wmybigdata/2021/10/08/spark-%E8%BF%90%E8%A1%8C%E6%9E%B6%E6%9E%84/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -581,8 +545,8 @@ $HIVE_HOME/bin/hiveserver2
                     
                         <div class="article-tag">
                             
-                                <a href="/tags/hive/">
-                                    <span class="chip bg-color">hive</span>
+                                <a href="/tags/spark/">
+                                    <span class="chip bg-color">spark</span>
                                 </a>
                             
                         </div>
@@ -752,17 +716,18 @@ $HIVE_HOME/bin/hiveserver2
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+                <i class="far fa-dot-circle"></i>&nbsp;本篇
+            </div>
             <div class="card">
-                <a href="/2021/09/19/java-BeanUtils/">
+                <a href="/2021/10/08/spark-%E8%BF%90%E8%A1%8C%E6%9E%B6%E6%9E%84/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/12.jpg" class="responsive-img" alt="java_BeanUtils">
+                        <img src="/medias/featureimages/14.jpg" class="responsive-img" alt="spark-运行架构">
                         
-                        <span class="card-title">java_BeanUtils</span>
+                        <span class="card-title">spark-运行架构</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -772,26 +737,27 @@ $HIVE_HOME/bin/hiveserver2
                         
                     </div>
                     <div class="publish-info">
-                        <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2021-09-19
-                        </span>
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-10-08
+                            </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/java/" class="post-category">
-                                    java
+                            <a href="/categories/spark/" class="post-category">
+                                    spark
                                 </a>
                             
                             
                         </span>
                     </div>
                 </div>
+
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/java/">
-                        <span class="chip bg-color">java</span>
+                    <a href="/tags/spark/">
+                        <span class="chip bg-color">spark</span>
                     </a>
                     
                 </div>
@@ -805,13 +771,13 @@ $HIVE_HOME/bin/hiveserver2
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2021/09/17/hive-sql-%E8%AE%B0%E5%BD%95/">
+                <a href="/2021/10/07/flink-SQL-%E5%87%BD%E6%95%B0/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/17.jpg" class="responsive-img" alt="hive-sql-记录">
+                        <img src="/medias/featureimages/7.jpg" class="responsive-img" alt="flink-SQL-函数">
                         
-                        <span class="card-title">hive-sql-记录</span>
+                        <span class="card-title">flink-SQL-函数</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -822,14 +788,14 @@ $HIVE_HOME/bin/hiveserver2
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2021-09-17
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-10-07
                             </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/hive/" class="post-category">
-                                    hive
+                            <a href="/categories/Flink%E6%B5%81%E5%BC%8F%E5%BC%95%E6%93%8E/" class="post-category">
+                                    Flink流式引擎
                                 </a>
                             
                             
@@ -839,8 +805,8 @@ $HIVE_HOME/bin/hiveserver2
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/hive/">
-                        <span class="chip bg-color">hive</span>
+                    <a href="/tags/Flink%E6%B5%81%E5%BC%8F%E5%BC%95%E6%93%8E/">
+                        <span class="chip bg-color">Flink流式引擎</span>
                     </a>
                     
                 </div>

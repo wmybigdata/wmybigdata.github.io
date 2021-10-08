@@ -29,9 +29,9 @@
 
     <script src="/libs/jquery/jquery.min.js"></script>
 
-<meta name="generator" content="Hexo 4.2.0"><link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
+<meta name="generator" content="Hexo 4.2.0">
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
-
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
 </head>
 
@@ -435,8 +435,8 @@
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/">
-                                <span class="chip bg-color">大数据环境搭建</span>
+                            <a href="/tags/spark/">
+                                <span class="chip bg-color">spark</span>
                             </a>
                         
                     </div>
@@ -447,8 +447,8 @@
                     <div class="post-cate">
                         <i class="fas fa-bookmark fa-fw icon-category"></i>
                         
-                            <a href="/categories/%E5%A4%A7%E6%95%B0%E6%8D%AE%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/" class="post-category">
-                                大数据环境搭建
+                            <a href="/categories/spark/" class="post-category">
+                                spark
                             </a>
                         
                     </div>
@@ -481,7 +481,7 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h1 id="大数据环境搭建-Spark3-0-0-hadoop3-2分布式部署"><a href="#大数据环境搭建-Spark3-0-0-hadoop3-2分布式部署" class="headerlink" title="大数据环境搭建-Spark3.0.0-hadoop3.2分布式部署"></a>大数据环境搭建-Spark3.0.0-hadoop3.2分布式部署</h1><h2 id="1、hive-on-Spark"><a href="#1、hive-on-Spark" class="headerlink" title="1、hive on Spark"></a>1、hive on Spark</h2><h3 id="1-1-spark-env-sh"><a href="#1-1-spark-env-sh" class="headerlink" title="1.1 spark-env.sh"></a>1.1 spark-env.sh</h3><pre class=" language-shell"><code class="language-shell">SPARK_MASTER_HOST=flink01
+                <h2 id="1、hive-on-Spark"><a href="#1、hive-on-Spark" class="headerlink" title="1、hive on Spark"></a>1、hive on Spark</h2><h3 id="1-1-spark-env-sh"><a href="#1-1-spark-env-sh" class="headerlink" title="1.1 spark-env.sh"></a>1.1 spark-env.sh</h3><pre class=" language-shell"><code class="language-shell">SPARK_MASTER_HOST=flink01
 SPARK_MASTER_PORT=7077
 export JAVA_HOME=/opt/module/jdk1.8.0_144
 </code></pre>
@@ -674,18 +674,18 @@ flink03
 10</span>
 </code></pre>
 <p>成功执行之后，杀掉flink01的spark master之后，等过一段时间就可以看到flink02变成了活跃的了。</p>
-<h2 id="6、spark-on-Yarn"><a href="#6、spark-on-Yarn" class="headerlink" title="6、spark on Yarn"></a>6、spark on Yarn</h2><h3 id="6-1-yarn-site-xm"><a href="#6-1-yarn-site-xm" class="headerlink" title="6.1  yarn-site.xm"></a>6.1  yarn-site.xm</h3><pre class=" language-xml"><code class="language-xml"><span class="token comment" spellcheck="true">&lt;!--是否启动一个线程检查每个任务正使用的物理内存量，如果任务超出分配值，则直接将其杀掉，默认是 true --&gt;</span>
-<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span><span class="token punctuation">&gt;</span></span>
-    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>name</span><span class="token punctuation">&gt;</span></span>yarn.nodemanager.pmem-check-enabled<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>name</span><span class="token punctuation">&gt;</span></span>
-    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>value</span><span class="token punctuation">&gt;</span></span>false<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>value</span><span class="token punctuation">&gt;</span></span>
-<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>property</span><span class="token punctuation">&gt;</span></span>
+<h2 id="6、spark-on-Yarn"><a href="#6、spark-on-Yarn" class="headerlink" title="6、spark on Yarn"></a>6、spark on Yarn</h2><h3 id="6-1-yarn-site-xm"><a href="#6-1-yarn-site-xm" class="headerlink" title="6.1  yarn-site.xm"></a>6.1  yarn-site.xm</h3><pre class=" language-xml"><code class="language-xml"><span class="token comment" spellcheck="true">&lt;!--是否启动一个线程检查每个任务正使用的物理内存量，如果任务超出分配值，则直接将其杀掉，默认是 true --></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>name</span><span class="token punctuation">></span></span>yarn.nodemanager.pmem-check-enabled<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>name</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>value</span><span class="token punctuation">></span></span>false<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>value</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>property</span><span class="token punctuation">></span></span>
 
 
-<span class="token comment" spellcheck="true">&lt;!-- 关闭yarn对虚拟内存的限制检查 --&gt;</span>
-<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span><span class="token punctuation">&gt;</span></span>
-    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>name</span><span class="token punctuation">&gt;</span></span>yarn.nodemanager.vmem-check-enabled<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>name</span><span class="token punctuation">&gt;</span></span>
-    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>value</span><span class="token punctuation">&gt;</span></span>false<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>value</span><span class="token punctuation">&gt;</span></span>
-<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>property</span><span class="token punctuation">&gt;</span></span>
+<span class="token comment" spellcheck="true">&lt;!-- 关闭yarn对虚拟内存的限制检查 --></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>name</span><span class="token punctuation">></span></span>yarn.nodemanager.vmem-check-enabled<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>name</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>value</span><span class="token punctuation">></span></span>false<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>value</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>property</span><span class="token punctuation">></span></span>
 </code></pre>
 <h3 id="6-2-spark-env-sh"><a href="#6-2-spark-env-sh" class="headerlink" title="6.2 spark-env.sh"></a>6.2 spark-env.sh</h3><pre class=" language-properties"><code class="language-properties"><span class="token attr-name">export</span> <span class="token attr-value">JAVA_HOME=/opt/bigdata/platform/jdk1.8.0_144</span>
 <span class="token attr-name">YARN_CONF_DIR</span><span class="token punctuation">=</span><span class="token attr-value">/opt/bigdata/platform/hadoop-3.1.3/etc/hadoop</span>
@@ -824,6 +824,11 @@ flink03
 </tr>
 </tbody></table>
 <p>所以这里我要使用的是spark on yarn模式来进行提交任务。</p>
+<h2 id="8、端口号"><a href="#8、端口号" class="headerlink" title="8、端口号"></a>8、端口号</h2><p>➢ Spark 查看当前 Spark-shell 运行任务情况端口号：4040（计算）</p>
+<p> ➢ Spark Master 内部通信服务端口号：7077 </p>
+<p>➢ Standalone 模式下，Spark Master Web 端口号：8080（资源） </p>
+<p>➢ Spark 历史服务器端口号：18080 </p>
+<p>➢ Hadoop YARN 任务运行情况查看端口号：8088</p>
 
                 
             </div>
@@ -888,8 +893,8 @@ flink03
                     
                         <div class="article-tag">
                             
-                                <a href="/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/">
-                                    <span class="chip bg-color">大数据环境搭建</span>
+                                <a href="/tags/spark/">
+                                    <span class="chip bg-color">spark</span>
                                 </a>
                             
                         </div>
