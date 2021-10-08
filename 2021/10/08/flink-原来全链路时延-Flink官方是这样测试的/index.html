@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="MySQLbinlog日志学习, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
+    <meta name="keywords" content="flink-原来全链路时延-Flink官方是这样测试的, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
     <meta name="description" content="本网站是个人兴趣爱好，总结分享经验，记录生活点滴的平台，希望在以后的学习旅途中，走出自己的风景。">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -16,7 +16,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>MySQLbinlog日志学习 | 情深骚明大数据之旅</title>
+    <title>flink-原来全链路时延-Flink官方是这样测试的 | 情深骚明大数据之旅</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -314,12 +314,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/21.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/7.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">MySQLbinlog日志学习</h1>
+                    <h1 class="description center-align post-title">flink-原来全链路时延-Flink官方是这样测试的</h1>
                 </div>
             </div>
         </div>
@@ -433,12 +433,25 @@
             <div class="row tag-cate">
                 <div class="col s7">
                     
-                          <div class="article-tag">
-                            <span class="chip bg-color">无标签</span>
-                          </div>
+                    <div class="article-tag">
+                        
+                            <a href="/tags/Flink%E6%B5%81%E5%BC%8F%E5%BC%95%E6%93%8E/">
+                                <span class="chip bg-color">Flink流式引擎</span>
+                            </a>
+                        
+                    </div>
                     
                 </div>
                 <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/Flink%E6%B5%81%E5%BC%8F%E5%BC%95%E6%93%8E/" class="post-category">
+                                Flink流式引擎
+                            </a>
+                        
+                    </div>
                     
                 </div>
             </div>
@@ -447,7 +460,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2021-08-24
+                    2021-10-08
                 </div>
                 
 
@@ -468,7 +481,111 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                
+                <p>这篇文章我是来自于：三分钟秒懂大数据这个公众号，我就是用来学习记录的。</p>
+<h2 id="1、背景"><a href="#1、背景" class="headerlink" title="1、背景"></a>1、背景</h2><p>FLink Job 端到端延迟是一个重要的指标，用来衡量FLink任务的整体性能和响应延迟（大部分流式应用，要求低延迟特性)。</p>
+<p>通过流处理引擎竞品对比，我们发现大部分流计算引擎产品，都在告警监控页面，集成了全链路时延指标展示（直方图）。</p>
+<p>一些低延时的处理场景，例如用于登陆、用户下单规则检测，实时预测场景，需要一个可度量的Metric指标，来实时观测、监控集群全链路时延情况。</p>
+<h2 id="2、源码分析来源"><a href="#2、源码分析来源" class="headerlink" title="2、源码分析来源"></a>2、源码分析来源</h2><p>1、本文的源码分析基于FLink社区ISSUE FLINK-3660，以及ISSUE对应的PR源码pull-2386，另外，个人也新增了实现源码的说明。</p>
+<p>2、其PR源码中只涉及到了部分全链路时延实现代码，因此，我在文章中新增总结了：</p>
+<ul>
+<li>Source到Sink处理Latency Marker源码</li>
+<li>LatencyMarksEmitter 提交时延标记类</li>
+<li>LatencyStats（时延直方图Metric实现）源码</li>
+<li>时延测量–整体架构图</li>
+</ul>
+<h2 id="3、腾讯Oceanus监控指标参考"><a href="#3、腾讯Oceanus监控指标参考" class="headerlink" title="3、腾讯Oceanus监控指标参考"></a>3、腾讯Oceanus监控指标参考</h2><p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20211008143248462.png" alt="物理机情况"></p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20211008143309866.png" alt="作业状况"></p>
+<h2 id="4、Flink-LatencyMarker实现思路"><a href="#4、Flink-LatencyMarker实现思路" class="headerlink" title="4、Flink LatencyMarker实现思路"></a>4、Flink LatencyMarker实现思路</h2><h3 id="4-1-方案变迁"><a href="#4-1-方案变迁" class="headerlink" title="4.1 方案变迁"></a>4.1 方案变迁</h3><p>在webinterface中，加入流式job的端到端延迟是一个重要特性。因此，FLink社区最初的想法是在每个记录的source上附加一个摄取时间( ingestion -time)时间戳。</p>
+<p>然而，这为不使用 monitor feature（监控功能）的用户，带来了额外开销(每个元素+每个元素上的System.currentTimeMilis()需要8个字节)。</p>
+<p>因此，FLink社区最后决定，通过定期发送特殊事件来实现此功能，类似于通过拓扑发送水印watermark。</p>
+<h3 id="4-2-实现原理"><a href="#4-2-实现原理" class="headerlink" title="4.2 实现原理"></a>4.2 实现原理</h3><p>这些特殊事件（LatencyMarker）在source上以可配置发送间隔，并由任务Task转发。Sink最后接收到LatencyMarks后，将比较LatencyMarker的时间戳与当前系统时间，以确定延迟。</p>
+<p>LatencyMarker不会增加作业的延迟，但是LatencyMarker与常规记录类似，可以被delay阻塞（例如反压情况），因此LatencyMarker的延迟与Record延迟近似。</p>
+<h3 id="4-3-节点间时钟偏移及准确性"><a href="#4-3-节点间时钟偏移及准确性" class="headerlink" title="4.3 节点间时钟偏移及准确性"></a>4.3 节点间时钟偏移及准确性</h3><p>**当前方案期望所有任务管理器TaskManager上的时钟是同步的。否则，测量的延迟也包括TaskManager时钟之间的偏移。<br>**</p>
+<p>后续，我们可以尝试通过使用JobManager作为计时服务中心（central timing service）来缓解这个问题。taskmanager将定期查询JM的当前时间，以确定其时钟的偏移量。</p>
+<p> 这个偏移量仍然包括TM和JM之间的网络延迟，但是仍然比较好的测量时延。</p>
+<h2 id="5、Flink-LatencyMarker实现源码"><a href="#5、Flink-LatencyMarker实现源码" class="headerlink" title="5、Flink LatencyMarker实现源码"></a>5、Flink LatencyMarker实现源码</h2><p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20211008143948608.png" alt="Flink LatencyMarker实现源码"></p>
+<h3 id="5-1-实现基础类及下发标记"><a href="#5-1-实现基础类及下发标记" class="headerlink" title="5.1 实现基础类及下发标记"></a>5.1 实现基础类及下发标记</h3><p> Flink源码中，引入了一个新的</p>
+<p>StreamElement，称为LatencyMarker。 </p>
+<p>与水印类似，LatencyMarker按配置的间隔从源发出。这个时间间隔的默认值是0毫秒，即不触发</p>
+<p>(配置项在ExecutionConfig#</p>
+<p>latencyTrackingInterval，</p>
+<p>名称metrics.latency.interval)，例如可以配置成2000毫秒触发一次LatencyMarker发送。</p>
+<p>LatencyMarker不能“多于”常规元素。这确保了测量的延迟接近于常规流元素的端到端延迟。 </p>
+<p>常规操作符Operator(不包括那些参与迭代的Operator)如果不是sink，就会转发延迟标记LatencyMarker。 </p>
+<h3 id="5-2-多输出通道—随机下发标记"><a href="#5-2-多输出通道—随机下发标记" class="headerlink" title="5.2 多输出通道—随机下发标记"></a>5.2 多输出通道—随机下发标记</h3><p>具有多个输出channel的Operator，随机选择一个channel通道，将LatencyMarker发送给它。这可以确保每个LatencyMarker标记在系统中只存在一次，并且重新分区步骤不会导致传输的LatencyMarker数量激增。</p>
+<pre class=" language-java"><code class="language-java">
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">RecordWriterOutput</span><span class="token punctuation">{</span>
+  <span class="token annotation punctuation">@Override</span>
+  <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">emitLatencyMarker</span><span class="token punctuation">(</span>LatencyMarker latencyMarker<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    serializationDelegate<span class="token punctuation">.</span><span class="token function">setInstance</span><span class="token punctuation">(</span>latencyMarker<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">try</span> <span class="token punctuation">{</span>
+      <span class="token comment" spellcheck="true">// 内部实现了随机选择通道</span>
+      recordWriter<span class="token punctuation">.</span><span class="token function">randomEmit</span><span class="token punctuation">(</span>serializationDelegate<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">Exception</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">RuntimeException</span><span class="token punctuation">(</span>e<span class="token punctuation">.</span><span class="token function">getMessage</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>上述RecordWriterOutput#emitLatencyMarker()会被StreamSource、AbstractStreamOperator调用，分别实现source和中间operator的延迟标记下发。</p>
+<p>如果操作符Operator是Sink，它将维护每个已知source实例的最128LatencyMarker信息。</p>
+<h3 id="5-3-、Metric展示"><a href="#5-3-、Metric展示" class="headerlink" title="5.3 、Metric展示"></a>5.3 、Metric展示</h3><p>每个已知source的最小/最大/平均值/p50/p95/p99时延，在sink的LatencyStats对象中，进行汇总(如果没有任何输出的Operator，就是是sink)。</p>
+<p>本PR只涉及全链路延迟统计的实现，Flink已有一整套Metric显示体系，全链路时延Metric展示交给FLink框架本身)。</p>
+<p>此外，目前还没有确保系统时钟同步的机制，因此如果硬件时钟不正确，则延迟测量将不准确。</p>
+<h2 id="6、时延粒度Granularity说明"><a href="#6、时延粒度Granularity说明" class="headerlink" title="6、时延粒度Granularity说明"></a>6、时延粒度Granularity说明</h2><h3 id="6-1-时延粒度–概念说明"><a href="#6-1-时延粒度–概念说明" class="headerlink" title="6.1 时延粒度–概念说明"></a>6.1 时延粒度–概念说明</h3><p>任意一个中间Operator或Sink，可以通过配置metrics.latency.granularity项，调整与Source间统计的粒度（Singe、Operator、Subtask）：<br>    A、统计的时候，可以选择source源id、source源subtask index进行组合，调整统计粒度。<br>    B、统计的时候，当前Operator及当前Operator subtask index总是参与粒度名称的生成，固定的。</p>
+<h3 id="6-2-三种时延跟踪策略及其源码定义"><a href="#6-2-三种时延跟踪策略及其源码定义" class="headerlink" title="6.2 三种时延跟踪策略及其源码定义"></a>6.2 三种时延跟踪策略及其源码定义</h3><p>Single - 跟踪延迟，无需区分:源+源子任务(例如双流Join的两个source，这里都默认为一个数据源了)</p>
+<pre class=" language-java"><code class="language-java">
+SINGLE <span class="token punctuation">{</span>
+    String <span class="token function">createUniqueHistogramName</span><span class="token punctuation">(</span>LatencyMarker marker<span class="token punctuation">,</span> 
+                                     OperatorID operatorId<span class="token punctuation">,</span> <span class="token keyword">int</span> operatorSubtaskIndex<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// 只有自己的operatorId和operatorSubtaskIndex参与</span>
+        <span class="token comment" spellcheck="true">// Metric名称生成</span>
+        <span class="token comment" spellcheck="true">// LatencyMarker带有的id（源）不参与Metric名称生成</span>
+        <span class="token keyword">return</span> String<span class="token punctuation">.</span><span class="token function">valueOf</span><span class="token punctuation">(</span>operatorId<span class="token punctuation">)</span> <span class="token operator">+</span> operatorSubtaskIndex<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>Operator - 跟踪延迟，区分源，但不区分源的子任务；</p>
+<pre class=" language-java"><code class="language-java">
+OPERATOR <span class="token punctuation">{</span>
+    String <span class="token function">createUniqueHistogramName</span><span class="token punctuation">(</span>LatencyMarker marker<span class="token punctuation">,</span> OperatorID operatorId<span class="token punctuation">,</span> <span class="token keyword">int</span> operatorSubtaskIndex<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// LatencyMarker带有的id（源）中id参与计算</span>
+        <span class="token keyword">return</span> String<span class="token punctuation">.</span><span class="token function">valueOf</span><span class="token punctuation">(</span>marker<span class="token punctuation">.</span><span class="token function">getOperatorId</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">+</span> operatorId <span class="token operator">+</span> operatorSubtaskIndex<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>Subtask - 跟踪延迟，区分源+源子任务</p>
+<pre class=" language-java"><code class="language-java">SUBTASK <span class="token punctuation">{</span>
+    String <span class="token function">createUniqueHistogramName</span><span class="token punctuation">(</span>LatencyMarker marker<span class="token punctuation">,</span> 
+                                     OperatorID operatorId<span class="token punctuation">,</span> <span class="token keyword">int</span> operatorSubtaskIndex<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> String<span class="token punctuation">.</span><span class="token function">valueOf</span><span class="token punctuation">(</span>marker<span class="token punctuation">.</span><span class="token function">getOperatorId</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">+</span> 
+            marker<span class="token punctuation">.</span><span class="token function">getSubtaskIndex</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">+</span> operatorId <span class="token operator">+</span> operatorSubtaskIndex<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>根据上述不同的名称key，将直方图对象放入Map中，Map定义：</p>
+<pre class=" language-java"><code class="language-java">
+Map<span class="token operator">&lt;</span>String<span class="token punctuation">,</span> DescriptiveStatisticsHistogram<span class="token operator">></span> latencyStats <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">HashMap</span><span class="token operator">&lt;</span><span class="token operator">></span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+伪代码<span class="token punctuation">(</span>创建直方图<span class="token punctuation">)</span>：
+latencyHistogram <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">DescriptiveStatisticsHistogram</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>historySize<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">this</span><span class="token punctuation">.</span>latencyStats<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span>uniqueName<span class="token punctuation">,</span> latencyHistogram<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+伪代码<span class="token punctuation">(</span>更新直方图<span class="token punctuation">)</span>：
+<span class="token keyword">long</span> now <span class="token operator">=</span> System<span class="token punctuation">.</span><span class="token function">currentTimeMillis</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+latencyHistogram<span class="token punctuation">.</span><span class="token function">update</span><span class="token punctuation">(</span>now <span class="token operator">-</span> marker<span class="token punctuation">.</span><span class="token function">getMarkedTime</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+</code></pre>
+<h3 id="6-3-Single、Operator-、Subtask-时延策略在Web-Metric中的体现"><a href="#6-3-Single、Operator-、Subtask-时延策略在Web-Metric中的体现" class="headerlink" title="6.3  Single、Operator 、Subtask 时延策略在Web Metric中的体现"></a>6.3  Single、Operator 、Subtask 时延策略在Web Metric中的体现</h3><p>上述Single、Operator 、Subtask不同测试，生成的Metric名称和group就会产生变化，Web Metric中名称相应改变一个Subtask时延粒度的Metric路径：</p>
+<pre class=" language-java"><code class="language-java">Job<span class="token operator">&lt;</span>source_id<span class="token operator">></span><span class="token operator">&lt;</span>source_subtask_index<span class="token operator">></span><span class="token operator">&lt;</span>operator_id<span class="token operator">></span><span class="token operator">&lt;</span>operator_subtask_index<span class="token operator">></span> <span class="token punctuation">.</span>latency
+</code></pre>
+<h2 id="七、总结说明"><a href="#七、总结说明" class="headerlink" title="七、总结说明"></a>七、总结说明</h2><p>1、LatencyMarker不参与window、MiniBatch的缓存计时，直接被中间Operator下发。</p>
+<p>2、Metric路径:</p>
+<p>TaskManagerJobMetricGroup/operator_id/operator_subtask_index/<br>latency（根据时延配置粒度Granularity，路径会有变化，参考本文第六章节）</p>
+<p>3、每个中间Operator、以及Sink都会统计自己与Source节点的链路延迟，我们在监控页面，一般展示Source至Sink链路延迟。</p>
+<p>4、延迟粒度细分到Task，可以用来排查哪台机器的Task时延偏高，进行对比和运维排查。</p>
+<p>5、从实现原理来看，发送时延标记间隔配置大一些（例如20秒一次），一般不会影响系统处理业务数据的性能（所有的StreamSource Task都按间隔发送时延标记，中间节点有多个输出通道的，随机选择一个通道下发，不会复制多份数据出来）。</p>
+
                 
             </div>
             <hr/>
@@ -494,7 +611,7 @@
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://github.com/wmybigdata/2021/08/24/MySQLbinlog%E6%97%A5%E5%BF%97%E5%AD%A6%E4%B9%A0/">https://github.com/wmybigdata/2021/08/24/MySQLbinlog%E6%97%A5%E5%BF%97%E5%AD%A6%E4%B9%A0/</a>
+                    <a href="https://github.com/wmybigdata/2021/10/08/flink-%E5%8E%9F%E6%9D%A5%E5%85%A8%E9%93%BE%E8%B7%AF%E6%97%B6%E5%BB%B6-Flink%E5%AE%98%E6%96%B9%E6%98%AF%E8%BF%99%E6%A0%B7%E6%B5%8B%E8%AF%95%E7%9A%84/">https://github.com/wmybigdata/2021/10/08/flink-%E5%8E%9F%E6%9D%A5%E5%85%A8%E9%93%BE%E8%B7%AF%E6%97%B6%E5%BB%B6-Flink%E5%AE%98%E6%96%B9%E6%98%AF%E8%BF%99%E6%A0%B7%E6%B5%8B%E8%AF%95%E7%9A%84/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -531,7 +648,11 @@
                 <div class="post-meta__tag-list" style="display: inline-block;">
                     
                         <div class="article-tag">
-                            <span class="chip bg-color">无标签</span>
+                            
+                                <a href="/tags/Flink%E6%B5%81%E5%BC%8F%E5%BC%95%E6%93%8E/">
+                                    <span class="chip bg-color">Flink流式引擎</span>
+                                </a>
+                            
                         </div>
                     
                 </div>
@@ -699,17 +820,18 @@
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+                <i class="far fa-dot-circle"></i>&nbsp;本篇
+            </div>
             <div class="card">
-                <a href="/2021/08/24/Flink1-12-0%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB/">
+                <a href="/2021/10/08/flink-%E5%8E%9F%E6%9D%A5%E5%85%A8%E9%93%BE%E8%B7%AF%E6%97%B6%E5%BB%B6-Flink%E5%AE%98%E6%96%B9%E6%98%AF%E8%BF%99%E6%A0%B7%E6%B5%8B%E8%AF%95%E7%9A%84/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/23.jpg" class="responsive-img" alt="Flink1.12.0源码阅读">
+                        <img src="/medias/featureimages/7.jpg" class="responsive-img" alt="flink-原来全链路时延-Flink官方是这样测试的">
                         
-                        <span class="card-title">Flink1.12.0源码阅读</span>
+                        <span class="card-title">flink-原来全链路时延-Flink官方是这样测试的</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -719,9 +841,9 @@
                         
                     </div>
                     <div class="publish-info">
-                        <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2021-08-24
-                        </span>
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-10-08
+                            </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
@@ -734,6 +856,7 @@
                         </span>
                     </div>
                 </div>
+
                 
                 <div class="card-action article-tags">
                     
@@ -752,13 +875,13 @@
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2021/08/24/Flink-CDC-2-0-%E6%AD%A3%E5%BC%8F%E5%8F%91%E5%B8%83-%E8%AF%A6%E8%A7%A3%E6%A0%B8%E5%BF%83%E6%94%B9%E8%BF%9B/">
+                <a href="/2021/10/08/spark-%E8%BF%90%E8%A1%8C%E6%9E%B6%E6%9E%84/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/16.jpg" class="responsive-img" alt="Flink-CDC-2.0-正式发布-详解核心改进">
+                        <img src="/medias/featureimages/14.jpg" class="responsive-img" alt="spark-运行架构">
                         
-                        <span class="card-title">Flink-CDC-2.0-正式发布-详解核心改进</span>
+                        <span class="card-title">spark-运行架构</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -769,14 +892,14 @@
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2021-08-24
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-10-08
                             </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/%E5%A4%A7%E6%95%B0%E6%8D%AE%E9%87%87%E9%9B%86%E7%B3%BB%E7%BB%9F/" class="post-category">
-                                    大数据采集系统
+                            <a href="/categories/spark/" class="post-category">
+                                    spark
                                 </a>
                             
                             
@@ -786,8 +909,8 @@
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE%E9%87%87%E9%9B%86%E7%B3%BB%E7%BB%9F/">
-                        <span class="chip bg-color">大数据采集系统</span>
+                    <a href="/tags/spark/">
+                        <span class="chip bg-color">spark</span>
                     </a>
                     
                 </div>
