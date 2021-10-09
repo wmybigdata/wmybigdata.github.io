@@ -1,0 +1,1421 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="keywords" content="flink-1.14.0内存优化, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
+    <meta name="description" content="本网站是个人兴趣爱好，总结分享经验，记录生活点滴的平台，希望在以后的学习旅途中，走出自己的风景。">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>flink-1.14.0内存优化 | 情深骚明大数据之旅</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+
+    <script src="/libs/jquery/jquery.min.js"></script>
+
+<meta name="generator" content="Hexo 4.2.0">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+</head>
+
+
+
+<script src="/js/FunnyTitle.js"></script>
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">情深骚明大数据之旅</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/contact" class="waves-effect waves-light">
+      
+      <i class="fas fa-comments" style="zoom: 0.6;"></i>
+      
+      <span>留言板</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">情深骚明大数据之旅</div>
+        <div class="logo-desc">
+            
+            本网站是个人兴趣爱好，总结分享经验，记录生活点滴的平台，希望在以后的学习旅途中，走出自己的风景。
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/contact" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-comments"></i>
+			
+			留言板
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/blinkfox/hexo-theme-matery" class="waves-effect waves-light" target="_blank">
+                <i class="fab fa-github-square fa-fw"></i>Fork Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/blinkfox/hexo-theme-matery" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
+   data-tooltip="Fork Me" data-position="left" data-delay="50">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor" class="octo-body"></path>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+    
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/0.jpg')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">flink-1.14.0内存优化</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        width: 345px;
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        padding: 35px 0 15px 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content {
+        padding-bottom: 30px;
+        overflow: auto;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+
+        position: absolute;
+        right: 23.5vw;
+        display: block;
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #floating-toc-btn {
+        position: fixed;
+        right: 15px;
+        bottom: 76px;
+        padding-top: 15px;
+        margin-bottom: 0;
+        z-index: 998;
+    }
+
+    #floating-toc-btn .btn-floating {
+        width: 48px;
+        height: 48px;
+    }
+
+    #floating-toc-btn .btn-floating i {
+        line-height: 48px;
+        font-size: 1.4rem;
+    }
+</style>
+<div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/Flink%E6%B5%81%E5%BC%8F%E5%BC%95%E6%93%8E/">
+                                <span class="chip bg-color">Flink流式引擎</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/Flink%E6%B5%81%E5%BC%8F%E5%BC%95%E6%93%8E/" class="post-category">
+                                Flink流式引擎
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2021-10-09
+                </div>
+                
+
+                
+
+                
+
+                
+
+                
+            </div>
+        </div>
+        <hr class="clearfix">
+
+        
+
+        
+
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>由于 Flink 在大数据流计算中占据非常重要的位置，毫不夸张的说，已经被所有一二线互联网大厂所使用，并且 Flink 组件在 Apache 社区持续占据热榜前五。<strong>2021年9月 30 号 Flink 1.14.0 版本发布</strong></p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20211009080148790.png" alt="Flink 问题总结"></p>
+<p>本篇文章使用 <strong>Flink 1.14.0</strong> 最新版本 讲解 Flink 内存模型及调优策略，帮助小伙伴在生产环境中学会配置内存参数，轻松玩转 Flink。大纲目录如下：</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20211009080307609.png" alt="Flink 内存模型及调优策略"></p>
+<h2 id="1、JVM"><a href="#1、JVM" class="headerlink" title="1、JVM"></a>1、JVM</h2><p>在大数据领域中，有很多开源框架（Hadoop、Spark、Storm）等都是基于 <strong>JVM</strong> 运行，可见 JVM 在大数据领域扮演的重要角色，所以在了解 Flink 内存时，我们需要先了解一下 JVM 。</p>
+<p>JVM 是可运行 Java 代码的假想计算机 ，包括程序计数器、Java 虚拟机栈、本地方法栈、Java 堆 和方法区。JVM 是运行在操作系统之上的，它与硬件没有直接的交互。</p>
+<h3 id="1-1-JVM-数据运行区"><a href="#1-1-JVM-数据运行区" class="headerlink" title="1.1 JVM 数据运行区"></a>1.1 JVM 数据运行区</h3><p>Java 虚拟机在执行 Java 程序的过程中会把它在主存中管理的内存部分划分成多个区域，每个区域存放不同类型的数据。如下图所示：</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20211009080619214.png" alt="JVM 数据运行区"></p>
+<p><strong>1.程序计数器：</strong>是一个<strong>数据结构</strong>，用于保存当前正常执行的程序的内存地址。Java 虚拟机的多线程就是通过线程轮流切换并分配处理器时间来实现的，为了线程切换后能恢复到正确的位置，每条线程都需要一个独立的程序计数器，互不影响，该区域<strong>线程私有。</strong></p>
+<p><strong>2.Java 虚拟机栈：</strong>与线程生命周期相同，用于存储局部变量表，操作栈，方法返回值。局部变量表放着基本数据类型，还有对象的引用，该区域<strong>线程私有。</strong></p>
+<p><strong>3.本地方法栈：</strong>跟虚拟机栈很像，不过它是为虚拟机使用到的 Native 方法服务,该区域<strong>线程私有。</strong></p>
+<p><strong>4.方法区：</strong>储存虚拟机加载的类信息，常量，静态变量，编译后的代码，该区域<strong>线程共享。</strong></p>
+<p><strong>5.Java 堆：</strong>存放所有对象的实例。这一块区域在 Java 虚拟机启动的时候被创建，<strong>该区域被所有线程所共享</strong>，同时也是垃圾收集器的主要工作区域，因此这一部分区域除了被叫 <strong>堆内内存</strong>以外，也被叫做 <strong>GC</strong> 堆（Garbage Collected Heap）。</p>
+<h3 id="1-2-堆内内存（on-heap-memory）"><a href="#1-2-堆内内存（on-heap-memory）" class="headerlink" title="1.2 堆内内存（on-heap memory）"></a>1.2 堆内内存（on-heap memory）</h3><p>堆内内存是 Java 垃圾收集器的主要工作区域，为了提高垃圾回收的效率，在堆内内存的内部又划分出了<strong>新生代、老年代和永久代</strong>。在新生代内存中又按照 8:1:1 的比例划分出了 <strong>Eden、Survivor1、Survivor2</strong> 三个区域。</p>
+<ol>
+<li><strong>新生代：</strong>新生代有一个 Eden 区和两个 Survivor 区，首先将对象放入 Eden 区，如果空间不足就向 Survivor1 区上放，触发一次 minor GC ，如果仍然放不下就将存活的对象放入 Survivor2 区中，然后清空 Eden 和 Survivor1 区的内存。在某次 GC 过程中，如果发现仍然又放不下的对象，就将这些对象放入老年代内存里去。</li>
+<li><strong>老年代：</strong>大对象以及长期存活的对象直接进入老年代。</li>
+<li><strong>永久代：</strong>永久存储区是一个常驻内存区域，用于存放 JDK 自身所携带的 <strong>Class、Interface</strong> 的元数据，也就是说它存储的是运行环境必须的类信息，被装载进此区域的数据是不会被垃圾回收器回收掉的，关闭 JVM 才会释放此区域所占用的内存。</li>
+</ol>
+<p>如果出现 java.lang.OutOfMemoryError: PermGen space，说明是 Java 虚拟机对永久代 Perm 内存设置不够。</p>
+<h3 id="1-3-GC-算法"><a href="#1-3-GC-算法" class="headerlink" title="1.3 GC 算法"></a>1.3 GC 算法</h3><p>由于<strong>堆内内存处理</strong>是编程人员容易出现问题的地方，<strong>忘记或者错误的内存回收会导致程序或系统的不稳定甚至崩溃</strong>，Java 就提供 GC 功能自动监测对象是否超过作用域从而达到自动回收内存的目的。</p>
+<p>关于堆内存和永久区的垃圾回收，Java 提供的 GC 算法包含：引用计数法，标记-清除算法，复制算法，标记-压缩算法，分代收集算法</p>
+<ol>
+<li><strong>引用计数法：</strong>引用计数器的实现很简单，对于一个对象 A，只要有任何一个对象引用了 A，则 A 的引用计数器就加 1，当引用失效时，引用计数器就减 1。只要对象 A 的引用计数器的值为 0，则对象 A 就不可能再被使用。</li>
+</ol>
+<p><strong>缺点：</strong>1. 无法处理循环引用情况，会造成内存泄漏。 2.对系统性能产生影响。</p>
+<ol>
+<li><strong>标记-清除算法：</strong>将垃圾回收分为两个阶段：标记阶段和清除阶段，首先标记出所有需要回收的对象，在标记完成后统一回收所有被标记的对象。</li>
+</ol>
+<p><strong>缺点：</strong>1. 效率问题，2. 空间问题。标记清除之后会产生大量不连续的内存碎片，空间碎片太多会导致以后程序在运行过程中需要分配较大对象时，无法找到足够的连续内存而提前触发另一次垃圾收集动作。</p>
+<ol>
+<li><strong>复制算法：</strong>将可用内存按容量划分为大小相等的两块，每次只试用其中的一块，当这一块内存用完时，将存活的对象复制到另外一块内存上面，然后清除使用内存中的所有对象。 适用于初生代。</li>
+<li><strong>标记压缩算法：</strong>首先标记出所有需要回收的对象，然后让所有存活的对象都向一端移动，然后清理掉端边界以外的内存。适用于老年代</li>
+<li><strong>分代收集算法：</strong>初生代使用复制算法，老年代使用标记压缩算法。</li>
+</ol>
+<h3 id="1-4-堆外内存（off-heap-memory）"><a href="#1-4-堆外内存（off-heap-memory）" class="headerlink" title="1.4 堆外内存（off-heap memory）"></a>1.4 堆外内存（off-heap memory）</h3><p><strong>虽然 Java 提供了多种算法进行垃圾回收，但仍然无法彻底解决堆内内存过大带来的长时间的 GC 停顿的问题，以及操作系统对堆内内存不可知的问题。</strong></p>
+<p>基于上述问题，Java 虚拟机开辟出了<strong>堆外内存</strong>(off-heap memory)。<strong>堆外内存意味着把一些对象的实例分配在 Java 虚拟机堆内内存以外的内存区域，这些内存直接受操作系统（而不是虚拟机）管理</strong>。这样做的结果就是能保持一个较小的堆，以减少垃圾收集对应用的影响。同时因为这部分区域直接受操作系统的管理，别的进程和设备（例如 GPU ）可以直接通过操作系统对其进行访问，减少了从虚拟机中复制内存数据的过程。</p>
+<p>Java 在 NIO 包中提供了 ByteBuffer 类，使用下面的方式，可以直接开辟指定大小的堆外内存，如下图为创建 128M 堆外内存。</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20211009081357014.png" alt="堆外内存"></p>
+<p><strong>优点 ：</strong></p>
+<ol>
+<li>可以很方便的自主开辟很大的内存空间，对大内存的伸缩性很好；</li>
+<li>减少垃圾回收带来的系统停顿时间；</li>
+<li>直接受操作系统控制，可以直接被其他进程和设备访问，减少了原本从虚拟机复制的过程；</li>
+<li>特别适合那些分配次数少，读写操作很频繁的场景。</li>
+</ol>
+<p><strong>缺点 ：</strong></p>
+<ol>
+<li>容易出现内存泄漏，并且很难排查；</li>
+<li>堆外内存的数据结构不直观，当存储结构复杂的对象时，会浪费大量的时间对其进行串行化。</li>
+</ol>
+<h3 id="1-5-堆外内存与堆内内存联系"><a href="#1-5-堆外内存与堆内内存联系" class="headerlink" title="1.5 堆外内存与堆内内存联系"></a>1.5 堆外内存与堆内内存联系</h3><p>虽然堆外内存本身不受垃圾回收算法的管辖，但是因为其是由 <strong>ByteBuffer</strong> 所创造出来的，因此这个 buffer 自身作为一个实例化的对象，其自身的信息（例如堆外内存在主存中的起始地址等信息）必须存储在堆内内存中，具体情况如下图所示。</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20211009081523073.png" alt="堆外内存与堆内内存联系"></p>
+<h3 id="1-6-JVM-内存管理缺陷"><a href="#1-6-JVM-内存管理缺陷" class="headerlink" title="1.6 JVM 内存管理缺陷"></a>1.6 JVM 内存管理缺陷</h3><p>由于在 JVM 内存中存储大量的数据 （包括缓存和高效处理）时，JVM 内存会面临很多问题，包括如下：</p>
+<ol>
+<li><strong>Java 对象存储密度低。</strong>Java 的对象在内存中存储包含 3 个主要部分：对象头、实例 数据、对齐填充部分。例如，一个只包含 boolean 属性的对象占 16byte：对象头占 8byte， boolean 属性占 1byte，为了对齐达到 8 的倍数额外占 7byte。而实际上只需要一个 bit（1/8 字节）就够了。</li>
+<li><strong>Full GC 会极大地影响性能。</strong>尤其是为了处理更大数据而开了很大内存空间的 JVM 来说，GC 会达到秒级甚至分钟级。</li>
+<li><strong>OOM 问题影响稳定性。</strong>OutOfMemoryError 是分布式计算框架经常会遇到的问题， 当 JVM 中所有对象大小超过分配给 JVM 的内存大小时，就会发生 OutOfMemoryError 错误， 导致 JVM 崩溃，分布式框架的健壮性和性能都会受到影响。</li>
+<li><strong>缓存未命中问题。</strong>CPU 进行计算的时候，是从 CPU 缓存中获取数据。现代体系的 CPU 会有多级缓存，而加载的时候是以 Cache Line 为单位加载。如果能够将对象连续存储， 这样就会大大降低 Cache Miss。使得 CPU 集中处理业务，而不是空转。</li>
+</ol>
+<h2 id="2、Flink-内存管理"><a href="#2、Flink-内存管理" class="headerlink" title="2、Flink 内存管理"></a>2、Flink 内存管理</h2><p>基于 JVM 内存存在一些问题，并且在大数据场景下，无法在内存中存储海量数据，计算效率无法提高。Flink 社区采用<strong>自主内存管理</strong>设计。</p>
+<p>Flink 并不是将大量对象存在堆内存上，而是将对象都序列化到一个预分配的内存块上， 这个内存块叫做 <strong>MemorySegment</strong>，它代表了一段固定长度的内存（默认大小为 32KB），也是 Flink 中最小的内存分配单元，并且提供了非常高效的读写方法，很多运算可以直接操作 二进制数据，<strong>不需要反序列化即可执行</strong>。每条记录都会以序列化的形式存储在一个或多个 MemorySegment 中。如果需要处理的数据多于可以保存在内存中的数据，Flink 的运算符会将部分数据溢出到磁盘。</p>
+<h3 id="2-1-Flink-内存模型"><a href="#2-1-Flink-内存模型" class="headerlink" title="2.1 Flink 内存模型"></a>2.1 Flink 内存模型</h3><p>Flink 总体内存类图如下：</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20211009081859768.png" alt="Flink 内存模型"></p>
+<p>主要包含 JobManager 内存模型和 TaskManager 内存模型。</p>
+<h3 id="2-2-JobManager-内存模型"><a href="#2-2-JobManager-内存模型" class="headerlink" title="2.2 JobManager 内存模型"></a>2.2 JobManager 内存模型</h3><p>Flink JobManager内存类图如虚线部分：</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20211009081942178.png" alt="JobManager 内存模型"></p>
+<p>在 1.11 中，Flink  对 JM 端的内存配置进行了修改，使它的选项和配置方式与 TM 端的配置方式保持一致。</p>
+<h4 id="2-2-1-配置JobManager的总进程内存"><a href="#2-2-1-配置JobManager的总进程内存" class="headerlink" title="2.2.1 配置JobManager的总进程内存"></a>2.2.1 配置JobManager的总进程内存</h4><pre class=" language-yaml"><code class="language-yaml"><span class="token comment" spellcheck="true">#Flink1.10版本</span>
+
+<span class="token comment" spellcheck="true">#The heap size for the JobManager JVM</span>
+
+jobmanager.heap.size<span class="token punctuation">:</span>1024m
+
+<span class="token comment" spellcheck="true">#Flink1.11版本及以后</span>
+
+<span class="token comment" spellcheck="true">#JobManager总进程内存</span>
+jobmanager.memory.process.size<span class="token punctuation">:</span>4096m
+
+<span class="token comment" spellcheck="true"># 作业管理器的 JVM 堆内存大小</span>
+jobmanager.memory.heap.size：2048m
+
+<span class="token comment" spellcheck="true">#作业管理器的堆外内存大小。此选项涵盖所有堆外内存使用。</span>
+jobmanager.memory.off<span class="token punctuation">-</span>heap.size：1536m
+</code></pre>
+<h3 id="2-3-TaskManager-内存模型"><a href="#2-3-TaskManager-内存模型" class="headerlink" title="2.3 TaskManager 内存模型"></a>2.3 TaskManager 内存模型</h3><p>TaskManager 内存模型如下图所示：</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20211009082302183.png" alt="TaskManager 内存模型"></p>
+<p>TaskManager 内存模型一共包含 3大部分，分别为总体内存、<strong>JVM Heap 堆上内存、Off-Heap 堆外内存</strong>等。</p>
+<h4 id="2-3-1-总体内存"><a href="#2-3-1-总体内存" class="headerlink" title="2.3.1 总体内存"></a>2.3.1 总体内存</h4><p>1、<strong>Total Process Memory：</strong>Flink Java 应用程序（包括用户代码）和 JVM 运行整个进程所消耗的总内存。</p>
+<p><strong>总进程内存(Total Process Memory) = Flink 总内存 + JVM 元空间 + JVM 执行开销</strong></p>
+<pre class=" language-yaml"><code class="language-yaml"><span class="token key atrule">配置参数：默认size</span><span class="token punctuation">:</span> 1728mb
+<span class="token key atrule">taskmanager.memory.process.size</span><span class="token punctuation">:</span> 1728mb
+</code></pre>
+<p>2、<strong>Total Flink Memory：</strong>仅 Flink Java 应用程序消耗的内存，包括用户代码，但不包括 JVM 为其运行而分配的内存。</p>
+<p><strong>Flink 总内存 = Framework堆内外 + task 堆内外 + network + managed Memory</strong></p>
+<pre class=" language-yaml"><code class="language-yaml"><span class="token comment" spellcheck="true"># 要排除JVM元空间和开销，请使用总的Flink内存大小，而不是'taskmanager.memory.process.size'。</span>
+<span class="token comment" spellcheck="true">#不建议同时设置“taskmanager.memory.process”。size'和Flink内存。</span>
+
+<span class="token key atrule">taskmanager.memory.flink.size</span><span class="token punctuation">:</span> 1280m
+</code></pre>
+<h4 id="2-3-2-JVM-Heap-JVM-堆上内存"><a href="#2-3-2-JVM-Heap-JVM-堆上内存" class="headerlink" title="2.3.2 JVM Heap (JVM 堆上内存)"></a>2.3.2 JVM Heap (JVM 堆上内存)</h4><ul>
+<li><strong>Framework Heap ：</strong>框架堆内存</li>
+</ul>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20211009083150474.png" alt="框架堆内存"></p>
+<ul>
+<li><p><strong>Task Heap :</strong> 任务堆内存</p>
+<p>如果内存大小没有指定，它将被推导出为总 Flink 内存减去框架堆内存、框架堆外内存、任务堆外内存、托管内存和网络内存。</p>
+</li>
+</ul>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20211009083232957.png" alt=" 任务堆内存"></p>
+<h4 id="2-3-3-Off-Heap-Mempry-JVM-堆外内存"><a href="#2-3-3-Off-Heap-Mempry-JVM-堆外内存" class="headerlink" title="2.3.3 Off-Heap Mempry(JVM 堆外内存)"></a>2.3.3 Off-Heap Mempry(JVM 堆外内存)</h4><ul>
+<li><strong>Managed memory:</strong> 托管内存</li>
+</ul>
+<p>由 Flink 管理的原生托管内存，<strong>保留用于排序、哈希表、中间结果缓存和 RocksDB 状态后端</strong>。</p>
+<p>托管内存由 Flink 管理并分配为原生内存（堆外）。以下工作负载使用托管内存：</p>
+<p>流式作业可以将其用于 <strong>RocksDB</strong> 状态后端。流和批处理作业都可以使用它进行排序、哈希表、中间结果的缓存。流作业和批处理作业都可以使用它在 Python 进程中执行用户定义的函数。</p>
+<p>托管内存配置时如果两者都设置，则大小将覆盖分数。如果大小和分数均未明确配置，则将使用默认分数。</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20211009083358808.png" alt="Off-Heap Mempry"></p>
+<p><strong>DirectMemory：</strong>JVM 直接内存</p>
+<p>Framework Off-Heap Memory：Flink 框架堆外内存。</p>
+<p>即 TaskManager 本身所占用的对外内存，不计入 Slot 资源。</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20211009083548916.png" alt="JVM 直接内存"></p>
+<p><strong>Task Off-Heap ：</strong>Task 堆外内存。</p>
+<p>专用于Flink 框架的堆外直接（或本机）内存。</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20211009083613094.png" alt="Task 堆外内存"></p>
+<p><strong>Network Memory：</strong>网络内存。</p>
+<p>网络数据交换所使用的堆外内存大小，如网络数据交换 缓冲区。</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20211009083650038.png" alt="网络内存"></p>
+<p><strong>JVM metaspace：</strong>JVM 元空间。</p>
+<p>Flink JVM 进程的元空间大小,默认为256MB。</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20211009083746481.png" alt="JVM 元空间"></p>
+<p><strong>JVM Overhead ：</strong>JVM执行开销。</p>
+<p>JVM 执行时自身所需要的内容，包括线程堆栈、IO、 编译缓存等所使用的内存,这是一个上限分级成分的的总进程内存。</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20211009083850227.png" alt="JVM执行开销"></p>
+<h2 id="3、Flink-内存数据结构"><a href="#3、Flink-内存数据结构" class="headerlink" title="3、Flink 内存数据结构"></a>3、Flink 内存数据结构</h2><p>Flink 的内存管理和操作系统管理内存一样.将内存划分为<strong>内存段</strong>、<strong>内存页</strong>等结构。</p>
+<h3 id="3-1-Flink-内存段"><a href="#3-1-Flink-内存段" class="headerlink" title="3.1 Flink 内存段"></a>3.1 Flink 内存段</h3><p>内存段在 Flink 内部叫 <strong>MemorySegment</strong>，是 Flink 中最小的内存分配单元，默认大小 32KB。它既可以是堆上内存（Java 的 byte 数组），也可以是堆外内存（基于 Netty 的 DirectByteBuffer），同时提供了对二进制数据进行读取和写入的方法。</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20211009083943452.png" alt="Flink 内存段"></p>
+<p>HeapMemorySegment：用来分配堆上内存 ;</p>
+<p><strong>HybridMemorySegment：用来分配堆外内存和堆上内存</strong>; 2017 年以后的版本实 际上只使用了 HybridMemorySegment。</p>
+<p>通过一个案例介绍Flink在序列化和反序列化过程中如何使用 MemorySegment：</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20211009084041302.png" alt="如何使用 MemorySegment"></p>
+<p>如上图所示，当创建一个Tuple 3 对象时，包含三个层面，一是 int 类型，一是 double 类型，还有一个是 Person。Person对象包含两个字段，一是 int 型的 ID，另一个是 String 类型的 name， </p>
+<p>（1）在序列化操作时，会委托相应具体序列化的序列化器进行相应的序列化操作。从图中可以看到 Tuple 3 会把 int 类型通过 IntSerializer 进行序列化操作，此时 int 只需要占用四个字节。</p>
+<p>（2）Person 类会被当成一个 Pojo 对象来进行处理，PojoSerializer 序列化器会把一些属性信息使用一个字节存储起来。同样，其字段则采取相对应的序列化器进行相应序列化，在序列化完的结果中，可以看到<strong>所有的数据都是由 MemorySegment 去支持</strong>。</p>
+<h3 id="3-2-Flink-内存页"><a href="#3-2-Flink-内存页" class="headerlink" title="3.2 Flink 内存页"></a>3.2 Flink 内存页</h3><p>内存页是 MemorySegment 之上的数据访问视图，数据读取抽象为 DataInputView，数据写入抽象为 DataOutputView。使用时就无需关心 MemorySegment 的细节，该层会自动处理跨 MemorySegment 的读取和写入。</p>
+<h4 id="3-2-1-DataInputView"><a href="#3-2-1-DataInputView" class="headerlink" title="3.2.1 DataInputView"></a>3.2.1 DataInputView</h4><p><strong>DataInputView</strong> 是从 MemorySegment 数据读取抽象视图，继承自 <strong>java.io.DataInput</strong>。InputView 中持有多个 MemorySegment 的引用（MemorySegment[]），这一组 MemorySegment 被视为一个内存页（Page）,可以顺序读取 MemorySegment 中的数据。如下图为继承关系图：</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20211009084252275.png" alt="DataInputView"></p>
+<h4 id="3-2-2-DataOutputView"><a href="#3-2-2-DataOutputView" class="headerlink" title="3.2.2 DataOutputView"></a>3.2.2 DataOutputView</h4><p><strong>DataOutputView 是从 MemorySegment 数据读取抽象视图</strong>，继承自java.io.DataOutput。OutputView 中持有多个 MemorySegment 的引用（MemorySegment[]），这一组 MemorySegment 被视为一个内存页（Page）,可以顺序地向 MemorySegment 中写入数据。如下图为继承关系图：</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20211009084341972.png" alt="DataOutputView "></p>
+<h4 id="3-2-3-Buffer"><a href="#3-2-3-Buffer" class="headerlink" title="3.2.3 Buffer"></a>3.2.3 Buffer</h4><p>Buffer 是具有引用计数的 MemorySegment 实例的包装器。用来将上游 Task 算子处理完毕的结果交给下游时定义的一个抽象或者内存对象。</p>
+<p>Buffer 的接口是网络层面上传输数据和事件的统一抽象，其实现类是 NetworkBuffer。<strong>Flink 在各个 TaskManger 之间传递数据时，使用的是这一层的抽象</strong>。1个 NetworkBuffer 中包装了一个 MemorySegment 。Buffer接口类图如下：</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20211009084418254.png" alt="Buffer"></p>
+<p><strong>Buffer 的底层是 MemorySegment</strong>，Buffer 申请和释放由 Flink 自行管理，Flink 引入了引用数的概念。当有新的 Buffer 消费者时，引用数加 1，当消费者消费完 Buffer 时，引用数减 1，最终当引用数变为 0 时，就可以将 Buffer 释放重用了。</p>
+<h4 id="3-2-4-Buffer-资源池"><a href="#3-2-4-Buffer-资源池" class="headerlink" title="3.2.4 Buffer 资源池"></a>3.2.4 Buffer 资源池</h4><p><strong>Buffer 资源池在 Flink 中叫作 BufferPool</strong>。BufferPool 用来管理 Buffer,包含 Buffer 的申请、释放、销毁、可用 Buffer 的通知等，其实现类是 LocalBufferPool ,<strong>每个 Task 拥有自己的 LocalBufferPool</strong> 。</p>
+<p>BufferPool 的类体系如下：</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20211009084553091.png" alt="Buffer 资源池"></p>
+<h2 id="4、网络缓冲器-NetworkBuffer"><a href="#4、网络缓冲器-NetworkBuffer" class="headerlink" title="4、网络缓冲器(NetworkBuffer)"></a>4、网络缓冲器(NetworkBuffer)</h2><p>网络缓冲器 (NetworkBuffer) 是网络交换数据的包装，其对应于 MemorySegment 内存段。</p>
+<p>Network Buffer，顾名思义，就是在网络传输中使用到的 Buffer（实际非网络传输也会用到）。了解 Flink 网络栈的同学应该会比较清楚，Flink 经过网络传输的上下游 Task 的设计会比较类似生产者 - 消费者模型。<strong>如果没有这个缓冲区，那么生产者或消费者会消耗大量时间在等待下游拿数据和上游发数据的环节上</strong>。加上这个缓冲区，生产者和消费者解耦开，任何一方短时间内的抖动理论上对另一方的数据处理都不会产生太大影响。如下图所示：</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20211009084730374.png" alt="网络缓冲器"></p>
+<p>这是对于单进程内生产者-消费者模型的一个图示，事实上，如果两个 Task 在同一个 TaskManager 内，那么使用的就是上述模型，</p>
+<p>对于不同 TM 内、或者需要跨网络传输的 TM 之间，利用生产者-消费者模型来进行数据传输的原理图如下：</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20211009084818399.png" alt="生产者-消费者模型"></p>
+<p>可以看到，在 Netty Server 端，<strong>buffer 只存在 LocalBufferPool 中</strong>，subpartition 自己并没有缓存 buffer 或者独享一部分 buffer，而在接收端，channel 有自己独享的一部分 buffer(Exclusive Buffers)，也有一部分共享的 buffer(Floating Buffers)，所以，Network Buffer 的使用同时存在于发送端和接收端。</p>
+<p>由此可见，<strong>TaskManager 内需要的 buffers 数量等于这个 TaskManager 内的所有 Task 中的发送端和接收端使用到的 network buffer 总和</strong>。明确了 Network Buffer 使用的位置，我们可以结合一些参数计算出作业实际所需的 NetworkBuffer 数量。</p>
+<h2 id="5、Flink-内存调优"><a href="#5、Flink-内存调优" class="headerlink" title="5、Flink 内存调优"></a>5、Flink 内存调优</h2><p>了解了 Flink JobManager Memory 和 TaskManager Memory的内存模型和数据结构之后，应该针对不同的部署情况，配置不同的内存，下面我们针对不同的部署方式介绍内存如何调优。</p>
+<h3 id="5-1-为-Standalone-配置内存"><a href="#5-1-为-Standalone-配置内存" class="headerlink" title="5.1 为 Standalone 配置内存"></a>5.1 为 Standalone 配置内存</h3><p>建议为 Standalone 配置 Flink 总内存，设置 JobManager 和 TaskManager 的 flink.size 大小,声明为 Flink 本身提供了多少内存。配置方式如下：</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20211009085231337.png" alt="Standalone 配置内存"></p>
+<h3 id="5-2-为-Containers-容器-配置内存"><a href="#5-2-为-Containers-容器-配置内存" class="headerlink" title="5.2 为 Containers(容器) 配置内存"></a>5.2 为 Containers(容器) 配置内存</h3><p>建议为容器化部署（Kubernetes或Yarn）配置总进程内存，设置 process.size 大小，它声明了总共应该分配多少内存给 Flink JVM 进程，并对应于请求容器的大小。配置方式如下：</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20211009085258664.png" alt=" Containers(容器) 配置内存"></p>
+<p>**<code>注意：</code>**如果你配置了总 Flink 内存， Flink 会隐式添加 JVM 内存组件来推导总进程内存，并请求一个具有该推导大小的内存的容器。</p>
+<p>**<code>警告：</code>**如果 Flink 或用户代码分配超出容器大小的非托管堆外（本机）内存，作业可能会失败，因为部署环境可能会杀死有问题的容器。</p>
+<h3 id="5-3-为-state-backends-状态后端-配置内存"><a href="#5-3-为-state-backends-状态后端-配置内存" class="headerlink" title="5.3  为 state backends(状态后端)配置内存"></a>5.3  为 state backends(状态后端)配置内存</h3><p>为 state backends(状态后端)配置内存时，这仅与 <code>TaskManager</code> 相关。</p>
+<p>在部署 Flink 流应用程序时，所使用的状态后端类型将决定集群的最佳内存配置。</p>
+<h4 id="5-3-1-HashMap-状态后端"><a href="#5-3-1-HashMap-状态后端" class="headerlink" title="5.3.1 HashMap 状态后端"></a><strong>5.3.1 HashMap 状态后端</strong></h4><p>运行无状态作业或使用 HashMapStateBackend 时，将托管内存设置为零。这将确保为 JVM 上的用户代码分配最大数量的堆内存。配置如下：</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20211009085354499.png" alt="HashMap 状态后端"></p>
+<h4 id="5-3-2-RocksDB-状态后端"><a href="#5-3-2-RocksDB-状态后端" class="headerlink" title="5.3.2 RocksDB 状态后端"></a>5.3.2 RocksDB 状态后端</h4><p>该 <strong>EmbeddedRocksDBStateBackend</strong> 使用本机内存。默认情况下，RocksDB 设置为将本机内存分配限制为托管内存的大小。因此，为你的状态保留足够的托管内存非常重要。如果禁用默认的 RocksDB 内存控制，RocksDB 分配的内存超过请求的容器大小（总进程内存）的限制，则可以在容器化部署中终止 TaskManager 。</p>
+<h3 id="5-4-为-batch-Job-批处理作业-配置内存"><a href="#5-4-为-batch-Job-批处理作业-配置内存" class="headerlink" title="5.4  为 batch Job(批处理作业)配置内存"></a>5.4  为 batch Job(批处理作业)配置内存</h3><p>为 batch Job(批处理作业)配置内存时，这仅与 TaskManager 相关。</p>
+<p><strong>Flink 的批处理操作符利用托管内存来更高效地运行。这样做时，可以直接对原始数据执行某些操作，而无需反序列化为 Java 对象</strong>。这意味着托管内存配置对应用程序的性能有实际影响。Flink 将尝试分配和使用 为批处理作业配置的尽可能多的托管内存，但不会超出其限制。这可以防止 OutOfMemoryError’s，因为 Flink 准确地知道它必须利用多少内存。如果托管内存不足，Flink 会优雅地溢出到磁盘。</p>
+<h2 id="6-故障排除"><a href="#6-故障排除" class="headerlink" title="6 故障排除"></a>6 故障排除</h2><h3 id="6-1-非法配置异常"><a href="#6-1-非法配置异常" class="headerlink" title="6.1 非法配置异常"></a>6.1 非法配置异常</h3><p>如果您看到从 TaskExecutorProcessUtils 或 JobManagerProcessUtils抛出的 IllegalConfigurationException，通常表明存在无效的配置值（例如负内存大小、大于 1 的分数等）或配置冲突。请重新配置内存参数。</p>
+<h3 id="6-2-Java-堆空间异常"><a href="#6-2-Java-堆空间异常" class="headerlink" title="6.2 Java 堆空间异常"></a>6.2 Java 堆空间异常</h3><p>如果报 <strong>OutOfMemoryError: Java heap space</strong> 异常，通常表示 JVM Heap 太小。您可以尝试通过增加总内存来增加 JVM 堆大小。您也可以直接为 TaskManager 增加任务堆内存或为 JobManager 增加 JVM 堆内存。</p>
+<blockquote>
+<blockquote>
+<p>还可以为 TaskManagers 增加框架堆内存，但只有在确定 Flink 框架本身需要更多内存时才应该更改此选项。</p>
+</blockquote>
+</blockquote>
+<h3 id="6-3-直接缓冲存储器异常"><a href="#6-3-直接缓冲存储器异常" class="headerlink" title="6.3 直接缓冲存储器异常"></a>6.3 直接缓冲存储器异常</h3><p>如果报 <strong>OutOfMemoryError: Direct buffer memory</strong> 异常,通常表示 JVM直接内存限制太小或存在直接内存泄漏。检查用户代码或其他外部依赖项是否使用了 JVM 直接内存，以及它是否被正确考虑。可以尝试通过调整直接堆外内存来增加其限制。可以参考如何为 TaskManagers、 JobManagers 和 Flink 设置的JVM 参数配置堆外内存。</p>
+<h3 id="6-4-元空间异常"><a href="#6-4-元空间异常" class="headerlink" title="6.4 元空间异常"></a>6.4 元空间异常</h3><p>如果报 <strong>OutOfMemoryError: Metaspace</strong> 异常，通常表示 JVM 元空间限制配置得太小。您可以尝试加大 JVM 元空间 TaskManagers 或JobManagers 选项。</p>
+<h3 id="6-5-网络缓冲区数量不足"><a href="#6-5-网络缓冲区数量不足" class="headerlink" title="6.5 网络缓冲区数量不足"></a>6.5 网络缓冲区数量不足</h3><p>如果报 <strong>IOException: Insufficient number of network buffers</strong> 异常，这仅与 TaskManager 相关。通常表示配置的网络内存大小不够大。您可以尝试通过调整以下选项来增加网络内存：</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20211009085546062.png" alt="网络缓冲区数量不足"></p>
+<h3 id="6-6-超出容器内存异常"><a href="#6-6-超出容器内存异常" class="headerlink" title="6.6 超出容器内存异常"></a>6.6 超出容器内存异常</h3><p>这个对应 5.2 节为容器配置内存。如果 Flink 容器尝试分配超出其请求大小（Yarn 或 Kubernetes）的内存，这通常<strong>表明 Flink 没有预留足够的本机内存</strong>。当容器被部署环境杀死时，可以通过使用外部监控系统或从错误消息中观察到这一点。</p>
+<p>如果在 JobManager 进程中遇到这个问题，还可以通过设置排除可能的 JVM Direct Memory 泄漏的选项来开启 JVM Direct Memory 的限制 使用以下命令进行配置</p>
+<p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20211009085623911.png" alt="超出容器内存异常"></p>
+<p>如果使用 RocksDBStateBackend，并且内存控制被禁用：可以尝试增加 TaskManager 的托管内存。在保存点或完整检查点期间启用内存控制和非堆内存增加，这可能是由于glibc内存分配器而发生的。</p>
+<p>可以尝试为 TaskManagers <strong>添加环境变量 MALLOC_ARENA_MAX=1,或者增加 JVM 开销。</strong></p>
+
+                
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="/about" rel="external nofollow noreferrer">情深骚明</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="https://github.com/wmybigdata/2021/10/09/flink-1-14-0%E5%86%85%E5%AD%98%E4%BC%98%E5%8C%96/">https://github.com/wmybigdata/2021/10/09/flink-1-14-0%E5%86%85%E5%AD%98%E4%BC%98%E5%8C%96/</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="/about" target="_blank">情深骚明</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/Flink%E6%B5%81%E5%BC%8F%E5%BC%95%E6%93%8E/">
+                                    <span class="chip bg-color">Flink流式引擎</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <style>
+    #reward {
+        margin: 40px 0;
+        text-align: center;
+    }
+
+    #reward .reward-link {
+        font-size: 1.4rem;
+        line-height: 38px;
+    }
+
+    #reward .btn-floating:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #rewardModal {
+        width: 320px;
+        height: 350px;
+    }
+
+    #rewardModal .reward-title {
+        margin: 15px auto;
+        padding-bottom: 5px;
+    }
+
+    #rewardModal .modal-content {
+        padding: 10px;
+    }
+
+    #rewardModal .close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 1.3rem;
+        line-height: 20px;
+        cursor: pointer;
+    }
+
+    #rewardModal .close:hover {
+        color: #ef5350;
+        transform: scale(1.3);
+        -moz-transform:scale(1.3);
+        -webkit-transform:scale(1.3);
+        -o-transform:scale(1.3);
+    }
+
+    #rewardModal .reward-tabs {
+        margin: 0 auto;
+        width: 210px;
+    }
+
+    .reward-tabs .tabs {
+        height: 38px;
+        margin: 10px auto;
+        padding-left: 0;
+    }
+
+    .reward-content ul {
+        padding-left: 0 !important;
+    }
+
+    .reward-tabs .tabs .tab {
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .reward-tabs .tab a {
+        color: #fff;
+        background-color: #ccc;
+    }
+
+    .reward-tabs .tab a:hover {
+        background-color: #ccc;
+        color: #fff;
+    }
+
+    .reward-tabs .wechat-tab .active {
+        color: #fff !important;
+        background-color: #22AB38 !important;
+    }
+
+    .reward-tabs .alipay-tab .active {
+        color: #fff !important;
+        background-color: #019FE8 !important;
+    }
+
+    .reward-tabs .reward-img {
+        width: 210px;
+        height: 210px;
+    }
+</style>
+
+<div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/reward/wechat.png" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="far fa-dot-circle"></i>&nbsp;本篇
+            </div>
+            <div class="card">
+                <a href="/2021/10/09/flink-1-14-0%E5%86%85%E5%AD%98%E4%BC%98%E5%8C%96/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/0.jpg" class="responsive-img" alt="flink-1.14.0内存优化">
+                        
+                        <span class="card-title">flink-1.14.0内存优化</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            学习心得记录
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-10-09
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/Flink%E6%B5%81%E5%BC%8F%E5%BC%95%E6%93%8E/" class="post-category">
+                                    Flink流式引擎
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Flink%E6%B5%81%E5%BC%8F%E5%BC%95%E6%93%8E/">
+                        <span class="chip bg-color">Flink流式引擎</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2021/10/08/spark-%E6%A0%B8%E5%BF%83%E7%BC%96%E7%A8%8B/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/8.jpg" class="responsive-img" alt="spark-核心编程">
+                        
+                        <span class="card-title">spark-核心编程</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            学习心得记录
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-10-08
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/spark/" class="post-category">
+                                    spark
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/spark/">
+                        <span class="chip bg-color">spark</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget card" style="background-color: white;">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('0'),
+            headingSelector: 'h2, h3, h4'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h2, h3, h4').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+    <div class="container row center-align" style="margin-bottom: 0px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            
+                <span id="year">2019-2021</span>
+            
+            <span id="year">2019</span>
+            <a href="/about" target="_blank">情深骚明</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+            
+            
+            
+            
+            
+            <span id="busuanzi_container_site_pv">
+                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
+                    class="white-color"></span>&nbsp;次
+            </span>
+            
+            
+            <span id="busuanzi_container_site_uv">
+                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
+                    class="white-color"></span>&nbsp;人
+            </span>
+            
+            <br>
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/wmybigdata/" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:wmy_2000@163.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="tencent://AddContact/?fromId=50&fromSubId=1&subcmd=all&uin=2647716549" class="tooltipped" target="_blank" data-tooltip="QQ联系我: 2647716549" data-position="top" data-delay="50">
+        <i class="fab fa-qq"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+
+    <a href="https://github.com/wmybigdata/" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="https://github.com/wmybigdata/" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:wmy_2000@163.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="tencent://AddContact/?fromId=50&fromSubId=1&subcmd=all&uin=2647716549" class="tooltipped" target="_blank" data-tooltip="QQ联系我: 2647716549" data-position="top" data-delay="50">
+        <i class="fab fa-qq"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="https://blog.csdn.net/weixin_45098163" class="tooltipped" target="_blank" data-tooltip="关注我的CSDN: https://blog.csdn.net/weixin_45098163" data-position="top" data-delay="50">
+        <i class="fab fa-csdn">C</i>
+    </a>
+
+
+
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+$(function () {
+    var searchFunc = function (path, search_id, content_id) {
+        'use strict';
+        $.ajax({
+            url: path,
+            dataType: "xml",
+            success: function (xmlResponse) {
+                // get the contents from search data
+                var datas = $("entry", xmlResponse).map(function () {
+                    return {
+                        title: $("title", this).text(),
+                        content: $("content", this).text(),
+                        url: $("url", this).text()
+                    };
+                }).get();
+                var $input = document.getElementById(search_id);
+                var $resultContent = document.getElementById(content_id);
+                $input.addEventListener('input', function () {
+                    var str = '<ul class=\"search-result-list\">';
+                    var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                    $resultContent.innerHTML = "";
+                    if (this.value.trim().length <= 0) {
+                        return;
+                    }
+                    // perform local searching
+                    datas.forEach(function (data) {
+                        var isMatch = true;
+                        var data_title = data.title.trim().toLowerCase();
+                        var data_content = data.content.trim().replace(/<[^>]+>/g, "").toLowerCase();
+                        var data_url = data.url;
+                        data_url = data_url.indexOf('/') === 0 ? data.url : '/' + data_url;
+                        var index_title = -1;
+                        var index_content = -1;
+                        var first_occur = -1;
+                        // only match artiles with not empty titles and contents
+                        if (data_title !== '' && data_content !== '') {
+                            keywords.forEach(function (keyword, i) {
+                                index_title = data_title.indexOf(keyword);
+                                index_content = data_content.indexOf(keyword);
+                                if (index_title < 0 && index_content < 0) {
+                                    isMatch = false;
+                                } else {
+                                    if (index_content < 0) {
+                                        index_content = 0;
+                                    }
+                                    if (i === 0) {
+                                        first_occur = index_content;
+                                    }
+                                }
+                            });
+                        }
+                        // show search results
+                        if (isMatch) {
+                            str += "<li><a href='" + data_url + "' class='search-result-title'>" + data_title + "</a>";
+                            var content = data.content.trim().replace(/<[^>]+>/g, "");
+                            if (first_occur >= 0) {
+                                // cut out 100 characters
+                                var start = first_occur - 20;
+                                var end = first_occur + 80;
+                                if (start < 0) {
+                                    start = 0;
+                                }
+                                if (start === 0) {
+                                    end = 100;
+                                }
+                                if (end > content.length) {
+                                    end = content.length;
+                                }
+                                var match_content = content.substr(start, end);
+                                // highlight all keywords
+                                keywords.forEach(function (keyword) {
+                                    var regS = new RegExp(keyword, "gi");
+                                    match_content = match_content.replace(regS, "<em class=\"search-keyword\">" + keyword + "</em>");
+                                });
+
+                                str += "<p class=\"search-result\">" + match_content + "...</p>"
+                            }
+                            str += "</li>";
+                        }
+                    });
+                    str += "</ul>";
+                    $resultContent.innerHTML = str;
+                });
+            }
+        });
+    };
+
+    searchFunc('/search.xml', 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <script src="/libs/others/clicklove.js" async="async"></script>
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+	
+    
+
+    
+
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>

@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="kafka-Config-Command-动态配置, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
+    <meta name="keywords" content="spark-核心编程, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
     <meta name="description" content="本网站是个人兴趣爱好，总结分享经验，记录生活点滴的平台，希望在以后的学习旅途中，走出自己的风景。">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -16,7 +16,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>kafka-Config-Command-动态配置 | 情深骚明大数据之旅</title>
+    <title>spark-核心编程 | 情深骚明大数据之旅</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -314,12 +314,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/0.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/8.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">kafka-Config-Command-动态配置</h1>
+                    <h1 class="description center-align post-title">spark-核心编程</h1>
                 </div>
             </div>
         </div>
@@ -435,8 +435,8 @@
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/kafka/">
-                                <span class="chip bg-color">kafka</span>
+                            <a href="/tags/spark/">
+                                <span class="chip bg-color">spark</span>
                             </a>
                         
                     </div>
@@ -447,8 +447,8 @@
                     <div class="post-cate">
                         <i class="fas fa-bookmark fa-fw icon-category"></i>
                         
-                            <a href="/categories/kafka/" class="post-category">
-                                kafka
+                            <a href="/categories/spark/" class="post-category">
+                                spark
                             </a>
                         
                     </div>
@@ -481,7 +481,52 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                
+                <h2 id="1、wordcount"><a href="#1、wordcount" class="headerlink" title="1、wordcount"></a>1、wordcount</h2><pre class=" language-java"><code class="language-java"><span class="token keyword">package</span> wmy<span class="token punctuation">.</span>com<span class="token punctuation">.</span>spark_core<span class="token punctuation">.</span>wc
+
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>spark<span class="token punctuation">.</span><span class="token punctuation">{</span>SparkConf<span class="token punctuation">,</span> SparkContext<span class="token punctuation">}</span>
+
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>net<span class="token punctuation">.</span>URLDecoder
+
+
+<span class="token comment" spellcheck="true">/**
+ * @project_name: spark
+ * @package_name: wmy.com.spark_core.wc
+ * @Author: wmy
+ * @Date: 2021/9/20
+ * @Major: 数据科学与大数据技术
+ * @Post：大数据实时开发
+ * @Email：wmy_2000@163.com
+ * @Desription: Spark的wordcount案例
+ * @Version: wmy-version-01
+ */</span>
+object WordCountExample <span class="token punctuation">{</span>
+  def <span class="token function">main</span><span class="token punctuation">(</span>args<span class="token operator">:</span> Array<span class="token punctuation">[</span>String<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token operator">:</span> Unit <span class="token operator">=</span> <span class="token punctuation">{</span>
+
+    <span class="token comment" spellcheck="true">// Application</span>
+    <span class="token comment" spellcheck="true">// Spark框架</span>
+    <span class="token comment" spellcheck="true">// 建立和Spark框架的连接</span>
+    <span class="token comment" spellcheck="true">// JDBC：Connection</span>
+    val conf <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">SparkConf</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">setMaster</span><span class="token punctuation">(</span><span class="token string">"local"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">setAppName</span><span class="token punctuation">(</span><span class="token string">"WordCountExample"</span><span class="token punctuation">)</span>
+    val sc <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">SparkContext</span><span class="token punctuation">(</span>conf<span class="token punctuation">)</span>
+
+    <span class="token comment" spellcheck="true">// 读取数据源</span>
+    val value <span class="token operator">=</span> sc<span class="token punctuation">.</span><span class="token function">textFile</span><span class="token punctuation">(</span><span class="token string">"src/main/resources/wc.txt"</span><span class="token punctuation">)</span>
+    val words <span class="token operator">=</span> value<span class="token punctuation">.</span><span class="token function">flatMap</span><span class="token punctuation">(</span>_<span class="token punctuation">.</span><span class="token function">split</span><span class="token punctuation">(</span><span class="token string">" "</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    val wordGroup <span class="token operator">=</span> words<span class="token punctuation">.</span><span class="token function">groupBy</span><span class="token punctuation">(</span>words <span class="token operator">=</span><span class="token operator">></span> words<span class="token punctuation">)</span>
+
+    val wordCount <span class="token operator">=</span> wordGroup<span class="token punctuation">.</span>map<span class="token punctuation">{</span>
+      <span class="token keyword">case</span><span class="token punctuation">(</span>word<span class="token punctuation">,</span>list<span class="token punctuation">)</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token punctuation">{</span>
+        <span class="token punctuation">(</span>word<span class="token punctuation">,</span>list<span class="token punctuation">.</span>size<span class="token punctuation">)</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    val array<span class="token operator">:</span> Array<span class="token punctuation">[</span><span class="token punctuation">(</span>String<span class="token punctuation">,</span> Int<span class="token punctuation">)</span><span class="token punctuation">]</span> <span class="token operator">=</span> wordCount<span class="token punctuation">.</span><span class="token function">collect</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    array<span class="token punctuation">.</span><span class="token function">foreach</span><span class="token punctuation">(</span>println<span class="token punctuation">)</span>
+    <span class="token comment" spellcheck="true">// 关闭连接</span>
+    sc<span class="token punctuation">.</span><span class="token function">stop</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+
                 
             </div>
             <hr/>
@@ -507,7 +552,7 @@
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://github.com/wmybigdata/2021/10/08/kafka-Config-Command-%E5%8A%A8%E6%80%81%E9%85%8D%E7%BD%AE/">https://github.com/wmybigdata/2021/10/08/kafka-Config-Command-%E5%8A%A8%E6%80%81%E9%85%8D%E7%BD%AE/</a>
+                    <a href="https://github.com/wmybigdata/2021/10/08/spark-%E6%A0%B8%E5%BF%83%E7%BC%96%E7%A8%8B/">https://github.com/wmybigdata/2021/10/08/spark-%E6%A0%B8%E5%BF%83%E7%BC%96%E7%A8%8B/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -545,8 +590,8 @@
                     
                         <div class="article-tag">
                             
-                                <a href="/tags/kafka/">
-                                    <span class="chip bg-color">kafka</span>
+                                <a href="/tags/spark/">
+                                    <span class="chip bg-color">spark</span>
                                 </a>
                             
                         </div>
@@ -716,18 +761,17 @@
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="far fa-dot-circle"></i>&nbsp;本篇
-            </div>
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2021/10/08/kafka-Config-Command-%E5%8A%A8%E6%80%81%E9%85%8D%E7%BD%AE/">
+                <a href="/2021/10/09/flink-1-14-0%E5%86%85%E5%AD%98%E4%BC%98%E5%8C%96/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/0.jpg" class="responsive-img" alt="kafka-Config-Command-动态配置">
+                        <img src="/medias/featureimages/0.jpg" class="responsive-img" alt="flink-1.14.0内存优化">
                         
-                        <span class="card-title">kafka-Config-Command-动态配置</span>
+                        <span class="card-title">flink-1.14.0内存优化</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -737,27 +781,26 @@
                         
                     </div>
                     <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2021-10-08
-                            </span>
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2021-10-09
+                        </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/kafka/" class="post-category">
-                                    kafka
+                            <a href="/categories/Flink%E6%B5%81%E5%BC%8F%E5%BC%95%E6%93%8E/" class="post-category">
+                                    Flink流式引擎
                                 </a>
                             
                             
                         </span>
                     </div>
                 </div>
-
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/kafka/">
-                        <span class="chip bg-color">kafka</span>
+                    <a href="/tags/Flink%E6%B5%81%E5%BC%8F%E5%BC%95%E6%93%8E/">
+                        <span class="chip bg-color">Flink流式引擎</span>
                     </a>
                     
                 </div>
