@@ -2005,23 +2005,23 @@
     
     
     <entry>
-      <title>实时数仓数据接口展示</title>
-      <link href="/2021/08/31/%E5%AE%9E%E6%97%B6%E6%95%B0%E4%BB%93%E6%95%B0%E6%8D%AE%E6%8E%A5%E5%8F%A3%E5%B1%95%E7%A4%BA/"/>
-      <url>/2021/08/31/%E5%AE%9E%E6%97%B6%E6%95%B0%E4%BB%93%E6%95%B0%E6%8D%AE%E6%8E%A5%E5%8F%A3%E5%B1%95%E7%A4%BA/</url>
+      <title>flink-实时数仓数据接口展示</title>
+      <link href="/2021/08/31/flink-%E5%AE%9E%E6%97%B6%E6%95%B0%E4%BB%93%E6%95%B0%E6%8D%AE%E6%8E%A5%E5%8F%A3%E5%B1%95%E7%A4%BA/"/>
+      <url>/2021/08/31/flink-%E5%AE%9E%E6%97%B6%E6%95%B0%E4%BB%93%E6%95%B0%E6%8D%AE%E6%8E%A5%E5%8F%A3%E5%B1%95%E7%A4%BA/</url>
       
         <content type="html"><![CDATA[<h1 id="实时数仓数据接口展示"><a href="#实时数仓数据接口展示" class="headerlink" title="实时数仓数据接口展示"></a>实时数仓数据接口展示</h1><h2 id="学习总结"><a href="#学习总结" class="headerlink" title="学习总结"></a>学习总结</h2><pre class=" language-properties"><code class="language-properties"><span class="token attr-name">数据接口是我们在对接前端的时候，使用Spring</span> <span class="token attr-value">Boot的方式来对接SQL最终通过接口的方式来进行可视化</span>目前市场上常用的数据可视化的工具有quickBI，tableau，Superset，Sugar但是Sugar是收费的，所以我们要熟练的去写这种数据接口，但是不是重点，但是必须得会，如果以后工作当中的30%的时间都是在进行写数据接口的话，立马离职，因为这个会影响我以后的发展生涯使用sugar的时候必须得利用一个内网穿透得工具，使得局域网里面得IP能够被外界进行访问，我使用得网云穿直接注册实名认证就行还需要在sugar里面配置一些域名得信息来简化开发只需要记住格式来进行暂时就好了</code></pre><p><img src="https://gitee.com/wmybigdata/blog-drawing-bed/raw/master/img/image-20210831111147707.png" alt="实时数仓项目"></p><h2 id="数据接口模式规范"><a href="#数据接口模式规范" class="headerlink" title="数据接口模式规范"></a>数据接口模式规范</h2><table><thead><tr><th><strong>分层</strong></th><th><strong>类</strong></th><th><strong>处理内容</strong></th></tr></thead><tbody><tr><td><strong>controller</strong>   <strong>控制层</strong></td><td>SugarController</td><td>查询交易额接口及返回参数处理</td></tr><tr><td><strong>service</strong>    <strong>服务层</strong></td><td>ProductStatsService  ProductStatsServiceImpl</td><td>查询商品统计数据</td></tr><tr><td><strong>mapper</strong>   <strong>数据映射层</strong></td><td>ProductStatsMapper</td><td>编写SQL查询商品统计表</td></tr></tbody></table>]]></content>
       
       
       <categories>
           
-          <category> 企业级数据仓库 </category>
+          <category> Flink流式引擎 </category>
           
       </categories>
       
       
         <tags>
             
-            <tag> 企业级数据仓库 </tag>
+            <tag> Flink流式引擎 </tag>
             
         </tags>
       
