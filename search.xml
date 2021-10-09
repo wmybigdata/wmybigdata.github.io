@@ -4,6 +4,31 @@
   
     
     <entry>
+      <title>flink-catalogs</title>
+      <link href="/2021/10/10/flink-catalogs/"/>
+      <url>/2021/10/10/flink-catalogs/</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+      
+      <categories>
+          
+          <category> Flink流式引擎 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> Flink流式引擎 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>Flink-1.14新特性预览</title>
       <link href="/2021/10/09/Flink-1-14%E6%96%B0%E7%89%B9%E6%80%A7%E9%A2%84%E8%A7%88/"/>
       <url>/2021/10/09/Flink-1-14%E6%96%B0%E7%89%B9%E6%80%A7%E9%A2%84%E8%A7%88/</url>
@@ -1726,14 +1751,14 @@
       
       <categories>
           
-          <category> 企业级数据仓库 </category>
+          <category> Flink流式引擎 </category>
           
       </categories>
       
       
         <tags>
             
-            <tag> 企业级数据仓库 </tag>
+            <tag> Flink流式引擎 </tag>
             
         </tags>
       
@@ -1826,14 +1851,14 @@
       
       <categories>
           
-          <category> 企业级数据仓库 </category>
+          <category> Flink流式引擎 </category>
           
       </categories>
       
       
         <tags>
             
-            <tag> 企业级数据仓库 </tag>
+            <tag> Flink流式引擎 </tag>
             
         </tags>
       
@@ -2564,14 +2589,14 @@
       
       <categories>
           
-          <category> 企业级数据仓库 </category>
+          <category> Flink流式引擎 </category>
           
       </categories>
       
       
         <tags>
             
-            <tag> 企业级数据仓库 </tag>
+            <tag> Flink流式引擎 </tag>
             
         </tags>
       
@@ -2989,14 +3014,14 @@
       
       <categories>
           
-          <category> 大数据采集系统 </category>
+          <category> Flink流式引擎 </category>
           
       </categories>
       
       
         <tags>
             
-            <tag> 大数据采集系统 </tag>
+            <tag> Flink流式引擎 </tag>
             
         </tags>
       
@@ -3064,14 +3089,14 @@
       
       <categories>
           
-          <category> 大数据采集系统 </category>
+          <category> Flink流式引擎 </category>
           
       </categories>
       
       
         <tags>
             
-            <tag> 大数据采集系统 </tag>
+            <tag> Flink流式引擎 </tag>
             
         </tags>
       
@@ -3189,14 +3214,14 @@
       
       <categories>
           
-          <category> 企业级数据仓库 </category>
+          <category> Flink流式引擎 </category>
           
       </categories>
       
       
         <tags>
             
-            <tag> 企业级数据仓库 </tag>
+            <tag> Flink流式引擎 </tag>
             
         </tags>
       
@@ -3364,14 +3389,14 @@
       
       <categories>
           
-          <category> 大数据环境搭建 </category>
+          <category> hadoop </category>
           
       </categories>
       
       
         <tags>
             
-            <tag> 大数据环境搭建 </tag>
+            <tag> hadoop </tag>
             
         </tags>
       
@@ -3459,19 +3484,19 @@
       <link href="/2021/08/18/Flink1-13-2%E7%8E%AF%E5%A2%83%E5%88%86%E5%B8%83%E5%BC%8F%E9%83%A8%E7%BD%B2/"/>
       <url>/2021/08/18/Flink1-13-2%E7%8E%AF%E5%A2%83%E5%88%86%E5%B8%83%E5%BC%8F%E9%83%A8%E7%BD%B2/</url>
       
-        <content type="html"><![CDATA[<h2 id="前提准备"><a href="#前提准备" class="headerlink" title="前提准备"></a>前提准备</h2><p>Flink是不依赖于任何组件的，但是它可以去集成周边的组件化，来看一下如何去搭建一个Flink-1.13.2的环境勒，这里的话，我是搭建的Flink Standalone的方式来进行一个测试操作</p><h2 id="软件版本"><a href="#软件版本" class="headerlink" title="软件版本"></a>软件版本</h2><p>flink1.13.2</p><h2 id="安装所需要的命令和步骤"><a href="#安装所需要的命令和步骤" class="headerlink" title="安装所需要的命令和步骤"></a>安装所需要的命令和步骤</h2><h2 id="测试安装是否成功"><a href="#测试安装是否成功" class="headerlink" title="测试安装是否成功"></a>测试安装是否成功</h2><p>使用启动命令来进行一个测试</p>]]></content>
+        <content type="html"><![CDATA[<p>Flink是不依赖于任何组件的，但是它可以去集成周边的组件化，来看一下如何去搭建一个Flink-1.13.2的环境勒，这里的话，我是搭建的Flink Standalone的方式来进行一个测试操作</p><h2 id="软件版本"><a href="#软件版本" class="headerlink" title="软件版本"></a>软件版本</h2><p>flink1.13.2</p><h2 id="安装所需要的命令和步骤"><a href="#安装所需要的命令和步骤" class="headerlink" title="安装所需要的命令和步骤"></a>安装所需要的命令和步骤</h2><h2 id="测试安装是否成功"><a href="#测试安装是否成功" class="headerlink" title="测试安装是否成功"></a>测试安装是否成功</h2><p>使用启动命令来进行一个测试</p>]]></content>
       
       
       <categories>
           
-          <category> 大数据环境搭建 </category>
+          <category> Flink流式引擎 </category>
           
       </categories>
       
       
         <tags>
             
-            <tag> 大数据环境搭建 </tag>
+            <tag> Flink流式引擎 </tag>
             
         </tags>
       
