@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="Flink-网络流控及反压剖析, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
+    <meta name="keywords" content="Flink-状态生存时间TTL, java,jvm,hadoop,flink,hive,kafka,spark,hbase,clickhose,linux,superset等">
     <meta name="description" content="本网站是个人兴趣爱好，总结分享经验，记录生活点滴的平台，希望在以后的学习旅途中，走出自己的风景。">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -16,7 +16,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>Flink-网络流控及反压剖析 | 情深骚明大数据之旅</title>
+    <title>Flink-状态生存时间TTL | 情深骚明大数据之旅</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -314,12 +314,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/12.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/13.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">Flink-网络流控及反压剖析</h1>
+                    <h1 class="description center-align post-title">Flink-状态生存时间TTL</h1>
                 </div>
             </div>
         </div>
@@ -481,102 +481,66 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <p>本文根据 Apache Flink 系列直播整理而成，由 Apache Flink Contributor、OPPO 大数据平台研发负责人张俊老师分享。主要内容如下：</p>
-<ul>
-<li>网络流控的概念与背景</li>
-<li>TCP的流控机制</li>
-<li>Flink TCP-based 反压机制（before V1.5）</li>
-<li>Flink Credit-based 反压机制 （since V1.5）</li>
-<li>总结与思考</li>
-</ul>
-<h2 id="网络流控的概念与背景"><a href="#网络流控的概念与背景" class="headerlink" title="网络流控的概念与背景"></a>网络流控的概念与背景</h2><h3 id="为什么需要网络流控"><a href="#为什么需要网络流控" class="headerlink" title="为什么需要网络流控"></a>为什么需要网络流控</h3><p><img src="C:/Users/wmy/AppData/Roaming/Typora/typora-user-images/image-20211014090947902.png" alt="为什么需要网络流控"></p>
-<p>​    首先我们可以看下这张最精简的网络流控的图，Producer 的吞吐率是 2MB/s，Consumer 是 1MB/s，这个时候我们就会发现在网络通信的时候我们的 Producer 的速度是比 Consumer 要快的，有 1MB/s 的这样的速度差，假定我们两端都有一个 Buffer，Producer 端有一个发送用的 Send Buffer，Consumer 端有一个接收用的 Receive Buffer，在网络端的吞吐率是 2MB/s，过了 5s 后我们的 Receive Buffer 可能就撑不住了，这时候会面临两种情况：</p>
-<ol>
-<li>如果 Receive Buffer 是有界的，这时候新到达的数据就只能被丢弃掉了。</li>
-<li>如果 Receive Buffer 是无界的，Receive Buffer 会持续的扩张，最终会导致 Consumer 的内存耗尽。</li>
-</ol>
-<h3 id="网络流控的实现：静态限速"><a href="#网络流控的实现：静态限速" class="headerlink" title="网络流控的实现：静态限速"></a>网络流控的实现：静态限速</h3><p><img src="https://i.loli.net/2021/10/14/BiuzoCQb1R4nMXW.png" alt="静态限速"></p>
-<p>为了解决这个问题，我们就需要网络流控来解决上下游速度差的问题，传统的做法可以在 Producer 端实现一个类似 Rate Limiter 这样的静态限流，Producer 的发送速率是 2MB/s，但是经过限流这一层后，往 Send Buffer 去传数据的时候就会降到 1MB/s 了，这样的话 Producer 端的发送速率跟 Consumer 端的处理速率就可以匹配起来了，就不会导致上述问题。但是这个解决方案有两点限制：</p>
-<ol>
-<li>事先无法预估 Consumer 到底能承受多大的速率</li>
-<li>Consumer 的承受能力通常会动态地波动</li>
-</ol>
-<h3 id="网络流控的实现：动态反馈-自动反压"><a href="#网络流控的实现：动态反馈-自动反压" class="headerlink" title="网络流控的实现：动态反馈/自动反压"></a>网络流控的实现：动态反馈/自动反压</h3><p><img src="https://i.loli.net/2021/10/14/xMPAYUEpjsoe9iH.png" alt="动态反馈/自动反压"></p>
-<p>针对静态限速的问题我们就演进到了动态反馈（自动反压）的机制，我们需要 Consumer 能够及时的给 Producer 做一个 feedback，即告知 Producer 能够承受的速率是多少。动态反馈分为两种：</p>
-<ol>
-<li>负反馈：接受速率小于发送速率时发生，告知 Producer 降低发送速率</li>
-<li>正反馈：发送速率小于接收速率时发生，告知 Producer 可以把发送速率提上来</li>
-</ol>
-<p>疑问：为什么 Flink（before V1.5）里没有用类似的方式实现 feedback 机制？</p>
-<p>首先在解决这个疑问之前我们需要先了解一下 Flink 的网络传输是一个什么样的架构。</p>
-<p><img src="https://i.loli.net/2021/10/14/yk1x2LZTsBU7mVb.png" alt="Flink 的网络传输"></p>
-<p>这张图就体现了 Flink 在做网络传输的时候基本的数据的流向，发送端在发送网络数据前要经历自己内部的一个流程，会有一个自己的 Network Buffer，在底层用 Netty 去做通信，Netty 这一层又有属于自己的 ChannelOutbound Buffer，因为最终是要通过 Socket 做网络请求的发送，所以在 Socket 也有自己的 Send Buffer，同样在接收端也有对应的三级 Buffer。学过计算机网络的时候我们应该了解到，TCP 是自带流量控制的。实际上 Flink （before V1.5）就是通过 TCP 的流控机制来实现 feedback 的。</p>
-<h2 id="TCP-流控机制"><a href="#TCP-流控机制" class="headerlink" title="TCP 流控机制"></a>TCP 流控机制</h2><p>根据下图我们来简单的回顾一下 TCP 包的格式结构。首先，他有 Sequence number 这样一个机制给每个数据包做一个编号，还有 ACK number 这样一个机制来确保 TCP 的数据传输是可靠的，除此之外还有一个很重要的部分就是 Window Size，接收端在回复消息的时候会通过 Window Size 告诉发送端还可以发送多少数据。</p>
-<p><img src="https://i.loli.net/2021/10/14/oa1K8PBD42R6pwN.png" alt="TCP 流控机制"></p>
-<p>接下来我们来简单看一下这个过程。</p>
-<h3 id="TCP-流控：滑动窗口"><a href="#TCP-流控：滑动窗口" class="headerlink" title="TCP 流控：滑动窗口"></a>TCP 流控：滑动窗口</h3><p><img src="https://i.loli.net/2021/10/14/CPFXyrc4Gw9u3VB.png" alt="TCP 流控：滑动窗口"></p>
-<p>TCP 的流控就是基于滑动窗口的机制，现在我们有一个 Socket 的发送端和一个 Socket 的接收端，目前我们的发送端的速率是我们接收端的 3 倍，这样会发生什么样的一个情况呢？假定初始的时候我们发送的 window 大小是 3，然后我们接收端的 window 大小是固定的，就是接收端的 Buffer 大小为 5。</p>
-<p><img src="https://i.loli.net/2021/10/14/E8aLAu5NWgFyiUY.png" alt="滑动窗口"></p>
-<p>首先，发送端会一次性发 3 个 packets，将 1，2，3 发送给接收端，接收端接收到后会将这 3 个 packets 放到 Buffer 里去。</p>
-<p><img src="https://i.loli.net/2021/10/14/vFMHzVPxBDRnuQ9.png" alt="滑动窗口"></p>
-<p>接收端一次消费 1 个 packet，这时候 1 就已经被消费了，然后我们看到接收端的滑动窗口会往前滑动一格，这时候 2，3 还在 Buffer 当中 而 4，5，6 是空出来的，所以接收端会给发送端发送 ACK = 4 ，代表发送端可以从 4 开始发送，同时会将 window 设置为 3 （Buffer 的大小 5 减去已经存下的 2 和 3），发送端接收到回应后也会将他的滑动窗口向前移动到 4，5，6。</p>
-<p><img src="https://i.loli.net/2021/10/14/uKh3tz67aYoPZiJ.png" alt="滑动窗口"></p>
-<p>这时候发送端将 4，5，6 发送，接收端也能成功的接收到 Buffer 中去。</p>
-<p><img src="https://i.loli.net/2021/10/14/SLUO4YJakNQEP52.png" alt="滑动窗口"></p>
-<p>到这一阶段后，接收端就消费到 2 了，同样他的窗口也会向前滑动一个，这时候他的 Buffer 就只剩一个了，于是向发送端发送 ACK = 7、window = 1。发送端收到之后滑动窗口也向前移，但是这个时候就不能移动 3 格了，虽然发送端的速度允许发 3 个 packets 但是 window 传值已经告知只能接收一个，所以他的滑动窗口就只能往前移一格到 7 ，这样就达到了限流的效果，发送端的发送速度从 3 降到 1。</p>
-<p><img src="https://i.loli.net/2021/10/14/Tqdshlejrwk8upn.png" alt="滑动窗口"></p>
-<p>我们再看一下这种情况，这时候发送端将 7 发送后，接收端接收到，但是由于接收端的消费出现问题，一直没有从 Buffer 中去取，这时候接收端向发送端发送 ACK = 8、window = 0 ，由于这个时候 window = 0，发送端是不能发送任何数据，也就会使发送端的发送速度降为 0。这个时候发送端不发送任何数据了，接收端也不进行任何的反馈了，那么如何知道消费端又开始消费了呢？</p>
-<p><img src="https://i.loli.net/2021/10/14/5WJie2hOm3QrcnF.png" alt="滑动窗口"></p>
-<p><img src="https://i.loli.net/2021/10/14/mALSB18NCFapHIb.png" alt="滑动窗口"></p>
-<p><img src="https://i.loli.net/2021/10/14/8cuO5yadKnWCVEr.png" alt="滑动窗口"></p>
-<p>TCP 当中有一个 ZeroWindowProbe 的机制，发送端会定期的发送 1 个字节的探测消息，这时候接收端就会把 window 的大小进行反馈。当接收端的消费恢复了之后，接收到探测消息就可以将 window 反馈给发送端端了从而恢复整个流程。TCP 就是通过这样一个滑动窗口的机制实现 feedback。</p>
-<h2 id="Flink-TCP-based-反压机制（before-V1-5）"><a href="#Flink-TCP-based-反压机制（before-V1-5）" class="headerlink" title="Flink TCP-based 反压机制（before V1.5）"></a>Flink TCP-based 反压机制（before V1.5）</h2><p>​    示例：WindowWordCount</p>
-<p><img src="C:/Users/wmy/AppData/Roaming/Typora/typora-user-images/image-20211014092814398.png" alt="WordCount"></p>
-<p>大体的逻辑就是从 Socket 里去接收数据，每 5s 去进行一次 WordCount，将这个代码提交后就进入到了编译阶段。</p>
-<h3 id="编译阶段：生成-JobGraph"><a href="#编译阶段：生成-JobGraph" class="headerlink" title="编译阶段：生成 JobGraph"></a>编译阶段：生成 JobGraph</h3><p><img src="C:/Users/wmy/AppData/Roaming/Typora/typora-user-images/image-20211014092932386.png" alt="image-20211014092932386"></p>
-<p>这时候还没有向集群去提交任务，在 Client 端会将 StreamGraph 生成 JobGraph，JobGraph 就是做为向集群提交的最基本的单元。在生成 JobGrap 的时候会做一些优化，将一些没有 Shuffle 机制的节点进行合并。有了 JobGraph 后就会向集群进行提交，进入运行阶段。</p>
-<h3 id="运行阶段：调度-ExecutionGraph"><a href="#运行阶段：调度-ExecutionGraph" class="headerlink" title="运行阶段：调度 ExecutionGraph"></a>运行阶段：调度 ExecutionGraph</h3><p>JobGraph 提交到集群后会生成 ExecutionGraph ，这时候就已经具备基本的执行任务的雏形了，把每个任务拆解成了不同的 SubTask，上图 ExecutionGraph 中的 Intermediate Result Partition 就是用于发送数据的模块，最终会将 ExecutionGraph 交给 JobManager 的调度器，将整个 ExecutionGraph 调度起来。然后我们概念化这样一张物理执行图，可以看到每个 Task 在接收数据时都会通过这样一个 InputGate 可以认为是负责接收数据的，再往前有这样一个 ResultPartition 负责发送数据，在 ResultPartition 又会去做分区跟下游的 Task 保持一致，就形成了 ResultSubPartition 和 InputChannel 的对应关系。这就是从逻辑层上来看的网络传输的通道，基于这么一个概念我们可以将反压的问题进行拆解。</p>
-<h3 id="问题拆解：反压传播两个阶段"><a href="#问题拆解：反压传播两个阶段" class="headerlink" title="问题拆解：反压传播两个阶段"></a>问题拆解：反压传播两个阶段</h3><p><img src="https://i.loli.net/2021/10/14/XgPmYQk8JSFfuMx.png" alt="反压传播"></p>
-<p>反压的传播实际上是分为两个阶段的，对应着上面的执行图，我们一共涉及 3 个 TaskManager，在每个 TaskManager 里面都有相应的 Task 在执行，还有负责接收数据的 InputGate，发送数据的 ResultPartition，这就是一个最基本的数据传输的通道。在这时候假设最下游的 Task （Sink）出现了问题，处理速度降了下来这时候是如何将这个压力反向传播回去呢？这时候就分为两种情况：</p>
-<ul>
-<li>跨 TaskManager ，反压如何从 InputGate 传播到 ResultPartition</li>
-<li>TaskManager 内，反压如何从 ResultPartition 传播到 InputGate</li>
-</ul>
-<h3 id="跨-TaskManager-数据传输"><a href="#跨-TaskManager-数据传输" class="headerlink" title="跨 TaskManager 数据传输"></a>跨 TaskManager 数据传输</h3><p><img src="https://i.loli.net/2021/10/14/abRZ6rQsIzEdSLt.png" alt="跨 TaskManager 数据传输"></p>
-<p>前面提到，发送数据需要 ResultPartition，在每个 ResultPartition 里面会有分区 ResultSubPartition，中间还会有一些关于内存管理的 Buffer。</p>
-<p>对于一个 TaskManager 来说会有一个统一的 Network BufferPool 被所有的 Task 共享，在初始化时会从 Off-heap Memory 中申请内存，申请到内存的后续内存管理就是同步 Network BufferPool 来进行的，不需要依赖 JVM GC 的机制去释放。有了 Network BufferPool 之后可以为每一个 ResultSubPartition 创建 Local BufferPool 。</p>
-<p>如上图左边的 TaskManager 的 Record Writer 写了 &lt;1，2&gt; 这个两个数据进来，因为 ResultSubPartition 初始化的时候为空，没有 Buffer 用来接收，就会向 Local BufferPool 申请内存，这时 Local BufferPool 也没有足够的内存于是将请求转到 Network BufferPool，最终将申请到的 Buffer 按原链路返还给 ResultSubPartition，&lt;1，2&gt; 这个两个数据就可以被写入了。之后会将 ResultSubPartition 的 Buffer 拷贝到 Netty 的 Buffer 当中最终拷贝到 Socket 的 Buffer 将消息发送出去。然后接收端按照类似的机制去处理将消息消费掉。</p>
-<p>接下来我们来模拟上下游处理速度不匹配的场景，发送端的速率为 2，接收端的速率为 1，看一下反压的过程是怎样的。</p>
-<h3 id="跨-TaskManager-反压过程"><a href="#跨-TaskManager-反压过程" class="headerlink" title="跨 TaskManager 反压过程"></a>跨 TaskManager 反压过程</h3><p><img src="https://i.loli.net/2021/10/14/62MvPSQlRTrijkK.png" alt="跨 TaskManager 反压过程"></p>
-<p>因为速度不匹配就会导致一段时间后 InputChannel 的 Buffer 被用尽，于是他会向 Local BufferPool 申请新的 Buffer ，这时候可以看到 Local BufferPool 中的一个 Buffer 就会被标记为 Used。</p>
-<p><img src="https://i.loli.net/2021/10/14/9lgGmabQ7zToUeZ.png" alt="跨TaskManager反压过程"></p>
-<p>发送端还在持续以不匹配的速度发送数据，然后就会导致 InputChannel 向 Local BufferPool 申请 Buffer 的时候发现没有可用的 Buffer 了，这时候就只能向 Network BufferPool 去申请，当然每个 Local BufferPool 都有最大的可用的 Buffer，防止一个 Local BufferPool 把 Network BufferPool 耗尽。这时候看到 Network BufferPool 还是有可用的 Buffer 可以向其申请。</p>
-<p><img src="https://i.loli.net/2021/10/14/ywSYPK9ZejHFOc2.png" alt="跨TaskManager反压过程"></p>
-<p>一段时间后，发现 Network BufferPool 没有可用的 Buffer，或是 Local BufferPool 的最大可用 Buffer 到了上限无法向 Network BufferPool 申请，没有办法去读取新的数据，这时 Netty AutoRead 就会被禁掉，Netty 就不会从 Socket 的 Buffer 中读取数据了。</p>
-<p><img src="https://i.loli.net/2021/10/14/Q7Mlm5uS3TZkYjs.png" alt="跨TaskManager反压过程"></p>
-<p>显然，再过不久 Socket 的 Buffer 也被用尽，这时就会将 Window = 0 发送给发送端（前文提到的 TCP 滑动窗口的机制）。这时发送端的 Socket 就会停止发送。</p>
-<p><img src="https://i.loli.net/2021/10/14/lApN5zoduVjcxIy.png" alt="跨TaskManager反压过程"></p>
-<p>很快发送端的 Socket 的 Buffer 也被用尽，Netty 检测到 Socket 无法写了之后就会停止向 Socket 写数据。</p>
-<p>这时候所有的压力都来到了 ResultSubPartition，和接收端一样他会不断的向 Local BufferPool 和 Network BufferPool 申请内存。</p>
-<p>Local BufferPool 和 Network BufferPool 都用尽后整个 Operator 就会停止写数据，达到跨 TaskManager 的反压。</p>
-<h3 id="TaskManager-内反压过程"><a href="#TaskManager-内反压过程" class="headerlink" title="TaskManager 内反压过程"></a>TaskManager 内反压过程</h3><p>了解了跨 TaskManager 反压过程后再来看 TaskManager 内反压过程就更好理解了，下游的 TaskManager 反压导致本 TaskManager 的 ResultSubPartition 无法继续写入数据，于是 Record Writer 的写也被阻塞住了，因为 Operator 需要有输入才能有计算后的输出，输入跟输出都是在同一线程执行， Record Writer 阻塞了，Record Reader 也停止从 InputChannel 读数据，这时上游的 TaskManager 还在不断地发送数据，最终将这个 TaskManager 的 Buffer 耗尽。具体流程可以参考下图，这就是 TaskManager 内的反压过程。</p>
-<h2 id="Flink-Credit-based-反压机制（since-V1-5）"><a href="#Flink-Credit-based-反压机制（since-V1-5）" class="headerlink" title="Flink Credit-based 反压机制（since V1.5）"></a>Flink Credit-based 反压机制（since V1.5）</h2><p>在介绍 Credit-based 反压机制之前，先分析下 TCP 反压有哪些弊端。</p>
-<ul>
-<li>在一个 TaskManager 中可能要执行多个 Task，如果多个 Task 的数据最终都要传输到下游的同一个 TaskManager 就会复用同一个 Socket 进行传输，这个时候如果单个 Task 产生反压，就会导致复用的 Socket 阻塞，其余的 Task 也无法使用传输，checkpoint barrier 也无法发出导致下游执行 checkpoint 的延迟增大。</li>
-<li>依赖最底层的 TCP 去做流控，会导致反压传播路径太长，导致生效的延迟比较大。</li>
-</ul>
-<h3 id="引入-Credit-based-反压"><a href="#引入-Credit-based-反压" class="headerlink" title="引入 Credit-based 反压"></a>引入 Credit-based 反压</h3><p>这个机制简单的理解起来就是在 Flink 层面实现类似 TCP 流控的反压机制来解决上述的弊端，Credit 可以类比为 TCP 的 Window 机制。</p>
-<h3 id="Credit-based-反压过程"><a href="#Credit-based-反压过程" class="headerlink" title="Credit-based 反压过程"></a>Credit-based 反压过程</h3><p>如图所示在 Flink 层面实现反压机制，就是每一次 ResultSubPartition 向 InputChannel 发送消息的时候都会发送一个 backlog size 告诉下游准备发送多少消息，下游就会去计算有多少的 Buffer 去接收消息，算完之后如果有充足的 Buffer 就会返还给上游一个 Credit 告知他可以发送消息（图上两个 ResultSubPartition 和 InputChannel 之间是虚线是因为最终还是要通过 Netty 和 Socket 去通信），下面我们看一个具体示例。</p>
-<p>假设我们上下游的速度不匹配，上游发送速率为 2，下游接收速率为 1，可以看到图上在 ResultSubPartition 中累积了两条消息，10 和 11， backlog 就为 2，这时就会将发送的数据 &lt;8,9&gt; 和 backlog = 2 一同发送给下游。下游收到了之后就会去计算是否有 2 个 Buffer 去接收，可以看到 InputChannel 中已经不足了这时就会从 Local BufferPool 和 Network BufferPool 申请，好在这个时候 Buffer 还是可以申请到的。</p>
-<p>过了一段时间后由于上游的发送速率要大于下游的接受速率，下游的 TaskManager 的 Buffer 已经到达了申请上限，这时候下游就会向上游返回 Credit = 0，ResultSubPartition 接收到之后就不会向 Netty 去传输数据，上游 TaskManager 的 Buffer 也很快耗尽，达到反压的效果，这样在 ResultSubPartition 层就能感知到反压，不用通过 Socket 和 Netty 一层层地向上反馈，降低了反压生效的延迟。同时也不会将 Socket 去阻塞，解决了由于一个 Task 反压导致 TaskManager 和 TaskManager 之间的 Socket 阻塞的问题。</p>
-<h2 id="总结与思考"><a href="#总结与思考" class="headerlink" title="总结与思考"></a>总结与思考</h2><h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><ul>
-<li>网络流控是为了在上下游速度不匹配的情况下，防止下游出现过载</li>
-<li>网络流控有静态限速和动态反压两种手段</li>
-<li>Flink 1.5 之前是基于 TCP 流控 + bounded buffer 实现反压</li>
-<li>Flink 1.5 之后实现了自己托管的 credit – based 流控机制，在应用层模拟 TCP 的流控机制</li>
-</ul>
-<h3 id="思考"><a href="#思考" class="headerlink" title="思考"></a>思考</h3><p>有了动态反压，静态限速是不是完全没有作用了？</p>
-<p>实际上动态反压不是万能的，我们流计算的结果最终是要输出到一个外部的存储（Storage），外部数据存储到 Sink 端的反压是不一定会触发的，这要取决于外部存储的实现，像 Kafka 这样是实现了限流限速的消息中间件可以通过协议将反压反馈给 Sink 端，但是像 ES 无法将反压进行传播反馈给 Sink 端，这种情况下为了防止外部存储在大的数据量下被打爆，我们就可以通过静态限速的方式在 Source 端去做限流。所以说动态反压并不能完全替代静态限速的，需要根据合适的场景去选择处理方案。</p>
+                <h1 id="状态生存时间TTL"><a href="#状态生存时间TTL" class="headerlink" title="状态生存时间TTL"></a>状态生存时间TTL</h1><h2 id="1、Flink-TTL的介绍"><a href="#1、Flink-TTL的介绍" class="headerlink" title="1、Flink TTL的介绍"></a>1、Flink TTL的介绍</h2><p>状态生存时间（TTL）</p>
+<p>一个时间的生存期（TTL）可以被分配给任何类型的被Keys化状态。如果配置了TTL并且状态值已过期，则将尽力清除存储的值，这将在下面更详细地讨论。</p>
+<p>所有状态集合类型都支持每个条目的TTL。这意味着列表数据元和映射条目将独立过期。</p>
+<p>为了使用状态TTL，必须首先构建StateTtlConfig配置对象。然后，可以通过传递配置在任何状态描述符中启用TTL函数： </p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">private</span> MapState<span class="token operator">&lt;</span>String<span class="token punctuation">,</span> String<span class="token operator">></span> mapState <span class="token operator">=</span> null<span class="token punctuation">;</span>
+<span class="token keyword">private</span> <span class="token keyword">final</span> <span class="token keyword">static</span> <span class="token keyword">long</span> TIME <span class="token operator">=</span> <span class="token number">1000</span> <span class="token operator">*</span> <span class="token number">60</span> <span class="token operator">*</span> 10L<span class="token punctuation">;</span><span class="token comment" spellcheck="true">//1000 * 60</span>
+
+<span class="token annotation punctuation">@Override</span>
+<span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">open</span><span class="token punctuation">(</span>Configuration parameters<span class="token punctuation">)</span> <span class="token keyword">throws</span> Exception <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//定义可编程状态：目前这个Flink Map State 这个是设置的是一天就结束</span>
+    MapStateDescriptor<span class="token operator">&lt;</span>String<span class="token punctuation">,</span> String<span class="token operator">></span> phoneState <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">MapStateDescriptor</span><span class="token operator">&lt;</span><span class="token operator">></span><span class="token punctuation">(</span><span class="token string">"phoneState"</span><span class="token punctuation">,</span> String<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">,</span> String<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    StateTtlConfig ttlConfig <span class="token operator">=</span> StateTtlConfig
+        <span class="token comment" spellcheck="true">// 状态有效时间</span>
+        <span class="token punctuation">.</span><span class="token function">newBuilder</span><span class="token punctuation">(</span>Time<span class="token punctuation">.</span><span class="token function">days</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token comment" spellcheck="true">// 这个是参考的是处理时间的TTL设置</span>
+        <span class="token comment" spellcheck="true">//设置状态更新类型</span>
+        <span class="token punctuation">.</span><span class="token function">setUpdateType</span><span class="token punctuation">(</span>StateTtlConfig<span class="token punctuation">.</span>UpdateType<span class="token punctuation">.</span>OnCreateAndWrite<span class="token punctuation">)</span>
+        <span class="token comment" spellcheck="true">// 已过期但还未被清理掉的状态如何处理</span>
+        <span class="token punctuation">.</span><span class="token function">setStateVisibility</span><span class="token punctuation">(</span>StateTtlConfig<span class="token punctuation">.</span>StateVisibility<span class="token punctuation">.</span>NeverReturnExpired<span class="token punctuation">)</span> <span class="token comment" spellcheck="true">// 永远不会返回过期的值</span>
+        <span class="token comment" spellcheck="true">// 过期对象的清理策略</span>
+        <span class="token punctuation">.</span><span class="token function">cleanupFullSnapshot</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token punctuation">.</span><span class="token function">build</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    phoneState<span class="token punctuation">.</span><span class="token function">enableTimeToLive</span><span class="token punctuation">(</span>ttlConfig<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>mapState <span class="token operator">=</span> <span class="token function">getRuntimeContext</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getMapState</span><span class="token punctuation">(</span>phoneState<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>配置有几个选项需要考虑：</p>
+<p>该newBuilder方法的第一个参数是必需的，它是生存时间值。</p>
+<p>更新类型配置状态TTL刷新时（默认情况下OnCreateAndWrite）：</p>
+<p>StateTtlConfig.UpdateType.OnCreateAndWrite - 仅限创建和写入权限<br>StateTtlConfig.UpdateType.OnReadAndWrite - 也读取访问权限<br>状态可见性配置是否在读取访问时返回过期值（如果尚未清除NeverReturnExpired）（默认情况下）：</p>
+<p>StateTtlConfig.StateVisibility.NeverReturnExpired - 永远不会返回过期的值<br>StateTtlConfig.StateVisibility.ReturnExpiredIfNotCleanedUp - 如果仍然可用则返回<br>在这种情况下NeverReturnExpired，过期状态表现得好像它不再存在，即使它仍然必须被删除。该选项对于在TTL之后必须严格读取访问数据的用例非常有用，例如应用程序使用隐私敏感数据。</p>
+<p>另一个选项ReturnExpiredIfNotCleanedUp允许在清理之前返回过期状态。</p>
+<p>笔记：</p>
+<p>状态后台存储上次修改的时间戳以及用户值，这意味着启用此函数会增加状态存储的消耗。堆状态后台存储一个额外的Java对象，其中包含对用户状态对象的引用和内存中的原始长值。RocksDB状态后台为每个存储值，列表条目或映射条目添加8个字节。</p>
+<p>目前仅支持参考处理时间的 TTL 。</p>
+<p>尝试恢复先前未配置TTL的状态，使用TTL启用描述符或反之亦然将导致兼容性失败和StateMigrationException。</p>
+<p>TTL配置不是检查点或保存点的一部分，而是Flink如何在当前运行的作业中处理它的方式。</p>
+<h2 id="2、对状态进行初始化"><a href="#2、对状态进行初始化" class="headerlink" title="2、对状态进行初始化"></a>2、对状态进行初始化</h2><pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">// 下面是两种赋值的方式</span>
+ValueStateDescriptor<span class="token operator">&lt;</span>Tuple2<span class="token operator">&lt;</span>Long<span class="token punctuation">,</span> Long<span class="token operator">>></span> valueStateDescriptor <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ValueStateDescriptor</span><span class="token operator">&lt;</span><span class="token operator">></span><span class="token punctuation">(</span>
+    <span class="token string">"ValueStateDescriptor"</span><span class="token punctuation">,</span>
+    TypeInformation<span class="token punctuation">.</span><span class="token function">of</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">TypeHint</span><span class="token operator">&lt;</span>Tuple2<span class="token operator">&lt;</span>Long<span class="token punctuation">,</span> Long<span class="token operator">>></span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token punctuation">)</span><span class="token punctuation">;</span>
+ValueStateDescriptor<span class="token operator">&lt;</span>Tuple2<span class="token operator">&lt;</span>Long<span class="token punctuation">,</span> String<span class="token operator">>></span> valueStateDescriptor1 <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ValueStateDescriptor</span><span class="token operator">&lt;</span><span class="token operator">></span><span class="token punctuation">(</span>
+    <span class="token string">"ValueStateDescriptor"</span><span class="token punctuation">,</span>
+    Types<span class="token punctuation">.</span><span class="token function">TUPLE</span><span class="token punctuation">(</span>Types<span class="token punctuation">.</span>LONG<span class="token punctuation">,</span> Types<span class="token punctuation">.</span>STRING<span class="token punctuation">)</span>
+<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>一个小的技巧就是在我们编写状态的时候，我们都是在使用的时候进行赋值的操作，而不是在创建的时候进行赋值</p>
+<p>TTL和状态的情况都是来帮助我们进行状态的清空处理</p>
+<h2 id="3、清空状态的方式"><a href="#3、清空状态的方式" class="headerlink" title="3、清空状态的方式"></a>3、清空状态的方式</h2><h3 id="1、disableCleanupInBackground"><a href="#1、disableCleanupInBackground" class="headerlink" title="1、disableCleanupInBackground"></a>1、disableCleanupInBackground</h3><p>默认情况下，过期值在读取时会被显式删除，例如<code>ValueState#value</code>，如果配置的状态后端支持，并且会在后台定期垃圾收集。可以在以下位置禁用后台清理<code>StateTtlConfig</code>：</p>
+<p>为了对后台的一些特殊清理进行更细粒度的控制，您可以按如下所述单独配置它。目前，堆状态后端依赖增量清理，RocksDB 后端使用压缩过滤器进行后台清理。</p>
+<p>完整快照中的清理 <a href="https://nightlies.apache.org/flink/flink-docs-release-1.14/docs/dev/datastream/fault-tolerance/state/#cleanup-in-full-snapshot" target="_blank" rel="noopener">#</a> </p>
+<p>此外，您可以在拍摄完整状态快照时激活清理，这将减小其大小。在当前实现下，本地状态不会被清除，但在从之前的快照恢复的情况下，它不会包括已删除的过期状态。它可以配置在<code>StateTtlConfig</code>：</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>flink<span class="token punctuation">.</span>api<span class="token punctuation">.</span>common<span class="token punctuation">.</span>state<span class="token punctuation">.</span>StateTtlConfig<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>flink<span class="token punctuation">.</span>api<span class="token punctuation">.</span>common<span class="token punctuation">.</span>time<span class="token punctuation">.</span>Time<span class="token punctuation">;</span>
+
+StateTtlConfig ttlConfig <span class="token operator">=</span> StateTtlConfig
+    <span class="token punctuation">.</span><span class="token function">newBuilder</span><span class="token punctuation">(</span>Time<span class="token punctuation">.</span><span class="token function">seconds</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token punctuation">.</span><span class="token function">cleanupFullSnapshot</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">.</span><span class="token function">build</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
 
                 
             </div>
@@ -603,7 +567,7 @@
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://github.com/wmybigdata/2021/10/14/Flink-%E7%BD%91%E7%BB%9C%E6%B5%81%E6%8E%A7%E5%8F%8A%E5%8F%8D%E5%8E%8B%E5%89%96%E6%9E%90/">https://github.com/wmybigdata/2021/10/14/Flink-%E7%BD%91%E7%BB%9C%E6%B5%81%E6%8E%A7%E5%8F%8A%E5%8F%8D%E5%8E%8B%E5%89%96%E6%9E%90/</a>
+                    <a href="https://github.com/wmybigdata/2021/10/14/Flink-%E7%8A%B6%E6%80%81%E7%94%9F%E5%AD%98%E6%97%B6%E9%97%B4TTL/">https://github.com/wmybigdata/2021/10/14/Flink-%E7%8A%B6%E6%80%81%E7%94%9F%E5%AD%98%E6%97%B6%E9%97%B4TTL/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -812,9 +776,10 @@
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+                <i class="far fa-dot-circle"></i>&nbsp;本篇
+            </div>
             <div class="card">
                 <a href="/2021/10/14/Flink-%E7%8A%B6%E6%80%81%E7%94%9F%E5%AD%98%E6%97%B6%E9%97%B4TTL/">
                     <div class="card-image">
@@ -832,9 +797,9 @@
                         
                     </div>
                     <div class="publish-info">
-                        <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2021-10-14
-                        </span>
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-10-14
+                            </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
@@ -847,6 +812,7 @@
                         </span>
                     </div>
                 </div>
+
                 
                 <div class="card-action article-tags">
                     
@@ -865,24 +831,24 @@
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2021/10/11/Flink-checkpoint%E6%9C%BA%E5%88%B6%E8%AF%A6%E7%BB%86%E8%A7%A3%E6%9E%90/">
+                <a href="/2021/10/14/Flink-%E7%BD%91%E7%BB%9C%E6%B5%81%E6%8E%A7%E5%8F%8A%E5%8F%8D%E5%8E%8B%E5%89%96%E6%9E%90/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/18.jpg" class="responsive-img" alt="Flink-checkpoint机制详细解析">
+                        <img src="/medias/featureimages/12.jpg" class="responsive-img" alt="Flink-网络流控及反压剖析">
                         
-                        <span class="card-title">Flink-checkpoint机制详细解析</span>
+                        <span class="card-title">Flink-网络流控及反压剖析</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            学习心得记录
+                            
                         
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2021-10-11
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-10-14
                             </span>
                         <span class="publish-author">
                             
